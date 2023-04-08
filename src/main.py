@@ -17,7 +17,7 @@ CRYPTOGECKO_API_URL = 'https://api.coingecko.com/api/v3/coins/'
 
 
 async def get_coin_list():
-    coin_list = requests.get("https://api.coingecko.com/api/v3/coins/")
+    coin_list = requests.get("https://api.coingecko.com/api/v3/coins/list?include_platform=false")
     return coin_list.json()
 
 

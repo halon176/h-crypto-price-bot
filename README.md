@@ -65,7 +65,6 @@ docker run 8924db6fccc3
 ```
 
 Of course, make sure to replace '8924db6fccc3' with the number of your image.
-Successfully built 8924db6fccc3.
 
 The bot is now up and running within the Docker container!
 

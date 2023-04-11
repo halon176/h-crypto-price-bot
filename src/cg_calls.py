@@ -12,31 +12,33 @@ CRYPTOGECKO_API_URL = 'https://api.coingecko.com/api/v3/coins/'
 
 async def get_coin_list():
     coin_list = requests.get("https://api.coingecko.com/api/v3/coins/list?include_platform=false")
-    return coin_list.json()
+    if coin_list.status_code == 200:
+        return coin_list.json()
+    else:
+        return "request_error"
 
 
-async def get_cg_price(coin_list, update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if len(context.args) == 0:
-        await context.bot.send_message(chat_id=update.effective_chat.id, text="Please enter a valid crypto symbol.")
-        return
-    api_id = ""
-    crypto_symbol = context.args[0]
+async def get_api_id(crypto_symbol: str, coin_list):
+    api_ids = []
     for crypto in coin_list:
         if crypto["symbol"] == crypto_symbol:
-            api_id = crypto["id"]
-            break
+            api_ids.append(crypto["id"])
+    if not api_ids:
+        return "symbol_error"
+    else:
+        return api_ids
 
+
+async def get_cg_price(coin, update: Update, context: ContextTypes.DEFAULT_TYPE):
     url_tail = '?localization=false&' \
                'tickers=false&market_data=true&' \
                'community_data=false' \
                '&developer_data=false' \
                '&sparkline=false'
 
-    url = CRYPTOGECKO_API_URL + api_id + url_tail
+    url = CRYPTOGECKO_API_URL + coin + url_tail
     logging.info(f'Request URL: {url}')
-    if api_id == "":
-        await context.bot.send_message(chat_id=update.effective_chat.id, text="Please enter a valid crypto symbol.")
-        return
+
     response = requests.get(url)
 
     if response.status_code != 200:

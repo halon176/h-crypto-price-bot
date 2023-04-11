@@ -77,7 +77,6 @@ The bot can receive requests using the command **/p** followed by the cryptocurr
 ```
 
 ## Roadmap
-- [ ] Create a method to select tokens with the same symbol (currently, the bot displays the one with the highest market capitalization).
 - [ ] Create a function that aligns spaces to make text appear more uniform within the message with the data.
 - [ ] Display a chart showing the price trend of a single coin in different selectable timeframes.
 - [ ] Create the possibility to query other APIs such as Binance or CoinMarketCap.

@@ -69,11 +69,7 @@ Of course, make sure to replace '8924db6fccc3' with the number of your image.
 The bot is now up and running within the Docker container!
 
 ## Usage
-When starting, the bot must be initialized with:
-```
-/start
-```
-After that, it can receive requests using the command **/p** followed by the cryptocurrency symbol, for example:
+The bot can receive requests using the command **/p** followed by the cryptocurrency symbol, for example:
 ```
 /p btc
 /p eth

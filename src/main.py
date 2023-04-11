@@ -77,11 +77,14 @@ async def cg_price_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if len(coins) == 1:
         await get_cg_price(coins[0], update, context)
     else:
-        keyboard = [[InlineKeyboardButton(crypto, callback_data=crypto) for crypto in coins]]
+        keyboard = []
+        for crypto in coins:
+            button = [InlineKeyboardButton(crypto, callback_data=crypto)]
+            keyboard.append(button)
         reply_markup = InlineKeyboardMarkup(keyboard)
         await context.bot.send_message(
             chat_id=update.message.chat_id,
-            text="Select an item:",
+            text="🟠 There are multiple coins with the same symbol, please select the desired one:",
             reply_markup=reply_markup
         )
 

@@ -21,7 +21,7 @@ async def get_coin_list():
 async def get_api_id(crypto_symbol: str, coin_list):
     api_ids = []
     for crypto in coin_list:
-        if crypto["symbol"] == crypto_symbol:
+        if crypto["symbol"] == crypto_symbol and "-peg-" not in crypto["id"]:
             api_ids.append(crypto["id"])
     if not api_ids:
         return "symbol_error"

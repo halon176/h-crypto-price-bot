@@ -1,7 +1,7 @@
 import logging
 
-from telegram import Update
-from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler, CallbackContext, CallbackQueryHandler
 
 from cg_calls import get_coin_list, get_cg_price, get_api_id
 from config import TOKEN
@@ -15,7 +15,22 @@ coin_list = []
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await context.bot.send_message(chat_id=update.effective_chat.id, text="Bot initialized")
+    await context.bot.send_message(chat_id=update.effective_chat.id, parse_mode="markdown", text="`Bot initialized`")
+
+
+async def callback(update, context):
+    query = update.callback_query
+    print(query)
+
+    selected_option = query.data
+
+    await context.bot.send_message(chat_id=query.message.chat_id, text="You selected " + selected_option)
+
+
+async def menu_handler(update: Update, context: CallbackContext):
+    query = update.callback_query
+    selected_option = query.data
+    await get_cg_price(selected_option, update, context)
 
 
 async def cg_price_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -33,7 +48,13 @@ async def cg_price_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if coins == "symbol_error":
         await context.bot.send_message(chat_id=update.effective_chat.id, text="Please enter a valid crypto symbol.")
         return
-    await get_cg_price(coins[0], update, context)
+    if len(coins) == 1:
+        await get_cg_price(coins[0], update, context)
+    else:
+        keyboard = [[InlineKeyboardButton(crypto, callback_data=crypto) for crypto in coins]]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        await context.bot.send_message(chat_id=update.message.chat_id, text="Select an item:",
+                                       reply_markup=reply_markup)
 
 
 if __name__ == '__main__':
@@ -44,5 +65,8 @@ if __name__ == '__main__':
 
     crypto_price_handler = CommandHandler('p', cg_price_handler)
     application.add_handler(crypto_price_handler)
+
+    menu_handler = CallbackQueryHandler(menu_handler)
+    application.add_handler(menu_handler)
 
     application.run_polling()

@@ -71,8 +71,7 @@ async def cg_price_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         return
 
-    crypto_symbol = context.args[0]
-
+    crypto_symbol = context.args[0].lower()
     coins = await get_api_id(crypto_symbol, coin_list)
     if coins == "symbol_error":
         await context.bot.send_message(

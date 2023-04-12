@@ -45,7 +45,14 @@ async def callback(update, context):
 async def menu_handler(update: Update, context: CallbackContext):
     query = update.callback_query
     selected_option = query.data
-    await get_cg_price(selected_option, update, context)
+    try:
+        await get_cg_price(selected_option, update, context)
+    except Exception as e:
+        logging.error(f"An error occurred: {str(e)}")
+        await context.bot.send_message(
+            chat_id=update.effective_chat.id,
+            text="An error occurred. Please try again later."
+        )
     await context.bot.delete_message(
         chat_id=query.message.chat_id,
         message_id=query.message.message_id
@@ -75,7 +82,14 @@ async def cg_price_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     coins = [coin for coin in coins if "-peg-" not in coin]
     if len(coins) == 1:
-        await get_cg_price(coins[0], update, context)
+        try:
+            await get_cg_price(coins[0], update, context)
+        except Exception as e:
+            logging.error(f"An error occurred: {str(e)}")
+            await context.bot.send_message(
+                chat_id=update.effective_chat.id,
+                text="An error occurred. Please try again later."
+            )
     else:
         keyboard = []
         for crypto in coins:

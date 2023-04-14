@@ -1,4 +1,5 @@
 import logging
+from functools import reduce
 
 import humanize
 import requests
@@ -7,7 +8,8 @@ from telegram.ext import ContextTypes
 
 from service import format_date
 
-CRYPTOGECKO_API_URL = 'https://api.coingecko.com/api/v3/coins/'
+CRYPTOGECKO_API_COINS = 'https://api.coingecko.com/api/v3/coins/'
+CRYPTOGECKO_API_DOMINANCE = 'https://api.coingecko.com/api/v3/global/'
 
 
 async def get_coin_list():
@@ -36,7 +38,7 @@ async def get_cg_price(coin, update: Update, context: ContextTypes.DEFAULT_TYPE)
                '&developer_data=false' \
                '&sparkline=false'
 
-    url = CRYPTOGECKO_API_URL + coin + url_tail
+    url = CRYPTOGECKO_API_COINS + coin + url_tail
     logging.info(f'Request URL: {url}')
 
     response = requests.get(url)
@@ -112,6 +114,56 @@ async def get_cg_price(coin, update: Update, context: ContextTypes.DEFAULT_TYPE)
               f"📈 ATH {ath}$ ({ath_change_percentage}%) {ath_date}\n" \
               f"📉 ATL {atl}$ ({atl_change_percentage}%) {atl_date}\n" \
               f"```"
+
+    await context.bot.send_message(chat_id=update.effective_chat.id,
+                                   text=message,
+                                   parse_mode="markdown",
+                                   disable_web_page_preview=True)
+
+
+async def get_cg_dominance(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    response = requests.get(CRYPTOGECKO_API_DOMINANCE)
+    if response.status_code != 200:
+        await context.bot.send_message(chat_id=update.effective_chat.id,
+                                       text="An error occurred. Please try again later.")
+        return
+    global_data = response.json()
+    logging.info(f'Request coin dominance list')
+
+    lst_str_emoji = ["🥇", "🥈", "🥉", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣", "🔟"]
+
+    dom_percentage = list(global_data["data"]["market_cap_percentage"].items())
+
+    class MarketCapEntry:
+        def __init__(self, tplSymbolPercentage):
+            self.strSymbol = tplSymbolPercentage[0].upper()
+            self.strPercentage = f"{tplSymbolPercentage[1]:.1f}%"
+
+    lstmkp = [MarketCapEntry(tplSymbolPercentage) for tplSymbolPercentage in dom_percentage]
+
+    def columnSize(lststr):
+        return max((len(string) for string in lststr))
+
+    lst_column_size = [
+        2,
+        columnSize((mkp.strSymbol for mkp in lstmkp)),
+        columnSize((mkp.strPercentage for mkp in lstmkp))
+    ]
+
+    lst_str_header = [
+        "```",
+        "-" * (len(lst_column_size) - 1 + reduce(lambda a, b: a + b, lst_column_size))
+    ]
+    str_format = f"{{}}  {{:{lst_column_size[1]}}}{{:>{lst_column_size[2]}}}"
+    message = "\n".join(
+        [f"🏆 TOP {len(lstmkp)} MARKETCAP 🏆"]
+        + lst_str_header
+        + [
+            str_format.format(str_emoji, mkp.strSymbol, mkp.strPercentage)
+            for str_emoji, mkp in zip(lst_str_emoji, lstmkp)
+        ]
+        + list(reversed(lst_str_header))
+    )
 
     await context.bot.send_message(chat_id=update.effective_chat.id,
                                    text=message,

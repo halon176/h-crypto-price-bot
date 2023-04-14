@@ -9,7 +9,7 @@ from telegram.ext import (
     CallbackQueryHandler,
 )
 
-from cg_calls import get_coin_list, get_cg_price, get_api_id
+from cg_calls import get_coin_list, get_cg_price, get_api_id, get_cg_dominance
 from config import TOKEN
 
 logging.basicConfig(
@@ -28,6 +28,19 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
              "`/p <crypto_symbol>` \n\n"
              "For example, `/p btc` will give you the current price of Bitcoin. Enjoy!"
     )
+    logging.info(f'Start call')
+
+
+async def bot_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await context.bot.send_message(
+        chat_id=update.effective_chat.id,
+        parse_mode="markdown",
+        text="📚*List of Commands:*\n\n"
+             "`/p <crypto_symbol>` - to receive the current price and historical variation of the coin \n"
+             "`/dom` - to receive the top 10 most capitalized tokens \n"
+             "`/help` - to receive this message"
+    )
+    logging.info(f'Help call')
 
 
 async def callback(update, context):
@@ -110,6 +123,12 @@ if __name__ == '__main__':
 
     crypto_price_handler = CommandHandler('p', cg_price_handler)
     application.add_handler(crypto_price_handler)
+
+    crypto_dominance_handler = CommandHandler('dom', get_cg_dominance)
+    application.add_handler(crypto_dominance_handler)
+
+    help_handler = CommandHandler('help', bot_help)
+    application.add_handler(help_handler)
 
     menu_handler = CallbackQueryHandler(menu_handler)
     application.add_handler(menu_handler)

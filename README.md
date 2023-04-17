@@ -58,7 +58,7 @@ docker build -t h-crypt-price .
 3) Now you can start the container using the command:
 
 ```
-dokcer run h-crypt-price
+docker run h-crypt-price
 ```
 
 The bot is now up and running within the Docker container!

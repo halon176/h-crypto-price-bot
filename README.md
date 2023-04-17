@@ -53,18 +53,13 @@ git clone https://github.com/halon176/h-crypto-price-bot.git
 
 ```
 cd h-crypto-price-bot
-docker build .
+docker build -t h-crypt-price .
 ```
-3) At the end of the process, you should get a result similar to this:
-```
-Successfully built 8924db6fccc3
-```
-This means that everything went smoothly. Now you can start your container by running:
-```
-docker run 8924db6fccc3
-```
+3) Now you can start the container using the command:
 
-Of course, make sure to replace '8924db6fccc3' with the number of your image.
+```
+dokcer run h-crypt-price
+```
 
 The bot is now up and running within the Docker container!
 
@@ -75,6 +70,9 @@ The bot can receive requests using the command **/p** followed by the cryptocurr
 /p eth
 /p cro
 ```
+To display the list of all available commands, type `/help`
+
+
 
 ## Roadmap
 - [ ] Create a function that aligns spaces to make text appear more uniform within the message with the data.

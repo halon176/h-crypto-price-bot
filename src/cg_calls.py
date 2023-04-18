@@ -152,9 +152,9 @@ async def get_cg_dominance(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     lst_str_header = [
         "```",
-        "-" * (len(lst_column_size) - 1 + reduce(lambda a, b: a + b, lst_column_size))
+        "-" * (len(lst_column_size) + reduce(lambda a, b: a + b, lst_column_size))
     ]
-    str_format = f"{{}}  {{:{lst_column_size[1]}}}{{:>{lst_column_size[2]}}}"
+    str_format = f"{{}}  {{:{lst_column_size[1]}}} {{:>{lst_column_size[2]}}}"
     message = "\n".join(
         [f"🏆 TOP {len(lstmkp)} MARKETCAP 🏆"]
         + lst_str_header

@@ -6,7 +6,7 @@ import requests
 from telegram import Update
 from telegram.ext import ContextTypes
 
-from service import format_date, max_column_size
+from service import format_date, max_column_size, at_handler, k_handler
 
 CRYPTOGECKO_API_COINS = 'https://api.coingecko.com/api/v3/coins/'
 CRYPTOGECKO_API_DOMINANCE = 'https://api.coingecko.com/api/v3/global/'
@@ -21,7 +21,7 @@ async def get_coin_list():
 
 
 async def get_api_id(crypto_symbol: str, coin_list):
-    excluded_values = ["-peg-", "-wormhole"]
+    excluded_values = ["-peg-", "-wormhole", "wrapped"]
     api_ids = []
     for crypto in coin_list:
         if crypto["symbol"] == crypto_symbol and all(excluded not in crypto["id"] for excluded in excluded_values):
@@ -129,8 +129,8 @@ async def get_cg_price(coin, update: Update, context: ContextTypes.DEFAULT_TYPE)
     if not crypto_data['market_data']['ath']["sgd"]:
         ath = "N/A"
     else:
-        ath = humanize.intcomma(crypto_data['market_data']['ath']["usd"])
-    ath_change_percentage = round(crypto_data['market_data']['ath_change_percentage']["usd"], 1)
+        ath = humanize.intcomma(at_handler(crypto_data['market_data']['ath']["usd"]))
+    ath_change_percentage = k_handler(crypto_data['market_data']['ath_change_percentage']["usd"])
     if not crypto_data['market_data']['ath_date']['sgd']:
         ath_date = "N/A"
     else:
@@ -138,8 +138,8 @@ async def get_cg_price(coin, update: Update, context: ContextTypes.DEFAULT_TYPE)
     if not crypto_data['market_data']['atl']:
         atl = "N/A"
     else:
-        atl = humanize.intcomma(crypto_data['market_data']['atl']["usd"])
-    atl_change_percentage = round(crypto_data['market_data']['atl_change_percentage']["usd"], 1)
+        atl = humanize.intcomma(at_handler((crypto_data['market_data']['atl']["usd"])))
+    atl_change_percentage = k_handler(crypto_data['market_data']['atl_change_percentage']["usd"])
     if not crypto_data['market_data']['atl_date']:
         atl_date = "N/A"
     else:

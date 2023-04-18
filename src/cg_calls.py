@@ -6,7 +6,7 @@ import requests
 from telegram import Update
 from telegram.ext import ContextTypes
 
-from service import format_date
+from service import format_date, max_column_size
 
 CRYPTOGECKO_API_COINS = 'https://api.coingecko.com/api/v3/coins/'
 CRYPTOGECKO_API_DOMINANCE = 'https://api.coingecko.com/api/v3/global/'
@@ -60,23 +60,69 @@ async def get_cg_price(coin, update: Update, context: ContextTypes.DEFAULT_TYPE)
     web = crypto_data['links']['homepage'][0]
     twitter = "https://twitter.com/" + crypto_data['links']["twitter_screen_name"]
     symbol = (crypto_data['symbol']).upper()
-    if not crypto_data['market_data']['price_change_percentage_24h']:
-        price_change_percentage_24h = "N/A"
-    else:
-        price_change_percentage_24h = round(crypto_data['market_data']['price_change_percentage_24h'], 1)
-    price_change_percentage_7d = round(crypto_data['market_data']['price_change_percentage_7d'], 1)
-    price_change_percentage_14d = round(crypto_data['market_data']['price_change_percentage_14d'], 1)
-    price_change_percentage_30d = round(crypto_data['market_data']['price_change_percentage_30d'], 1)
-    price_change_percentage_60d = round(crypto_data['market_data']['price_change_percentage_60d'], 1)
-    price_change_percentage_200d = round(crypto_data['market_data']['price_change_percentage_200d'], 1)
-    price_change_percentage_1y = round(crypto_data['market_data']['price_change_percentage_1y'], 1)
 
-    if not crypto_data['market_data']['market_cap']:
-        market_cap = "N/A"
-    else:
-        market_cap = humanize.intword(crypto_data['market_data']['market_cap']["usd"])
-    circulating_supply = humanize.intword(crypto_data['market_data']['circulating_supply'])
-    total_supply = humanize.intword(crypto_data['market_data']['total_supply'])
+    price_change_data = {
+        "24h": "price_change_percentage_24h",
+        "7d": "price_change_percentage_7d",
+        "14d": "price_change_percentage_14d",
+        "30d": "price_change_percentage_30d",
+        "60d": "price_change_percentage_60d",
+        "200d": "price_change_percentage_200d",
+        "1y": "price_change_percentage_1y",
+    }
+    general_data_sheme = (("💰", "M. Cap", "market_cap"),
+                          ("💵", "Circ. S", "circulating_supply"),
+                          ("🖨", "Total S", "total_supply"))
+
+    class GeneralDataEntry:
+        def __init__(self, data_emoji, data_type, data_value):
+            self.emoji = data_emoji
+            self.type = data_type
+            if value is None:
+                self.value = "N/A"
+            else:
+                self.value = humanize.intword(data_value)
+
+    general_data = []
+    for emoji, label, data_key in general_data_sheme:
+        if data_key == "market_cap":
+            value = crypto_data['market_data'][data_key]["usd"]
+        else:
+            value = crypto_data['market_data'].get(data_key)
+        general_data.append(GeneralDataEntry(emoji, label, value))
+    print(general_data[0].value)
+
+    lst_column_size_gend = [
+        2,
+        max_column_size((gend.type for gend in general_data)),
+        max_column_size((gend.value for gend in general_data))
+    ]
+
+    str_format_gend = f"{{}} {{:{lst_column_size_gend[1]}}}   {{:>{lst_column_size_gend[2]}}}"
+    general_data_message = "\n".join(
+        [str_format_gend.format(gend.emoji, gend.type, gend.value) for gend in general_data])
+
+    class PriceChangeEntry:
+        def __init__(self, change_label, change_value):
+            self.strEntry = change_label
+            if change_value is None:
+                self.strPercentage = "N/A"
+            else:
+                self.strPercentage = f"{change_value:.1f}%"
+
+    price_changes = []
+    for label, data_key in price_change_data.items():
+        value = crypto_data['market_data'].get(data_key)
+        price_changes.append(PriceChangeEntry(label, value))
+
+    lst_column_size_changes = [
+        max_column_size((prc.strEntry for prc in price_changes)),
+        max_column_size((prc.strPercentage for prc in price_changes))
+    ]
+
+    str_format_prc = f"{{:{lst_column_size_changes[0]}}}    {{:>{lst_column_size_changes[1]}}}"
+    price_change_message = "\n".join([str_format_prc.format(prc.strEntry, prc.strPercentage) for prc in price_changes])
+
     if not crypto_data['market_data']['ath']["sgd"]:
         ath = "N/A"
     else:
@@ -96,21 +142,16 @@ async def get_cg_price(coin, update: Update, context: ContextTypes.DEFAULT_TYPE)
     else:
         atl_date = format_date(crypto_data['market_data']['atl_date']["usd"])
 
+    lst_str_header = "-" * (len(lst_column_size_changes) + 2 + reduce(lambda a, b: a + b, lst_column_size_changes)) \
+                     + "\n"
+
     message = f"{market_cap_rank}° [{crypto_name}]({web}) [{symbol}]({twitter})\n" \
               f"```\n" \
               f"Price: {crypto_price}$\n" \
-              f"-----------------------------\n" \
-              f"24h:     {price_change_percentage_24h}%\n" \
-              f"7d:      {price_change_percentage_7d}%\n" \
-              f"14d:     {price_change_percentage_14d}%\n" \
-              f"30d:     {price_change_percentage_30d}%\n" \
-              f"60d:     {price_change_percentage_60d}%\n" \
-              f"200d:    {price_change_percentage_200d}%\n" \
-              f"1y:      {price_change_percentage_1y}%\n" \
-              f"-----------------------------\n" \
-              f"💰 M. Cap     {market_cap}\n" \
-              f"💵 Circ. S    {circulating_supply}\n" \
-              f"🖨 Total S    {total_supply}\n" \
+              f"{lst_str_header}" \
+              f"{price_change_message}\n" \
+              f"{lst_str_header}" \
+              f"{general_data_message}\n" \
               f"📈 ATH {ath}$ ({ath_change_percentage}%) {ath_date}\n" \
               f"📉 ATL {atl}$ ({atl_change_percentage}%) {atl_date}\n" \
               f"```"
@@ -130,7 +171,7 @@ async def get_cg_dominance(update: Update, context: ContextTypes.DEFAULT_TYPE):
     global_data = response.json()
     logging.info(f'Request coin dominance list')
 
-    lst_str_emoji = ["🥇", "🥈", "🥉", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣", "🔟"]
+    positional_emoji = ["🥇", "🥈", "🥉", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣", "🔟"]
 
     dom_percentage = list(global_data["data"]["market_cap_percentage"].items())
 
@@ -141,13 +182,10 @@ async def get_cg_dominance(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     lstmkp = [MarketCapEntry(tplSymbolPercentage) for tplSymbolPercentage in dom_percentage]
 
-    def columnSize(lststr):
-        return max((len(string) for string in lststr))
-
     lst_column_size = [
         2,
-        columnSize((mkp.strSymbol for mkp in lstmkp)),
-        columnSize((mkp.strPercentage for mkp in lstmkp))
+        max_column_size((mkp.strSymbol for mkp in lstmkp)),
+        max_column_size((mkp.strPercentage for mkp in lstmkp))
     ]
 
     lst_str_header = [
@@ -160,7 +198,7 @@ async def get_cg_dominance(update: Update, context: ContextTypes.DEFAULT_TYPE):
         + lst_str_header
         + [
             str_format.format(str_emoji, mkp.strSymbol, mkp.strPercentage)
-            for str_emoji, mkp in zip(lst_str_emoji, lstmkp)
+            for str_emoji, mkp in zip(positional_emoji, lstmkp)
         ]
         + list(reversed(lst_str_header))
     )

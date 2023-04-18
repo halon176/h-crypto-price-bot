@@ -55,7 +55,10 @@ async def get_cg_price(coin, update: Update, context: ContextTypes.DEFAULT_TYPE)
         await context.bot.send_message(chat_id=update.effective_chat.id, text="Please enter a valid crypto symbol.")
         return
 
-    market_cap_rank = crypto_data['market_cap_rank']
+    if crypto_data['market_cap_rank'] is None:
+        market_cap_rank = ""
+    else:
+        market_cap_rank = str(crypto_data['market_cap_rank']) + "°"
     crypto_name = crypto_data['name']
     crypto_price = humanize.intcomma(crypto_data['market_data']['current_price']["usd"])
     web = crypto_data['links']['homepage'][0]
@@ -91,7 +94,6 @@ async def get_cg_price(coin, update: Update, context: ContextTypes.DEFAULT_TYPE)
         else:
             value = crypto_data['market_data'].get(data_key)
         general_data.append(GeneralDataEntry(emoji, label, value))
-    print(general_data[0].value)
 
     lst_column_size_gend = [
         2,
@@ -146,7 +148,7 @@ async def get_cg_price(coin, update: Update, context: ContextTypes.DEFAULT_TYPE)
     lst_str_header = "-" * (len(lst_column_size_changes) + 2 + reduce(lambda a, b: a + b, lst_column_size_changes)) \
                      + "\n"
 
-    message = f"{market_cap_rank}° [{crypto_name}]({web}) [{symbol}]({twitter})\n" \
+    message = f"{market_cap_rank} [{crypto_name}]({web}) [{symbol}]({twitter})\n" \
               f"```\n" \
               f"Price: {crypto_price}$\n" \
               f"{lst_str_header}" \

@@ -21,7 +21,6 @@ def at_handler(at):
         for i in range(3, len(at_str)):
             if at_str[i] != 0:
                 fep = i
-                print(fep)
                 break
         return round(at, fep)
 

@@ -126,24 +126,49 @@ async def get_cg_price(coin, update: Update, context: ContextTypes.DEFAULT_TYPE)
     str_format_prc = f"{{:{lst_column_size_changes[0]}}}    {{:>{lst_column_size_changes[1]}}}"
     price_change_message = "\n".join([str_format_prc.format(prc.strEntry, prc.strPercentage) for prc in price_changes])
 
-    if not crypto_data['market_data']['ath']["sgd"]:
-        ath = "N/A"
-    else:
-        ath = humanize.intcomma(at_handler(crypto_data['market_data']['ath']["usd"]))
-    ath_change_percentage = k_handler(crypto_data['market_data']['ath_change_percentage']["usd"])
-    if not crypto_data['market_data']['ath_date']['sgd']:
-        ath_date = "N/A"
-    else:
-        ath_date = format_date(crypto_data['market_data']['ath_date']["usd"])
-    if not crypto_data['market_data']['atl']:
-        atl = "N/A"
-    else:
-        atl = humanize.intcomma(at_handler((crypto_data['market_data']['atl']["usd"])))
-    atl_change_percentage = k_handler(crypto_data['market_data']['atl_change_percentage']["usd"])
-    if not crypto_data['market_data']['atl_date']:
-        atl_date = "N/A"
-    else:
-        atl_date = format_date(crypto_data['market_data']['atl_date']["usd"])
+    at_data_schema = (("📈", "ATH", "ath", "ath_change_percentage", "ath_date"),
+                      ("📉", "ATL", "atl", "atl_change_percentage", "atl_date"))
+
+    class AtEntry:
+        def __init__(self, allt_emoji, allt_symbol, allt_price, allt_percentage, allt_date):
+            self.emoji = allt_emoji
+            self.symbol = allt_symbol
+            if allt_price == "N/A":
+                self.at_price = allt_price
+            else:
+                self.at_price = humanize.intcomma(at_handler(allt_price)) + "$"
+            self.at_percentage = k_handler(allt_percentage) + "%"
+            if allt_date == "N/A":
+                self.date = allt_date
+            else:
+                self.date = format_date(allt_date)
+
+    at_data = []
+    for emoji, label, price, percentage, date in at_data_schema:
+        if not crypto_data['market_data'][price]["sgd"]:
+            at_price = "N/A"
+        else:
+            at_price = crypto_data['market_data'][price]["usd"]
+        at_percentage = crypto_data['market_data'][percentage]["usd"]
+        if not crypto_data['market_data'][date]:
+            at_date = "N/A"
+        else:
+            at_date = crypto_data['market_data'][date]["usd"]
+        at_data.append(AtEntry(emoji, label, at_price, at_percentage, at_date))
+
+    lst_column_size_at = [
+        2,
+        max_column_size((at.symbol for at in at_data)),
+        max_column_size((at.at_price for at in at_data)),
+        max_column_size((at.at_percentage for at in at_data)),
+        max_column_size((at.date for at in at_data))
+    ]
+
+    str_format_at = f"{{:{lst_column_size_at[0]}}}{{:{lst_column_size_at[1]}}} {{:>{lst_column_size_at[2]}}}" \
+                    f" ({{:>{lst_column_size_at[3]}}}) {{:>{lst_column_size_at[4]}}}"
+
+    at_data_message = "\n".join([str_format_at.format(atd.emoji, atd.symbol, atd.at_price, atd.at_percentage, atd.date)
+                                 for atd in at_data])
 
     lst_str_header = "-" * (len(lst_column_size_changes) + 2 + reduce(lambda a, b: a + b, lst_column_size_changes)) \
                      + "\n"
@@ -155,8 +180,7 @@ async def get_cg_price(coin, update: Update, context: ContextTypes.DEFAULT_TYPE)
               f"{price_change_message}\n" \
               f"{lst_str_header}" \
               f"{general_data_message}\n" \
-              f"📈 ATH {ath}$ ({ath_change_percentage}%) {ath_date}\n" \
-              f"📉 ATL {atl}$ ({atl_change_percentage}%) {atl_date}\n" \
+              f"{at_data_message}" \
               f"```"
 
     await context.bot.send_message(chat_id=update.effective_chat.id,

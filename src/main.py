@@ -11,6 +11,7 @@ from telegram.ext import (
 
 from cg_calls import get_coin_list, get_cg_price, get_api_id, get_cg_dominance
 from config import TOKEN
+from news import news
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -40,6 +41,7 @@ async def bot_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
         text="📚*List of Commands:*\n\n"
              "`/p <crypto_symbol>` - to receive the current price and historical variation of the coin \n"
              "`/dom` - to receive the top 10 most capitalized tokens \n"
+             "`/news` - to receive CoinTelegraph news \n"
              "`/help` - to receive this message\n\n"
              "This bot is written with open-source and free code, and you can find it all at "
              "[GitHub](https://github.com/halon176/h-crypto-price-bot)"
@@ -96,7 +98,6 @@ async def cg_price_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             text="Please enter a valid crypto symbol."
         )
         return
-    coins = [coin for coin in coins if "-peg-" not in coin]
     if len(coins) == 1:
         try:
             await get_cg_price(coins[0], update, context)
@@ -130,6 +131,9 @@ if __name__ == '__main__':
 
     crypto_dominance_handler = CommandHandler('dom', get_cg_dominance)
     application.add_handler(crypto_dominance_handler)
+
+    news_handler = CommandHandler('news', news)
+    application.add_handler(news_handler)
 
     help_handler = CommandHandler('help', bot_help)
     application.add_handler(help_handler)

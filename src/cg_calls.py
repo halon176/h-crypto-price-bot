@@ -90,9 +90,9 @@ async def get_cg_price(coin, update: Update, context: ContextTypes.DEFAULT_TYPE)
     general_data = []
     for emoji, label, data_key in general_data_sheme:
         if data_key == "market_cap":
-            value = crypto_data['market_data'][data_key]["usd"]
+            value = crypto_data['market_data'].get(data_key, {}).get("usd", "N/A")
         else:
-            value = crypto_data['market_data'].get(data_key)
+            value = crypto_data['market_data'].get(data_key, "N/A")
         general_data.append(GeneralDataEntry(emoji, label, value))
 
     lst_column_size_gend = [
@@ -133,27 +133,24 @@ async def get_cg_price(coin, update: Update, context: ContextTypes.DEFAULT_TYPE)
         def __init__(self, allt_emoji, allt_symbol, allt_price, allt_percentage, allt_date):
             self.emoji = allt_emoji
             self.symbol = allt_symbol
-            if allt_price == "N/A":
-                self.at_price = allt_price
+            if allt_price and "usd" in allt_price:
+                self.at_price = humanize.intcomma(at_handler(allt_price["usd"])) + "$"
             else:
-                self.at_price = humanize.intcomma(at_handler(allt_price)) + "$"
-            self.at_percentage = k_handler(allt_percentage) + "%"
-            if allt_date == "N/A":
-                self.date = allt_date
+                self.at_price = "N/A"
+            if allt_percentage and "usd" in allt_percentage:
+                self.at_percentage = k_handler(allt_percentage["usd"]) + "%"
             else:
-                self.date = format_date(allt_date)
+                self.at_percentage = "N/A"
+            if allt_date and "usd" in allt_date:
+                self.date = format_date(allt_date["usd"])
+            else:
+                self.date = "N/A"
 
     at_data = []
     for emoji, label, price, percentage, date in at_data_schema:
-        if not crypto_data['market_data'][price]["sgd"]:
-            at_price = "N/A"
-        else:
-            at_price = crypto_data['market_data'][price]["usd"]
-        at_percentage = crypto_data['market_data'][percentage]["usd"]
-        if not crypto_data['market_data'][date]:
-            at_date = "N/A"
-        else:
-            at_date = crypto_data['market_data'][date]["usd"]
+        at_price = crypto_data['market_data'][price]
+        at_percentage = crypto_data['market_data'][percentage]
+        at_date = crypto_data['market_data'][date]
         at_data.append(AtEntry(emoji, label, at_price, at_percentage, at_date))
 
     lst_column_size_at = [

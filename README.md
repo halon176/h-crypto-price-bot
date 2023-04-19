@@ -75,7 +75,6 @@ To display the list of all available commands, type `/help`
 
 
 ## Roadmap
-- [ ] Create a function that aligns spaces to make text appear more uniform within the message with the data.
 - [ ] Display a chart showing the price trend of a single coin in different selectable timeframes.
 - [ ] Create the possibility to query other APIs such as Binance or CoinMarketCap.
 

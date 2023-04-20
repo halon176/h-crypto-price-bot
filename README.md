@@ -49,16 +49,17 @@ Your bot should now be up and running! You can add it to a Telegram group or sta
 git clone https://github.com/halon176/h-crypto-price-bot.git
 ```
 
-2) Enter into the project directory, and then launch the 'docker build' command to build your Docker image.
+2) Substitute `<telegram_bot_token>` with your telegram bot token in Dockerfile.
+
+3) Launch the 'docker build' command to build your Docker image.
 
 ```
-cd h-crypto-price-bot
-docker build -t h-crypt-price .
+docker build -t h-crypto-price h-crypto-price-bot/.
 ```
-3) Now you can start the container using the command:
+4) Now you can start the container using the command:
 
 ```
-docker run h-crypt-price
+docker run -d --name h-crypto-price h-crypto-price
 ```
 
 The bot is now up and running within the Docker container!

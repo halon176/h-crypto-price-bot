@@ -61,7 +61,13 @@ async def get_cg_price(coin, update: Update, context: ContextTypes.DEFAULT_TYPE)
         market_cap_rank = str(crypto_data['market_cap_rank']) + "°"
     crypto_name = crypto_data['name']
     crypto_price = humanize.intcomma(crypto_data['market_data']['current_price']["usd"])
-    web = crypto_data['links']['homepage'][0]
+
+    try:
+        index_of_ref = crypto_data['links']['homepage'][0].index("?")
+        web = crypto_data['links']['homepage'][0][:index_of_ref]
+    except ValueError:
+        web = crypto_data['links']['homepage'][0]
+
     twitter = "https://twitter.com/" + crypto_data['links']["twitter_screen_name"]
     symbol = (crypto_data['symbol']).upper()
 

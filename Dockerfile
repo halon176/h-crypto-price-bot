@@ -6,10 +6,6 @@ WORKDIR crypto_price_bot
 
 COPY requirements.txt .
 
-ENV TOKEN=<telegram_bot_token>
-
-RUN echo "TOKEN=${TOKEN}" > .env
-
 RUN pip install -r requirements.txt
 
 COPY . .

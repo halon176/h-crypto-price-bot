@@ -60,7 +60,8 @@ async def get_cg_price(coin, update: Update, context: ContextTypes.DEFAULT_TYPE)
     else:
         market_cap_rank = str(crypto_data['market_cap_rank']) + "°"
     crypto_name = crypto_data['name']
-    crypto_price = humanize.intcomma(crypto_data['market_data']['current_price']["usd"])
+    usd_price = crypto_data['market_data']['current_price'].get('usd')
+    crypto_price = humanize.intcomma(usd_price) if usd_price is not None else 'N/A'
 
     try:
         index_of_ref = crypto_data['links']['homepage'][0].index("?")

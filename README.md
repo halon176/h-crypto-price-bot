@@ -1,4 +1,9 @@
-## HCryptoPrice
+# HCryptoPrice
+
+[![build](https://github.com/halon176/h-crypto-price-bot/workflows/CI/badge.svg)](https://github.com/halon176/h-crypto-price-bot/actions/workflows/docker-image.yml)
+[![license: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/halon176/h-crypto-price-bot/blob/master/LICENSE)
+
+
 
 HCryptoPrice is a Python-based bot that fetches real-time cryptocurrency prices from Coingecko and presents them in an easy-to-understand format on Telegram. It also offers historical price data, market cap rankings.
 

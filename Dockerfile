@@ -1,5 +1,7 @@
 FROM python:3.10
 
+LABEL org.opencontainers.image.source="https://github.com/halon176/h-crypto-price-bot"
+
 RUN mkdir /crypto_price_bot
 
 WORKDIR crypto_price_bot

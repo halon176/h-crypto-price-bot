@@ -21,6 +21,6 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GHCR_ACCESS_TOKEN }}
       - name: Build the Docker image
-        run: |
-          docker build . --file Dockerfile --tag ghcr.io/halon176/h-crypto-price:latest
-          docker push ghcr.io/halon176/h-crypto-price:latest
+        run: docker build . --file Dockerfile --tag ghcr.io/halon176/h-crypto-price-bot:latest
+      - name: Publish the Docker image
+        run: docker push ghcr.io/halon176/h-crypto-price-bot:latest

@@ -5,7 +5,10 @@
 
 
 
-HCryptoPrice is a Python-based bot that fetches real-time cryptocurrency prices from Coingecko and presents them in an easy-to-understand format on Telegram. It also offers historical price data, market cap rankings.
+HCryptoPrice is a Python-based bot that fetches real-time cryptocurrency prices from Coingecko and presents them in an
+easy-to-understand format on Telegram. It also offers historical price data, market cap rankings.
+
+Here's a working version of the bot: [@h_crypto_price_bot](https://t.me/h_crypto_price_bot)
 
 ## Installation
 
@@ -32,9 +35,10 @@ pip install -r requirements.txt
 
 4) Create a new Telegram bot by following the instructions in the Telegram Bot API documentation: https://core.telegram.org/bots#6-botfather
 
-5) Once you have created your bot, copy the bot token that BotFather gave you. With the following command create the .env file and insert the token inside it, making sure to replace **<telegram_bot_token>**
+5) After creating your bot, copy the token provided by BotFather. Then, set up an environment variable named TOKEN with
+the bot token using the following command, replacing **<telegram_bot_token>** with your bot token:
 ```
-echo "TOKEN=<telegram_bot_token>" > .env
+export TOKEN=<telegram_bot_token>
 ```
 
 6) Run the bot by running the following command:
@@ -54,17 +58,15 @@ Your bot should now be up and running! You can add it to a Telegram group or sta
 git clone https://github.com/halon176/h-crypto-price-bot.git
 ```
 
-2) Substitute `<telegram_bot_token>` with your telegram bot token in Dockerfile.
-
-3) Launch the 'docker build' command to build your Docker image.
+2) Launch the 'docker build' command to build your Docker image.
 
 ```
 docker build -t h-crypto-price h-crypto-price-bot/.
 ```
-4) Now you can start the container using the command:
+3) Now you can start the container using the command, replacing **<telegram_bot_token>** with your bot token:
 
 ```
-docker run -d --name h-crypto-price h-crypto-price
+docker run -d -e TOKEN=<telegram_bot_token> --name h-crypto-price h-crypto-price
 ```
 
 The bot is now up and running within the Docker container!

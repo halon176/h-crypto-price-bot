@@ -9,7 +9,7 @@ from telegram.ext import (
     CallbackQueryHandler,
 )
 
-from cg_calls import get_coin_list, get_cg_price, get_api_id, get_cg_dominance
+from cg_calls import get_cg_price, get_api_id, get_cg_dominance, get_coin_list
 from config import TOKEN
 from news import news
 

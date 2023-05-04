@@ -1,4 +1,4 @@
-FROM python:3.10
+FROM python:3.11.3
 
 LABEL org.opencontainers.image.source="https://github.com/halon176/h-crypto-price-bot"
 

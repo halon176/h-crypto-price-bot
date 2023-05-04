@@ -1,3 +1,4 @@
+import datetime
 import logging
 
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
@@ -19,6 +20,7 @@ logging.basicConfig(
 )
 
 coin_list = []
+coin_list_update = datetime.datetime.now()
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -79,7 +81,7 @@ async def menu_handler(update: Update, context: CallbackContext):
 
 
 async def cg_price_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    global coin_list
+    global coin_list, coin_list_update
     if not coin_list:
         coin_list = await get_coin_list()
 
@@ -92,12 +94,25 @@ async def cg_price_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     crypto_symbol = context.args[0].lower()
     coins = await get_api_id(crypto_symbol, coin_list)
-    if coins == "symbol_error":
-        await context.bot.send_message(
-            chat_id=update.effective_chat.id,
-            text="Please enter a valid crypto symbol."
-        )
-        return
+    if not coins:
+        if (datetime.datetime.now() - coin_list_update) >= datetime.timedelta(hours=1):
+            coin_list = await get_coin_list()
+            coin_list_update = datetime.datetime.now()
+            logging.info("Reloaded coin list")
+            coins = await get_api_id(crypto_symbol, coin_list)
+            if not coins:
+                await context.bot.send_message(
+                    chat_id=update.effective_chat.id,
+                    text="Please enter a valid crypto symbol."
+                )
+                return
+        else:
+            await context.bot.send_message(
+                chat_id=update.effective_chat.id,
+                text="Please enter a valid crypto symbol."
+            )
+            return
+
     if len(coins) == 1:
         try:
             await get_cg_price(coins[0], update, context)

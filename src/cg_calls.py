@@ -26,10 +26,7 @@ async def get_api_id(crypto_symbol: str, coin_list):
     for crypto in coin_list:
         if crypto["symbol"] == crypto_symbol and all(excluded not in crypto["id"] for excluded in excluded_values):
             api_ids.append(crypto["id"])
-    if not api_ids:
-        return "symbol_error"
-    else:
-        return api_ids
+    return api_ids
 
 
 async def get_cg_price(coin, update: Update, context: ContextTypes.DEFAULT_TYPE):

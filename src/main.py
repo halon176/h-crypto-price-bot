@@ -44,6 +44,7 @@ async def bot_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
         text="📚*List of Commands:*\n\n"
              "`/p <crypto_symbol>` - to receive the current price and historical variation of the coin \n"
              "`/dom` - to receive the top 10 most capitalized tokens \n"
+             "'/gas' - to receive real time gas information on ERC"
              "`/news` - to receive CoinTelegraph news \n"
              "`/help` - to receive this message\n\n"
              "This bot is written with open-source and free code, and you can find it all at "

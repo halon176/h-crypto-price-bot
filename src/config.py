@@ -1,3 +1,4 @@
 import os
 
-TOKEN = os.environ.get("TOKEN")
+TELEGRAM_TOKEN = os.environ.get("TELEGRAM_TOKEN")
+ETHSCAN_API_KEY = os.environ.get("ETHSCAN_API_KEY")

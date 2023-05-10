@@ -6,7 +6,7 @@ from telegram import Update
 from telegram.ext import ContextTypes
 
 from config import ETHSCAN_API_KEY
-from src.service import max_column_size
+from service import max_column_size
 
 
 async def gas_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):

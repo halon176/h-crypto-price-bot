@@ -11,7 +11,8 @@ from telegram.ext import (
 )
 
 from cg_calls import get_cg_price, get_api_id, get_cg_dominance, get_coin_list
-from config import TOKEN
+from config import TELEGRAM_TOKEN
+from ethersca_calls import gas_handler
 from news import news
 
 logging.basicConfig(
@@ -136,13 +137,16 @@ async def cg_price_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 if __name__ == '__main__':
-    application = ApplicationBuilder().token(TOKEN).build()
+    application = ApplicationBuilder().token(TELEGRAM_TOKEN).build()
 
     start_handler = CommandHandler('start', start)
     application.add_handler(start_handler)
 
     crypto_price_handler = CommandHandler('p', cg_price_handler)
     application.add_handler(crypto_price_handler)
+
+    crypto_gas_handler = CommandHandler('gas', gas_handler)
+    application.add_handler(crypto_gas_handler)
 
     crypto_dominance_handler = CommandHandler('dom', get_cg_dominance)
     application.add_handler(crypto_dominance_handler)

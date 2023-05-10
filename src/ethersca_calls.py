@@ -60,9 +60,6 @@ async def gas_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         str_format_gp = f"{{}} {{:{gp_column_size[1]}}}  {{:>{gp_column_size[2]}}}"
 
-        gas_price_message = "\n".join(
-            [str_format_gp.format(gp.emoji, gp.gas_entry, gp.price_entry) for gp in gas_price])
-
         gas_price_header = [
             "```",
             "-" * (len(gp_column_size) + reduce(lambda a, b: a + b, gp_column_size))

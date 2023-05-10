@@ -38,8 +38,13 @@ pip install -r requirements.txt
 5) After creating your bot, copy the token provided by BotFather. Then, set up an environment variable named TOKEN with
 the bot token using the following command, replacing **<telegram_bot_token>** with your bot token:
 ```
-export TOKEN=<telegram_bot_token>
+export TELEGRAM_TOKEN=<telegram_bot_token>
 ```
+To use the gas price feature, you must include an Etherscan API key.
+```
+export ETHSCAN_API_KEY=<etherscan_api_key>
+```
+
 
 6) Run the bot by running the following command:
 
@@ -66,8 +71,15 @@ docker build -t h-crypto-price h-crypto-price-bot/.
 3) Now you can start the container using the command, replacing **<telegram_bot_token>** with your bot token:
 
 ```
-docker run -d -e TOKEN=<telegram_bot_token> --name h-crypto-price h-crypto-price
+docker run -d -e TELEGRAM_TOKEN=<telegram_bot_token> --name h-crypto-price h-crypto-price
 ```
+
+To use the gas price feature, you must include an Etherscan API key. ETHSCAN_API_KEY=<etherscan_api_key>
+
+```
+docker run -d -e TELEGRAM_TOKEN=<telegram_bot_token> -e ETHSCAN_API_KEY=<etherscan_api_key> --name h-crypto-price h-crypto-price
+```
+
 
 The bot is now up and running within the Docker container!
 

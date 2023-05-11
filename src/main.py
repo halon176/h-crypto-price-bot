@@ -33,7 +33,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
              "For example, `/p btc` will give you the current price of Bitcoin. Enjoy!\n\n"
              "To display the complete list of commands, type `/help`"
     )
-    logging.info(f'Start call')
+    logging.info('Start call')
 
 
 async def bot_help(update: Update, context: ContextTypes.DEFAULT_TYPE):

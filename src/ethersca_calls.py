@@ -4,6 +4,7 @@ from functools import reduce
 import requests
 from telegram import Update
 from telegram.ext import ContextTypes
+from web3 import Web3
 
 from config import ETHSCAN_API_KEY
 from service import max_column_size
@@ -20,17 +21,25 @@ async def gas_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if gas_request["status"] == "1":
         mood_emoji = ["😎", "😄", "🤨", "😰", "💀"]
         gas_data = {
-            "Safe Gas Price": "SafeGasPrice",
-            "Fast Gas Price": "FastGasPrice",
-            "Suggested Gas": "suggestBaseFee"
+            "Safe": "SafeGasPrice",
+            "Fast": "FastGasPrice",
+            "Suggested": "suggestBaseFee"
         }
+
+        def get_eth_price():
+            response = requests.get(
+                f'https://api.etherscan.io/api?module=stats&action=ethprice&apikey={ETHSCAN_API_KEY}').json()
+            price = float(response['result']['ethusd'])
+            return price
+
+        eth_price = get_eth_price()
 
         class GasEntry:
             def __init__(self, gas_entry, entry_price):
-
                 self.gas_entry = gas_entry
                 self.price_entry = f"{float(entry_price):.1f}"
                 self.emoji = self.assign_emoji(entry_price)
+                self.usd_value = f"{float(self.estimate_function_cost(entry_price)):.2f}$"
 
             @staticmethod
             def assign_emoji(entry_price):
@@ -46,6 +55,15 @@ async def gas_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 elif price >= 100:
                     return mood_emoji[4]
 
+            @staticmethod
+            def estimate_function_cost(gwei_value):
+                gas_limit = 21000
+                wei_value = Web3.to_wei(gwei_value, 'gwei')
+                cost_in_eth = Web3.from_wei(gas_limit * wei_value, 'ether')
+                cost_in_eth = float(cost_in_eth)
+                cost_in_usd = cost_in_eth * eth_price
+                return cost_in_usd
+
         gas_result = gas_request["result"]
 
         gas_price = []
@@ -55,19 +73,20 @@ async def gas_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         gp_column_size = [
             2,
             max_column_size((gp.gas_entry for gp in gas_price)),
-            max_column_size((gp.price_entry for gp in gas_price))
+            max_column_size((gp.price_entry for gp in gas_price)),
+            max_column_size((gp.usd_value for gp in gas_price))
         ]
 
-        str_format_gp = f"{{}} {{:{gp_column_size[1]}}}  {{:>{gp_column_size[2]}}}"
+        str_format_gp = f"{{}} {{:{gp_column_size[1]}}}  {{:>{gp_column_size[2]}}}  {{:>{gp_column_size[3]}}}"
 
         gas_price_header = [
             "```",
-            "-" * (len(gp_column_size) + reduce(lambda a, b: a + b, gp_column_size))
+            "-" * (len(gp_column_size) + 1 + reduce(lambda a, b: a + b, gp_column_size))
         ]
         message = "\n".join(
-            ["⛽ Ethereum Gas in gwei"]
+            ["⛽ Ethereum Gas Fee"]
             + gas_price_header
-            + [str_format_gp.format(gp.emoji, gp.gas_entry, gp.price_entry) for gp in gas_price]
+            + [str_format_gp.format(gp.emoji, gp.gas_entry, gp.price_entry, gp.usd_value) for gp in gas_price]
             + list(reversed(gas_price_header))
         )
 

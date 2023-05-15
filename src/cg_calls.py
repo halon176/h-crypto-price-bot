@@ -2,6 +2,7 @@ import logging
 from functools import reduce
 
 import humanize
+import matplotlib.pyplot as plt
 import requests
 from telegram import Update
 from telegram.ext import ContextTypes
@@ -188,6 +189,20 @@ async def get_cg_price(coin, update: Update, context: ContextTypes.DEFAULT_TYPE)
                                    text=message,
                                    parse_mode="markdown",
                                    disable_web_page_preview=True)
+
+
+async def get_cg_chart(coin, period):
+    chart = requests.get(
+        f"https://api.coingecko.com/api/v3/coins/{coin}/market_chart?vs_currency=usd&days={period}").json()
+    print(chart)
+    x = [p[0] for p in chart['prices']]
+    y = [p[1] for p in chart['prices']]
+    plt.plot(x, y)
+    plt.title(f'Price {coin} over {period} days')
+    plt.tick_params(axis='x', which='both', bottom=False, top=False, labelbottom=False)
+    plt.ylim(min(y), max(y))
+
+    plt.savefig('plot.jpg')
 
 
 async def get_cg_dominance(update: Update, context: ContextTypes.DEFAULT_TYPE):

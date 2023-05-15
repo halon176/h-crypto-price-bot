@@ -53,18 +53,6 @@ async def bot_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     logging.info(f'Help call')
 
 
-async def callback(update, context):
-    query = update.callback_query
-    print(query)
-
-    selected_option = query.data
-
-    await context.bot.send_message(
-        chat_id=query.message.chat_id,
-        text="You selected " + selected_option
-    )
-
-
 async def menu_handler(update: Update, context: CallbackContext):
     query = update.callback_query
     selected_option = query.data

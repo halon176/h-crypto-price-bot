@@ -13,6 +13,7 @@ from telegram.ext import (
 from cg_calls import get_cg_price, get_api_id, get_cg_dominance, get_coin_list
 from config import TELEGRAM_TOKEN
 from ethersca_calls import gas_handler
+from info import start, bot_help
 from news import news
 
 logging.basicConfig(
@@ -22,52 +23,6 @@ logging.basicConfig(
 
 coin_list = []
 coin_list_update = datetime.datetime.now()
-
-
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await context.bot.send_message(
-        chat_id=update.effective_chat.id,
-        parse_mode="markdown",
-        text="Hi! I am HCryptoPrice, You can ask me for the current price of any crypto by typing:\n\n"
-             "`/p <crypto_symbol>` \n\n"
-             "For example, `/p btc` will give you the current price of Bitcoin. Enjoy!\n\n"
-             "To display the complete list of commands, type `/help`"
-    )
-    logging.info('Start call')
-
-
-async def bot_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await context.bot.send_message(
-        chat_id=update.effective_chat.id,
-        parse_mode="markdown",
-        disable_web_page_preview=True,
-        text="📚*List of Commands:*\n\n"
-             "`/p <crypto_symbol>` - to receive the current price and historical variation of the coin\n"
-             "`/dom` - to receive the top 10 most capitalized tokens\n"
-             "`/gas` - to receive real time gas information on ERC\n"
-             "`/news` - to receive CoinTelegraph news\n"
-             "`/help` - to receive this message\n\n"
-             "This bot is written with open-source and free code, and you can find it all at "
-             "[GitHub](https://github.com/halon176/h-crypto-price-bot)"
-    )
-    logging.info(f'Help call')
-
-
-async def menu_handler(update: Update, context: CallbackContext):
-    query = update.callback_query
-    selected_option = query.data
-    try:
-        await get_cg_price(selected_option, update, context)
-    except Exception as e:
-        logging.error(f"An error occurred: {str(e)}")
-        await context.bot.send_message(
-            chat_id=update.effective_chat.id,
-            text="An error occurred. Please try again later."
-        )
-    await context.bot.delete_message(
-        chat_id=query.message.chat_id,
-        message_id=query.message.message_id
-    )
 
 
 async def cg_price_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -123,6 +78,23 @@ async def cg_price_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             text="🟠 There are multiple coins with the same symbol, please select the desired one:",
             reply_markup=reply_markup
         )
+
+
+async def menu_handler(update: Update, context: CallbackContext):
+    query = update.callback_query
+    selected_option = query.data
+    try:
+        await get_cg_price(selected_option, update, context)
+    except Exception as e:
+        logging.error(f"An error occurred: {str(e)}")
+        await context.bot.send_message(
+            chat_id=update.effective_chat.id,
+            text="An error occurred. Please try again later."
+        )
+    await context.bot.delete_message(
+        chat_id=query.message.chat_id,
+        message_id=query.message.message_id
+    )
 
 
 if __name__ == '__main__':

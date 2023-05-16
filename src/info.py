@@ -25,6 +25,7 @@ async def bot_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
         disable_web_page_preview=True,
         text="📚*List of Commands:*\n\n"
              "`/p <crypto_symbol>` - to receive the current price and historical variation of the coin\n"
+             "`/c <crypto_symbol>` - to receive the chart in different timeframes of selected crypto\n"
              "`/dom` - to receive the top 10 most capitalized tokens\n"
              "`/gas` - to receive real time gas information on ERC\n"
              "`/news` - to receive CoinTelegraph news\n"

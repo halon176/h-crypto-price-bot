@@ -206,7 +206,6 @@ async def get_cg_chart(coin, update: Update, context: ContextTypes.DEFAULT_TYPE,
     plt.plot(x, y)
     plt.title(f'Price {coin} over {period} days')
     plt.tick_params(axis='x', which='both', bottom=False, top=False, labelbottom=False)
-    plt.ylim(min(y), max(y))
     plt.savefig('plot.jpg')
     if period == '1':
         checkbox[0] = '✅'

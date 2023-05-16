@@ -1,10 +1,11 @@
 import logging
+import os
 from functools import reduce
 
 import humanize
 import matplotlib.pyplot as plt
 import requests
-from telegram import Update
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ContextTypes
 
 from service import format_date, max_column_size, at_handler, k_handler
@@ -191,18 +192,46 @@ async def get_cg_price(coin, update: Update, context: ContextTypes.DEFAULT_TYPE)
                                    disable_web_page_preview=True)
 
 
-async def get_cg_chart(coin, period):
-    chart = requests.get(
-        f"https://api.coingecko.com/api/v3/coins/{coin}/market_chart?vs_currency=usd&days={period}").json()
-    print(chart)
+async def get_cg_chart(coin, update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs):
+    period = kwargs.get('period', None)
+    if not period:
+        period = '30'
+    url = f'https://api.coingecko.com/api/v3/coins/{coin}/market_chart?vs_currency=usd&days={period}'
+    chart = requests.get(url).json()
+    logging.info(f'Request URL: {url}')
+    checkbox = ['', '', '', '', '', '']
     x = [p[0] for p in chart['prices']]
     y = [p[1] for p in chart['prices']]
+    plt.clf()
     plt.plot(x, y)
     plt.title(f'Price {coin} over {period} days')
     plt.tick_params(axis='x', which='both', bottom=False, top=False, labelbottom=False)
     plt.ylim(min(y), max(y))
-
     plt.savefig('plot.jpg')
+    if period == '1':
+        checkbox[0] = '✅'
+    if period == '7':
+        checkbox[1] = '✅'
+    if period == '30':
+        checkbox[2] = '✅'
+    if period == '90':
+        checkbox[3] = '✅'
+    if period == '365':
+        checkbox[4] = '✅'
+    if period == 'max':
+        checkbox[5] = '✅'
+    keyboard = [
+        [InlineKeyboardButton(f"{checkbox[0]}24h", callback_data=f'period_1.{coin}'),
+         InlineKeyboardButton(f"{checkbox[1]}7d", callback_data=f'period_7.{coin}'),
+         InlineKeyboardButton(f"{checkbox[2]}30d", callback_data=f'period_30.{coin}'),
+         InlineKeyboardButton(f"{checkbox[3]}90d", callback_data=f'period_90.{coin}'),
+         InlineKeyboardButton(f"{checkbox[4]}1y", callback_data=f'period_365.{coin}'),
+         InlineKeyboardButton(f"{checkbox[5]}max", callback_data=f'period_max.{coin}')]
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    await context.bot.send_photo(chat_id=update.effective_chat.id, photo=open('plot.jpg', 'rb'),
+                                 reply_markup=reply_markup)
+    os.remove('plot.jpg')
 
 
 async def get_cg_dominance(update: Update, context: ContextTypes.DEFAULT_TYPE):

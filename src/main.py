@@ -1,6 +1,5 @@
 import datetime
 import logging
-import os
 
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (
@@ -26,7 +25,8 @@ coin_list = []
 coin_list_update = datetime.datetime.now()
 
 
-async def coin_check(coin, update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def coin_check(coin, update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs):
+    coin_type = kwargs.get('type', None)
     global coin_list, coin_list_update
     if not coin_list:
         coin_list = await get_coin_list()
@@ -59,6 +59,17 @@ async def coin_check(coin, update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if len(coins) == 1:
         return coins[0]
+    elif coin_type == 'chart':
+        keyboard = []
+        for crypto in coins:
+            button = [InlineKeyboardButton(crypto, callback_data="chart_" + crypto)]
+            keyboard.append(button)
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        await context.bot.send_message(
+            chat_id=update.message.chat_id,
+            text="🟠 There are multiple coins with the same symbol, please select the desired one:",
+            reply_markup=reply_markup
+        )
     else:
         keyboard = []
         for crypto in coins:
@@ -89,10 +100,25 @@ async def cg_price_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def callback_menu_handler(update: Update, context: CallbackContext):
     query = update.callback_query
     selected_option = query.data
-    if selected_option.startswith("period_"):
-        print(selected_option)
+
+    if selected_option.startswith("chart_"):
+        await get_cg_chart(selected_option[6:], update, context)
+        await context.bot.delete_message(
+            chat_id=query.message.chat_id,
+            message_id=query.message.message_id
+        )
+
+    elif selected_option.startswith("period_"):
+        indexdot = selected_option.index('.')
+        await get_cg_chart(selected_option[indexdot + 1:], update, context, period=selected_option[7:indexdot])
+        await context.bot.delete_message(
+            chat_id=query.message.chat_id,
+            message_id=query.message.message_id
+        )
+
     else:
         try:
+            print(update.message.chat_id)
             await get_cg_price(selected_option, update, context)
         except Exception as e:
             logging.error(f"An error occurred: {str(e)}")
@@ -108,21 +134,9 @@ async def callback_menu_handler(update: Update, context: CallbackContext):
 
 async def cg_chart_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     crypto_symbol = context.args[0].lower()
-    coins = await get_api_id(crypto_symbol, coin_list)
-    await get_cg_chart(coins[0], "30")
-
-    keyboard = [
-        [InlineKeyboardButton("24h", callback_data='period_1'),
-         InlineKeyboardButton("7d", callback_data='period_7'),
-         InlineKeyboardButton("✅ 30d", callback_data='period_30'),
-         InlineKeyboardButton("90d", callback_data='period_90'),
-         InlineKeyboardButton("1y", callback_data='period_365'),
-         InlineKeyboardButton("max", callback_data='period_max')]
-    ]
-    reply_markup = InlineKeyboardMarkup(keyboard)
-    await context.bot.send_photo(chat_id=update.message.chat_id, photo=open('plot.jpg', 'rb'),
-                                 reply_markup=reply_markup)
-    os.remove('plot.jpg')
+    coin = await coin_check(crypto_symbol, update, context, type='chart')
+    if coin:
+        await get_cg_chart(coin, update, context)
 
 
 if __name__ == '__main__':

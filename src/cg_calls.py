@@ -3,7 +3,9 @@ import os
 from functools import reduce
 
 import humanize
-import matplotlib.pyplot as plt
+import pandas as pd
+import plotly.express as px
+import plotly.io as pio
 import requests
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ContextTypes
@@ -13,7 +15,7 @@ from service import format_date, max_column_size, at_handler, k_handler
 CRYPTOGECKO_API_COINS = 'https://api.coingecko.com/api/v3/coins/'
 CRYPTOGECKO_API_DOMINANCE = 'https://api.coingecko.com/api/v3/global/'
 
-
+chart_template = 'plotly_dark'
 async def get_coin_list():
     coin_list = requests.get("https://api.coingecko.com/api/v3/coins/list?include_platform=false")
     if coin_list.status_code == 200:
@@ -192,41 +194,32 @@ async def get_cg_price(coin, update: Update, context: ContextTypes.DEFAULT_TYPE)
                                    disable_web_page_preview=True)
 
 
-async def get_cg_chart(coin, update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs):
-    period = kwargs.get('period', None)
-    if not period:
-        period = '30'
+async def get_cg_chart(coin, update: Update, context: ContextTypes.DEFAULT_TYPE, period='30'):
     url = f'https://api.coingecko.com/api/v3/coins/{coin}/market_chart?vs_currency=usd&days={period}'
     chart = requests.get(url).json()
     logging.info(f'Request URL: {url}')
-    checkbox = ['', '', '', '', '', '']
-    x = [p[0] for p in chart['prices']]
+    x = [p[0] / 1000 for p in chart['prices']]
     y = [p[1] for p in chart['prices']]
-    plt.clf()
-    plt.plot(x, y)
-    plt.title(f'Price {coin} over {period} days')
-    plt.tick_params(axis='x', which='both', bottom=False, top=False, labelbottom=False)
-    plt.savefig('plot.jpg')
-    if period == '1':
-        checkbox[0] = '✅'
-    if period == '7':
-        checkbox[1] = '✅'
-    if period == '30':
-        checkbox[2] = '✅'
-    if period == '90':
-        checkbox[3] = '✅'
-    if period == '365':
-        checkbox[4] = '✅'
-    if period == 'max':
-        checkbox[5] = '✅'
-    keyboard = [
-        [InlineKeyboardButton(f"{checkbox[0]}24h", callback_data=f'period_1.{coin}'),
-         InlineKeyboardButton(f"{checkbox[1]}7d", callback_data=f'period_7.{coin}'),
-         InlineKeyboardButton(f"{checkbox[2]}30d", callback_data=f'period_30.{coin}'),
-         InlineKeyboardButton(f"{checkbox[3]}90d", callback_data=f'period_90.{coin}'),
-         InlineKeyboardButton(f"{checkbox[4]}1y", callback_data=f'period_365.{coin}'),
-         InlineKeyboardButton(f"{checkbox[5]}max", callback_data=f'period_max.{coin}')]
-    ]
+
+    df = pd.DataFrame({'timeframe': x, 'prices': y})
+    df['timeframe'] = pd.to_datetime(df['timeframe'], unit='s')
+    title = f'Chart of {coin} in {period} day{"s" if period != "1" else ""}'
+    template = chart_template
+    fig = px.line(df, x='timeframe', y='prices', template=template, title=title, labels={'timeframe': ''})
+    pio.write_image(fig, 'plot.jpg', format='jpg')
+
+    periods = [{'1': '24h'}, {'7': '7d'}, {'30': '30d'}, {'90': '90d'}, {'365': '1y'}, {'max': 'max'}]
+    checkbox = [''] * 6
+
+    for i in range(len(periods)):
+        current_key = list(periods[i].keys())[0]
+        if period == current_key:
+            checkbox[i] = '✅'
+
+    keyboard = [[InlineKeyboardButton(f"{checkbox[i]}{list(periods[i].values())[0]}",
+                                      callback_data=f'period_{list(periods[i].keys())[0]}.{coin}') for i in
+                 range(len(periods))]]
+
     reply_markup = InlineKeyboardMarkup(keyboard)
     await context.bot.send_photo(chat_id=update.effective_chat.id, photo=open('plot.jpg', 'rb'),
                                  reply_markup=reply_markup)

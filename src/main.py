@@ -24,7 +24,6 @@ logging.basicConfig(
 coin_list = []
 coin_list_update = datetime.datetime.now()
 
-
 async def coin_check(coin, update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs):
     coin_type = kwargs.get('type', None)
     global coin_list, coin_list_update
@@ -110,7 +109,9 @@ async def callback_menu_handler(update: Update, context: CallbackContext):
 
     elif selected_option.startswith("period_"):
         indexdot = selected_option.index('.')
-        await get_cg_chart(selected_option[indexdot + 1:], update, context, period=selected_option[7:indexdot])
+        await get_cg_chart(selected_option[indexdot + 1:], update, context, selected_option[7:indexdot])
+
+        # await get_cg_chart(selected_option[indexdot + 1:], update, context, period=selected_option[7:indexdot])
         await context.bot.delete_message(
             chat_id=query.message.chat_id,
             message_id=query.message.message_id

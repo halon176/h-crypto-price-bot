@@ -25,7 +25,7 @@ async def get_coin_list():
 
 
 async def get_api_id(crypto_symbol: str, coin_list):
-    excluded_values = ["-peg-", "-wormhole", "wrapped", "oec-", "-iou"]
+    excluded_values = ["-peg-", "-wormhole", "wrapped", "oec-", "-iou", "harrypotter"]
     api_ids = []
     for crypto in coin_list:
         if crypto["symbol"] == crypto_symbol and all(excluded not in crypto["id"] for excluded in excluded_values):

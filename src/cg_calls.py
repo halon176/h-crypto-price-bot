@@ -45,6 +45,12 @@ async def get_coin_info(coin_name: str):
             return {'name': crypto['name'], 'symbol': crypto['symbol'].upper()}
 
 
+def set_chart_template(template: str):
+    global chart_template
+    chart_template = template
+    return
+
+
 async def get_cg_price(coin, update: Update, context: ContextTypes.DEFAULT_TYPE):
     url_tail = '?localization=false&' \
                'tickers=false&market_data=true&' \
@@ -220,7 +226,8 @@ async def get_cg_chart(coin, update: Update, context: ContextTypes.DEFAULT_TYPE,
     bottom = f'{period} day{"s" if period != "1" else ""} chart'
     template = chart_template
     fig = px.line(df, x='timeframe', y='prices', template=template,
-                  labels={'timeframe': bottom, 'prices': 'prices ($)'})
+                  labels={'timeframe': bottom, 'prices': 'price ($)'})
+
     fig.update_layout(
         title={
             'text': title,
@@ -228,8 +235,8 @@ async def get_cg_chart(coin, update: Update, context: ContextTypes.DEFAULT_TYPE,
             'x': 0.5,
             'font': dict(size=24)
         }
-
     )
+
     pio.write_image(fig, 'plot.jpg', format='jpg')
 
     periods = [{'1': '24h'}, {'7': '7d'}, {'30': '30d'}, {'90': '90d'}, {'365': '1y'}, {'max': 'max'}]

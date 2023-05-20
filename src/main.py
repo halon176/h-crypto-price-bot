@@ -10,7 +10,7 @@ from telegram.ext import (
     CallbackQueryHandler,
 )
 
-from cg_calls import get_cg_price, get_api_id, get_cg_dominance, get_coin_list, get_cg_chart
+from cg_calls import get_cg_price, get_api_id, get_cg_dominance, get_coin_list, get_cg_chart, set_chart_template
 from config import TELEGRAM_TOKEN
 from ethersca_calls import gas_handler
 from info import start, bot_help
@@ -107,6 +107,17 @@ async def callback_menu_handler(update: Update, context: CallbackContext):
             chat_id=query.message.chat_id,
             message_id=query.message.message_id
         )
+    elif selected_option.startswith("charttemplate_"):
+        set_chart_template(selected_option[14:])
+        await context.bot.delete_message(
+            chat_id=query.message.chat_id,
+            message_id=query.message.message_id
+        )
+
+        await context.bot.send_message(
+            chat_id=update.effective_chat.id,
+            text=f"{selected_option[21:]} theme selected"
+        )
 
     elif selected_option.startswith("period_"):
         indexdot = selected_option.index('.')
@@ -138,6 +149,21 @@ async def cg_chart_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await get_cg_chart(coin, update, context)
 
 
+async def chart_color_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    themes = [['🌕 white', 'charttemplate_plotly_white'],
+              ['🌑 dark', 'charttemplate_plotly_dark']]
+    keyboard = []
+    for theme in themes:
+        button = [InlineKeyboardButton(theme[0], callback_data=theme[1])]
+        keyboard.append(button)
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    await context.bot.send_message(
+        chat_id=update.message.chat_id,
+        text="🟠 select desired chart theme",
+        reply_markup=reply_markup
+    )
+
+
 if __name__ == '__main__':
     application = ApplicationBuilder().token(TELEGRAM_TOKEN).build()
 
@@ -149,6 +175,9 @@ if __name__ == '__main__':
 
     chart_handler = CommandHandler('c', cg_chart_handler)
     application.add_handler(chart_handler)
+
+    chart_color = CommandHandler('chart_color', chart_color_handler)
+    application.add_handler(chart_color)
 
     crypto_gas_handler = CommandHandler('gas', gas_handler)
     application.add_handler(crypto_gas_handler)

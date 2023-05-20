@@ -16,10 +16,16 @@ CRYPTOGECKO_API_COINS = 'https://api.coingecko.com/api/v3/coins/'
 CRYPTOGECKO_API_DOMINANCE = 'https://api.coingecko.com/api/v3/global/'
 
 chart_template = 'plotly_dark'
+
+coin_list_gc = []
+
+
 async def get_coin_list():
-    coin_list = requests.get("https://api.coingecko.com/api/v3/coins/list?include_platform=false")
-    if coin_list.status_code == 200:
-        return coin_list.json()
+    global coin_list_gc
+    coin_request = requests.get("https://api.coingecko.com/api/v3/coins/list?include_platform=false")
+    if coin_request.status_code == 200:
+        coin_list_gc = coin_request.json()
+        return coin_list_gc
     else:
         return "request_error"
 
@@ -31,6 +37,12 @@ async def get_api_id(crypto_symbol: str, coin_list):
         if crypto["symbol"] == crypto_symbol and all(excluded not in crypto["id"] for excluded in excluded_values):
             api_ids.append(crypto["id"])
     return api_ids
+
+
+async def get_coin_info(coin_name: str):
+    for crypto in coin_list_gc:
+        if coin_name == crypto['id']:
+            return {'name': crypto['name'], 'symbol': crypto['symbol'].upper()}
 
 
 async def get_cg_price(coin, update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -203,9 +215,21 @@ async def get_cg_chart(coin, update: Update, context: ContextTypes.DEFAULT_TYPE,
 
     df = pd.DataFrame({'timeframe': x, 'prices': y})
     df['timeframe'] = pd.to_datetime(df['timeframe'], unit='s')
-    title = f'Chart of {coin} in {period} day{"s" if period != "1" else ""}'
+    info = await get_coin_info(coin)
+    title = f'{info["name"]} ({info["symbol"]})'
+    bottom = f'{period} day{"s" if period != "1" else ""} chart'
     template = chart_template
-    fig = px.line(df, x='timeframe', y='prices', template=template, title=title, labels={'timeframe': ''})
+    fig = px.line(df, x='timeframe', y='prices', template=template,
+                  labels={'timeframe': bottom, 'prices': 'prices ($)'})
+    fig.update_layout(
+        title={
+            'text': title,
+            'y': 0.93,
+            'x': 0.5,
+            'font': dict(size=24)
+        }
+
+    )
     pio.write_image(fig, 'plot.jpg', format='jpg')
 
     periods = [{'1': '24h'}, {'7': '7d'}, {'30': '30d'}, {'90': '90d'}, {'365': '1y'}, {'max': 'max'}]

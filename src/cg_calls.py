@@ -15,9 +15,28 @@ from service import format_date, max_column_size, at_handler, k_handler
 CRYPTOGECKO_API_COINS = 'https://api.coingecko.com/api/v3/coins/'
 CRYPTOGECKO_API_DOMINANCE = 'https://api.coingecko.com/api/v3/global/'
 
-chart_template = 'plotly_dark'
-
 coin_list_gc = []
+
+
+class ChartTemplate:
+    _instance = None
+    template = 'plotly_dark'
+
+    @classmethod
+    def get_instance(cls):
+        if not cls._instance:
+            cls._instance = cls()
+        return cls._instance
+
+    @classmethod
+    def set_template(cls, template: str):
+        cls.template = template
+
+    def get_template(self):
+        return self.template
+
+
+chart_template = ChartTemplate()
 
 
 async def get_coin_list():
@@ -43,12 +62,6 @@ async def get_coin_info(coin_name: str):
     for crypto in coin_list_gc:
         if coin_name == crypto['id']:
             return {'name': crypto['name'], 'symbol': crypto['symbol'].upper()}
-
-
-def set_chart_template(template: str):
-    global chart_template
-    chart_template = template
-    return
 
 
 async def get_cg_price(coin, update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -224,7 +237,7 @@ async def get_cg_chart(coin, update: Update, context: ContextTypes.DEFAULT_TYPE,
     info = await get_coin_info(coin)
     title = f'{info["name"]} ({info["symbol"]})'
     bottom = f'{period} day{"s" if period != "1" else ""} chart'
-    template = chart_template
+    template = chart_template.get_template()
     fig = px.line(df, x='timeframe', y='prices', template=template,
                   labels={'timeframe': bottom, 'prices': 'price ($)'})
 

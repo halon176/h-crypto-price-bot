@@ -1,4 +1,3 @@
-import datetime
 import logging
 
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
@@ -10,50 +9,37 @@ from telegram.ext import (
     CallbackQueryHandler,
 )
 
-from cg_calls import get_cg_price, get_api_id, get_cg_dominance, get_coin_list, get_cg_chart
+from cg_calls import get_cg_price, get_api_id, get_cg_dominance, get_cg_chart
 from config import TELEGRAM_TOKEN
 from ethersca_calls import gas_handler
 from info import start, bot_help
 from news import news
-from src.shared import ChartTemplate
+from src.shared import ChartTemplate, CoinList
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     level=logging.INFO
 )
 
-coin_list = []
-coin_last_update = datetime.datetime.now()
+coin_list = CoinList()
+coin_list.update()
 
 chart_template = ChartTemplate()
 
 
 async def coin_check(coin, update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs):
     coin_type = kwargs.get('type', None)
-    global coin_list, coin_last_update
-    if not coin_list:
-        coin_list = await get_coin_list()
-
     if len(coin) == 0:
         await context.bot.send_message(
             chat_id=update.effective_chat.id,
             text="Please enter a valid crypto symbol."
         )
         return False
-    coins = await get_api_id(coin, coin_list)
+    coins = await get_api_id(coin)
     if not coins:
-        if (datetime.datetime.now() - coin_last_update) >= datetime.timedelta(hours=1):
-            coin_list = await get_coin_list()
-            coin_last_update = datetime.datetime.now()
-            logging.info("Reloaded coin list")
-            coins = await get_api_id(coin, coin_list)
-            if not coins:
-                await context.bot.send_message(
-                    chat_id=update.effective_chat.id,
-                    text="Please enter a valid crypto symbol."
-                )
-                return False
-        else:
+        coin_list.update()
+        coins = await get_api_id(coin)
+        if not coins:
             await context.bot.send_message(
                 chat_id=update.effective_chat.id,
                 text="Please enter a valid crypto symbol."

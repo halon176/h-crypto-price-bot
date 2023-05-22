@@ -11,7 +11,7 @@ from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ContextTypes
 
 from service import format_date, max_column_size, at_handler, k_handler
-from src.shared import ChartTemplate
+from src.shared import ChartTemplate, CoinList
 
 CRYPTOGECKO_API_COINS = 'https://api.coingecko.com/api/v3/coins/'
 CRYPTOGECKO_API_DOMINANCE = 'https://api.coingecko.com/api/v3/global/'
@@ -19,29 +19,20 @@ CRYPTOGECKO_API_DOMINANCE = 'https://api.coingecko.com/api/v3/global/'
 coin_list_gc = []
 
 chart_template = ChartTemplate()
+coin_list = CoinList()
 
 
-async def get_coin_list():
-    global coin_list_gc
-    coin_request = requests.get("https://api.coingecko.com/api/v3/coins/list?include_platform=false")
-    if coin_request.status_code == 200:
-        coin_list_gc = coin_request.json()
-        return coin_list_gc
-    else:
-        return "request_error"
-
-
-async def get_api_id(crypto_symbol: str, coin_list):
+async def get_api_id(crypto_symbol: str):
     excluded_values = ["-peg-", "-wormhole", "wrapped", "oec-", "-iou", "harrypotter"]
     api_ids = []
-    for crypto in coin_list:
+    for crypto in coin_list.coin_list:
         if crypto["symbol"] == crypto_symbol and all(excluded not in crypto["id"] for excluded in excluded_values):
             api_ids.append(crypto["id"])
     return api_ids
 
 
 async def get_coin_info(coin_name: str):
-    for crypto in coin_list_gc:
+    for crypto in coin_list.coin_list:
         if coin_name == crypto['id']:
             return {'name': crypto['name'], 'symbol': crypto['symbol'].upper()}
 

@@ -14,7 +14,7 @@ from config import TELEGRAM_TOKEN
 from ethersca_calls import gas_handler
 from info import start, bot_help
 from news import news
-from src.shared import ChartTemplate, CoinList
+from shared import ChartTemplate, CoinList
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',

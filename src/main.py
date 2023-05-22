@@ -10,11 +10,12 @@ from telegram.ext import (
     CallbackQueryHandler,
 )
 
-from cg_calls import get_cg_price, get_api_id, get_cg_dominance, get_coin_list, get_cg_chart, ChartTemplate
+from cg_calls import get_cg_price, get_api_id, get_cg_dominance, get_coin_list, get_cg_chart
 from config import TELEGRAM_TOKEN
 from ethersca_calls import gas_handler
 from info import start, bot_help
 from news import news
+from src.shared import ChartTemplate
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',

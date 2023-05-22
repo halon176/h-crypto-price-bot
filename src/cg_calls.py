@@ -11,30 +11,12 @@ from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ContextTypes
 
 from service import format_date, max_column_size, at_handler, k_handler
+from src.shared import ChartTemplate
 
 CRYPTOGECKO_API_COINS = 'https://api.coingecko.com/api/v3/coins/'
 CRYPTOGECKO_API_DOMINANCE = 'https://api.coingecko.com/api/v3/global/'
 
 coin_list_gc = []
-
-
-class ChartTemplate:
-    _instance = None
-    template = 'plotly_dark'
-
-    @classmethod
-    def get_instance(cls):
-        if not cls._instance:
-            cls._instance = cls()
-        return cls._instance
-
-    @classmethod
-    def set_template(cls, template: str):
-        cls.template = template
-
-    def get_template(self):
-        return self.template
-
 
 chart_template = ChartTemplate()
 

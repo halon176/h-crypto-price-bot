@@ -15,7 +15,6 @@ async def get_defilama_price(contract, chain, update: Update, context: ContextTy
     else:
         logging.info(f'Request URL: {url}')
         coin = list(response['coins'].values())[0]
-        print(coin)
         message = f'```\n' \
                   f'{coin["symbol"].upper()} on {chain.upper()}\n' \
                   f'price = {coin["price"]}$' \

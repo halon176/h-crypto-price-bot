@@ -5,10 +5,10 @@ from telegram.ext import (
     ApplicationBuilder,
     ContextTypes,
     CommandHandler,
-    CallbackContext,
     CallbackQueryHandler,
 )
 
+from callback import callback_handler
 from cg_calls import get_cg_price, get_api_id, get_cg_dominance, get_cg_chart
 from config import TELEGRAM_TOKEN
 from defilama_calls import get_defilama_price
@@ -87,51 +87,6 @@ async def cg_price_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
 
 
-async def callback_menu_handler(update: Update, context: CallbackContext):
-    query = update.callback_query
-    selected_option = query.data
-
-    if selected_option.startswith("chart_"):
-        await get_cg_chart(selected_option[6:], update, context)
-        await context.bot.delete_message(
-            chat_id=query.message.chat_id,
-            message_id=query.message.message_id
-        )
-    elif selected_option.startswith("charttemplate_"):
-        chart_template.set_template(selected_option[14:])
-        await context.bot.delete_message(
-            chat_id=query.message.chat_id,
-            message_id=query.message.message_id
-        )
-
-        await context.bot.send_message(
-            chat_id=update.effective_chat.id,
-            text=f"{selected_option[21:]} theme selected"
-        )
-
-    elif selected_option.startswith("period_"):
-        indexdot = selected_option.index('.')
-        await get_cg_chart(selected_option[indexdot + 1:], update, context, selected_option[7:indexdot])
-        await context.bot.delete_message(
-            chat_id=query.message.chat_id,
-            message_id=query.message.message_id
-        )
-
-    else:
-        try:
-            await get_cg_price(selected_option, update, context)
-        except Exception as e:
-            logging.error(f"An error occurred: {str(e)}")
-            await context.bot.send_message(
-                chat_id=update.effective_chat.id,
-                text="An error occurred. Please try again later."
-            )
-        await context.bot.delete_message(
-            chat_id=query.message.chat_id,
-            message_id=query.message.message_id
-        )
-
-
 async def cg_chart_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     crypto_symbol = context.args[0].lower()
     coin = await coin_check(crypto_symbol, update, context, type='chart')
@@ -203,7 +158,7 @@ if __name__ == '__main__':
     help_handler = CommandHandler('help', bot_help)
     application.add_handler(help_handler)
 
-    menu_handler = CallbackQueryHandler(callback_menu_handler)
+    menu_handler = CallbackQueryHandler(callback_handler)
     application.add_handler(menu_handler)
 
     application.run_polling()

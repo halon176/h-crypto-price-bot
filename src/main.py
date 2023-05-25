@@ -10,6 +10,7 @@ from telegram.ext import (
 
 from callback import callback_handler
 from cg_calls import get_cg_price, get_api_id, get_cg_dominance, get_cg_chart
+from cmc_calls import ogz_price
 from config import TELEGRAM_TOKEN
 from defilama_calls import get_defilama_price
 from ethersca_calls import gas_handler
@@ -145,6 +146,9 @@ if __name__ == '__main__':
 
     chart_color = CommandHandler('chart_color', chart_color_handler)
     application.add_handler(chart_color)
+
+    ogz_price_handler = CommandHandler('ogz', ogz_price)
+    application.add_handler(ogz_price_handler)
 
     crypto_gas_handler = CommandHandler('gas', gas_handler)
     application.add_handler(crypto_gas_handler)

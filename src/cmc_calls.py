@@ -3,7 +3,7 @@ from telegram import Update
 from telegram.ext import ContextTypes
 
 from config import CMC_API_KEY
-from src.service import human_format
+from service import human_format
 
 
 async def ogz_price(update: Update, context: ContextTypes.DEFAULT_TYPE):

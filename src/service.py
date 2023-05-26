@@ -25,13 +25,20 @@ def at_handler(at):
         return round(at, fep)
 
 
-def k_handler(num):
-    num_str = str(num)
-    if len(num_str.split('.')[0]) > 3:
-        num_str = num_str.split('.')[0][:2] + 'k'
-    else:
-        if abs(num) < 10:
-            num_str = "{:.2f}".format(num)
-        else:
-            num_str = "{:.0f}".format(num)
-    return num_str
+def human_format(num) -> str:
+    magnitude = 0
+    suffixes = ['', 'K', 'M', 'B', 'T']
+    max_suffix_index = len(suffixes) - 1
+
+    while abs(num) >= 1000 and magnitude < max_suffix_index:
+        magnitude += 1
+        num /= 1000.0
+
+    num = float('{:.3g}'.format(num))
+    additional_digits = max(int(magnitude - max_suffix_index), 0)
+
+    formatted_num = '{:f}'.format(num).rstrip('0').rstrip('.')
+
+    formatted_num += '0' * additional_digits
+
+    return '{}{}'.format(formatted_num, suffixes[magnitude])

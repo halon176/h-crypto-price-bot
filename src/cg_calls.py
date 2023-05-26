@@ -2,7 +2,6 @@ import logging
 import os
 from functools import reduce
 
-import humanize
 import pandas as pd
 import plotly.express as px
 import plotly.io as pio
@@ -10,7 +9,7 @@ import requests
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ContextTypes
 
-from service import format_date, max_column_size, at_handler, k_handler
+from service import format_date, max_column_size, at_handler, human_format
 from shared import ChartTemplate, CoinList
 
 CRYPTOGECKO_API_COINS = 'https://api.coingecko.com/api/v3/coins/'
@@ -66,7 +65,7 @@ async def get_cg_price(coin, update: Update, context: ContextTypes.DEFAULT_TYPE)
         market_cap_rank = str(crypto_data['market_cap_rank']) + "°"
     crypto_name = crypto_data['name']
     usd_price = crypto_data['market_data']['current_price'].get('usd')
-    crypto_price = humanize.intcomma(usd_price) if usd_price is not None else 'N/A'
+    crypto_price = human_format(usd_price) if usd_price is not None else 'N/A'
 
     try:
         index_of_ref = crypto_data['links']['homepage'][0].index("?")
@@ -97,7 +96,7 @@ async def get_cg_price(coin, update: Update, context: ContextTypes.DEFAULT_TYPE)
             if value is None:
                 self.value = "N/A"
             else:
-                self.value = humanize.intword(data_value)
+                self.value = human_format(data_value)
 
     general_data = []
     for emoji, label, data_key in general_data_sheme:
@@ -146,11 +145,11 @@ async def get_cg_price(coin, update: Update, context: ContextTypes.DEFAULT_TYPE)
             self.emoji = allt_emoji
             self.symbol = allt_symbol
             if allt_price and "usd" in allt_price:
-                self.at_price = humanize.intcomma(at_handler(allt_price["usd"])) + "$"
+                self.at_price = human_format(at_handler(allt_price["usd"])) + "$"
             else:
                 self.at_price = "N/A"
             if allt_percentage and "usd" in allt_percentage:
-                self.at_percentage = k_handler(allt_percentage["usd"]) + "%"
+                self.at_percentage = human_format(allt_percentage["usd"]) + "%"
             else:
                 self.at_percentage = "N/A"
             if allt_date and "usd" in allt_date:

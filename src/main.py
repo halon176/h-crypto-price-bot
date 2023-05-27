@@ -16,15 +16,18 @@ from defilama_calls import get_defilama_price
 from ethersca_calls import gas_handler
 from info import start, bot_help
 from news import news
-from shared import ChartTemplate, CoinList
+from shared import ChartTemplate, CGCoinList, CMCCoinList
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     level=logging.INFO
 )
 
-coin_list = CoinList()
-coin_list.update()
+cg_coin_list = CGCoinList()
+cg_coin_list.update()
+
+cmc_coin_list = CMCCoinList()
+cmc_coin_list.update()
 
 chart_template = ChartTemplate()
 
@@ -39,7 +42,7 @@ async def coin_check(coin, update: Update, context: ContextTypes.DEFAULT_TYPE, *
         return False
     coins = await get_api_id(coin)
     if not coins:
-        coin_list.update()
+        cg_coin_list.update()
         coins = await get_api_id(coin)
         if not coins:
             await context.bot.send_message(

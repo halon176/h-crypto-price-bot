@@ -1,3 +1,4 @@
+import logging
 from functools import reduce
 
 import requests
@@ -27,8 +28,10 @@ async def get_cmc_coin_info(coin_id: int):
 
 
 async def get_cmc_price(coin, update: Update, context: ContextTypes.DEFAULT_TYPE):
-    r = (requests.get(f"https://pro-api.coinmarketcap.com/v2/cryptocurrency/quotes/latest?id={coin}",
-                      headers={"X-CMC_PRO_API_KEY": CMC_API_KEY})).json()
+    url = f"https://pro-api.coinmarketcap.com/v2/cryptocurrency/quotes/latest?id={coin}"
+    r = (requests.get(url, headers={"X-CMC_PRO_API_KEY": CMC_API_KEY})).json()
+    logging.info(f'Request CMC URL: {url}')
+
     crypto_data = r["data"][str(coin)]
 
     market_cap_rank = crypto_data['cmc_rank']

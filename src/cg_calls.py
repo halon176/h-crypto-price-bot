@@ -44,7 +44,7 @@ async def get_cg_price(coin, update: Update, context: ContextTypes.DEFAULT_TYPE)
                '&sparkline=false'
 
     url = CRYPTOGECKO_API_COINS + coin + url_tail
-    logging.info(f'Request URL: {url}')
+    logging.info(f'Request CG URL: {url}')
 
     response = requests.get(url)
 

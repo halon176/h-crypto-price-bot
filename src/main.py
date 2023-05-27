@@ -9,8 +9,8 @@ from telegram.ext import (
 )
 
 from callback import callback_handler
-from cg_calls import get_cg_price, get_api_id, get_cg_dominance, get_cg_chart
-from cmc_calls import ogz_price
+from cg_calls import get_cg_price, get_cg_id, get_cg_dominance, get_cg_chart
+from cmc_calls import ogz_price, get_cmc_id, get_cmc_price
 from config import TELEGRAM_TOKEN
 from defilama_calls import get_defilama_price
 from ethersca_calls import gas_handler
@@ -32,7 +32,28 @@ cmc_coin_list.update()
 chart_template = ChartTemplate()
 
 
-async def coin_check(coin, update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs):
+async def cmc_coin_check(coin, update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs):
+    if len(coin) == 0:
+        await context.bot.send_message(
+            chat_id=update.effective_chat.id,
+            text="Please enter a valid crypto symbol."
+        )
+        return False
+    coins = await get_cmc_id(coin)
+    if not coins:
+        cmc_coin_list.update()
+        coins = await get_cmc_id(coin)
+        if not coins:
+            await context.bot.send_message(
+                chat_id=update.effective_chat.id,
+                text="Please enter a valid crypto symbol."
+            )
+            return False
+    if len(coins) == 1:
+        return coins[0]
+
+
+async def gc_coin_check(coin, update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs):
     coin_type = kwargs.get('type', None)
     if len(coin) == 0:
         await context.bot.send_message(
@@ -40,10 +61,10 @@ async def coin_check(coin, update: Update, context: ContextTypes.DEFAULT_TYPE, *
             text="Please enter a valid crypto symbol."
         )
         return False
-    coins = await get_api_id(coin)
+    coins = await get_cg_id(coin)
     if not coins:
         cg_coin_list.update()
-        coins = await get_api_id(coin)
+        coins = await get_cg_id(coin)
         if not coins:
             await context.bot.send_message(
                 chat_id=update.effective_chat.id,
@@ -79,7 +100,7 @@ async def coin_check(coin, update: Update, context: ContextTypes.DEFAULT_TYPE, *
 
 async def cg_price_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     crypto_symbol = context.args[0].lower()
-    coin = await coin_check(crypto_symbol, update, context)
+    coin = await gc_coin_check(crypto_symbol, update, context)
     if coin:
         try:
             await get_cg_price(coin, update, context)
@@ -91,9 +112,23 @@ async def cg_price_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
 
 
+async def cmc_price_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    crypto_symbol = context.args[0].lower()
+    coin = await cmc_coin_check(crypto_symbol, update, context)
+    if coin:
+        try:
+            await get_cmc_price(coin, update, context)
+        except Exception as e:
+            logging.error(f"An error occurred: {str(e)}")
+            await context.bot.send_message(
+                chat_id=update.effective_chat.id,
+                text="An error occurred. Please try again later."
+            )
+
+
 async def cg_chart_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     crypto_symbol = context.args[0].lower()
-    coin = await coin_check(crypto_symbol, update, context, type='chart')
+    coin = await gc_coin_check(crypto_symbol, update, context, type='chart')
     if coin:
         await get_cg_chart(coin, update, context)
 
@@ -135,8 +170,8 @@ if __name__ == '__main__':
     start_handler = CommandHandler('start', start)
     application.add_handler(start_handler)
 
-    price_handler = CommandHandler('p', cg_price_handler)
-    application.add_handler(price_handler)
+    cg_price_handler = CommandHandler('p', cg_price_handler)
+    application.add_handler(cg_price_handler)
 
     chart_handler = CommandHandler('c', cg_chart_handler)
     application.add_handler(chart_handler)
@@ -149,6 +184,9 @@ if __name__ == '__main__':
 
     chart_color = CommandHandler('chart_color', chart_color_handler)
     application.add_handler(chart_color)
+
+    cmc_price_handler = CommandHandler('cmc', cmc_price_handler)
+    application.add_handler(cmc_price_handler)
 
     ogz_price_handler = CommandHandler('ogz', ogz_price)
     application.add_handler(ogz_price_handler)

@@ -30,7 +30,7 @@ async def get_cg_id(crypto_symbol: str):
     return api_ids
 
 
-async def get_coin_info(coin_name: str):
+async def get_cg_coin_info(coin_name: str):
     for crypto in coin_list.coin_list:
         if coin_name == crypto['id']:
             return {'name': crypto['name'], 'symbol': crypto['symbol'].upper()}
@@ -206,7 +206,7 @@ async def get_cg_chart(coin, update: Update, context: ContextTypes.DEFAULT_TYPE,
 
     df = pd.DataFrame({'timeframe': x, 'prices': y})
     df['timeframe'] = pd.to_datetime(df['timeframe'], unit='s')
-    info = await get_coin_info(coin)
+    info = await get_cg_coin_info(coin)
     title = f'{info["name"]} ({info["symbol"]})'
     bottom = f'{period} day{"s" if period != "1" else ""} chart'
     template = chart_template.get_template()

@@ -20,6 +20,12 @@ async def get_cmc_id(crypto_symbol: str):
     return api_ids
 
 
+async def get_cmc_coin_info(coin_id: int):
+    for crypto in coin_list.coin_list["data"]:
+        if coin_id == crypto['id']:
+            return {'name': crypto['name'], 'symbol': crypto['symbol']}
+
+
 async def get_cmc_price(coin, update: Update, context: ContextTypes.DEFAULT_TYPE):
     r = (requests.get(f"https://pro-api.coinmarketcap.com/v2/cryptocurrency/quotes/latest?id={coin}",
                       headers={"X-CMC_PRO_API_KEY": CMC_API_KEY})).json()

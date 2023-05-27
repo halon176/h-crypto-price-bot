@@ -6,6 +6,7 @@ from telegram.ext import (
 )
 
 from cg_calls import get_cg_price, get_cg_chart
+from cmc_calls import get_cmc_price
 from shared import ChartTemplate
 
 chart_template = ChartTemplate()
@@ -21,6 +22,14 @@ async def callback_handler(update: Update, context: CallbackContext):
             chat_id=query.message.chat_id,
             message_id=query.message.message_id
         )
+    if selected_option.startswith("cmc_"):
+        coin_id = selected_option[4:]
+        await get_cmc_price(coin_id, update, context)
+        await context.bot.delete_message(
+            chat_id=query.message.chat_id,
+            message_id=query.message.message_id
+        )
+
     elif selected_option.startswith("charttemplate_"):
         chart_template.set_template(selected_option[14:])
         await context.bot.delete_message(

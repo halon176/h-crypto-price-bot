@@ -10,7 +10,7 @@ from telegram.ext import (
 
 from callback import callback_handler
 from cg_calls import get_cg_price, get_cg_id, get_cg_dominance, get_cg_chart
-from cmc_calls import ogz_price, get_cmc_id, get_cmc_price
+from cmc_calls import ogz_price, get_cmc_id, get_cmc_price, get_cmc_coin_info
 from config import TELEGRAM_TOKEN
 from defilama_calls import get_defilama_price
 from ethersca_calls import gas_handler
@@ -51,6 +51,18 @@ async def cmc_coin_check(coin, update: Update, context: ContextTypes.DEFAULT_TYP
             return False
     if len(coins) == 1:
         return coins[0]
+    else:
+        keyboard = []
+        for crypto in coins:
+            coin_data = await get_cmc_coin_info(crypto)
+            button = [InlineKeyboardButton(coin_data['name'], callback_data="cmc_" + str(crypto))]
+            keyboard.append(button)
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        await context.bot.send_message(
+            chat_id=update.message.chat_id,
+            text="🟠 There are multiple coins with the same symbol, please select the desired one:",
+            reply_markup=reply_markup
+        )
 
 
 async def gc_coin_check(coin, update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs):

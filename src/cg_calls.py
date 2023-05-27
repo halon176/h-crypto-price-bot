@@ -10,7 +10,7 @@ from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ContextTypes
 
 from service import format_date, max_column_size, at_handler, human_format
-from shared import ChartTemplate, CoinList
+from shared import ChartTemplate, CGCoinList
 
 CRYPTOGECKO_API_COINS = 'https://api.coingecko.com/api/v3/coins/'
 CRYPTOGECKO_API_DOMINANCE = 'https://api.coingecko.com/api/v3/global/'
@@ -18,7 +18,7 @@ CRYPTOGECKO_API_DOMINANCE = 'https://api.coingecko.com/api/v3/global/'
 coin_list_gc = []
 
 chart_template = ChartTemplate()
-coin_list = CoinList()
+coin_list = CGCoinList()
 
 
 async def get_api_id(crypto_symbol: str):

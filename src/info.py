@@ -28,6 +28,7 @@ async def bot_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
              "`/c <crypto_symbol>` - to receive the chart in different timeframes of selected crypto\n"
              "`/cmc <crypto_symbol>` - to receive the current price and historical variation from CoinMarketCap\n"
              "`/chart_color` to select chart color theme\n"
+             "/cmckey - to reveive info about CoinMarketCap api key usage"
              "/dom - to receive the top 10 most capitalized tokens\n"
              "/gas - to receive real time gas information on ERC\n"
              "/news - to receive CoinTelegraph news\n"

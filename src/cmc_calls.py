@@ -6,6 +6,7 @@ from telegram import Update
 from telegram.ext import ContextTypes
 
 from config import CMC_API_KEY
+from models import PriceChangeEntry, GeneralDataEntry
 from service import human_format, max_column_size
 from shared import CMCCoinList
 
@@ -49,14 +50,6 @@ async def get_cmc_price(coin, update: Update, context: ContextTypes.DEFAULT_TYPE
         "90d": "percent_change_90d",
     }
 
-    class PriceChangeEntry:
-        def __init__(self, change_label, change_value):
-            self.strEntry = change_label
-            if change_value is None:
-                self.strPercentage = "N/A"
-            else:
-                self.strPercentage = f"{change_value:.1f}%"
-
     price_changes = []
     for label, data_key in price_change_data.items():
         value = crypto_data['quote']['USD'].get(data_key)
@@ -78,15 +71,6 @@ async def get_cmc_price(coin, update: Update, context: ContextTypes.DEFAULT_TYPE
                           ("🖨", "Total S", "total_supply"),
                           ("🏦", "Max S", "max_supply"),
                           )
-
-    class GeneralDataEntry:
-        def __init__(self, data_emoji, data_type, data_value):
-            self.emoji = data_emoji
-            self.type = data_type
-            if value == "N/A" or value is None:
-                self.value = "N/A"
-            else:
-                self.value = human_format(float(data_value))
 
     general_data = []
     for emoji, label, data_key in general_data_sheme:

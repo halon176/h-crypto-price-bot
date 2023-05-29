@@ -9,7 +9,8 @@ import requests
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ContextTypes
 
-from service import format_date, max_column_size, at_handler, human_format
+from models import GeneralDataEntry, AtEntry, PriceChangeEntry
+from service import max_column_size, human_format
 from shared import ChartTemplate, CGCoinList
 
 CRYPTOGECKO_API_COINS = 'https://api.coingecko.com/api/v3/coins/'
@@ -89,15 +90,6 @@ async def get_cg_price(coin, update: Update, context: ContextTypes.DEFAULT_TYPE)
                           ("💵", "Circ. S", "circulating_supply"),
                           ("🖨", "Total S", "total_supply"))
 
-    class GeneralDataEntry:
-        def __init__(self, data_emoji, data_type, data_value):
-            self.emoji = data_emoji
-            self.type = data_type
-            if value is None:
-                self.value = "N/A"
-            else:
-                self.value = human_format(data_value)
-
     general_data = []
     for emoji, label, data_key in general_data_sheme:
         if data_key == "market_cap":
@@ -116,14 +108,6 @@ async def get_cg_price(coin, update: Update, context: ContextTypes.DEFAULT_TYPE)
     general_data_message = "\n".join(
         [str_format_gend.format(gend.emoji, gend.type, gend.value) for gend in general_data])
 
-    class PriceChangeEntry:
-        def __init__(self, change_label, change_value):
-            self.strEntry = change_label
-            if change_value is None:
-                self.strPercentage = "N/A"
-            else:
-                self.strPercentage = f"{change_value:.1f}%"
-
     price_changes = []
     for label, data_key in price_change_data.items():
         value = crypto_data['market_data'].get(data_key)
@@ -139,23 +123,6 @@ async def get_cg_price(coin, update: Update, context: ContextTypes.DEFAULT_TYPE)
 
     at_data_schema = (("📈", "ATH", "ath", "ath_change_percentage", "ath_date"),
                       ("📉", "ATL", "atl", "atl_change_percentage", "atl_date"))
-
-    class AtEntry:
-        def __init__(self, allt_emoji, allt_symbol, allt_price, allt_percentage, allt_date):
-            self.emoji = allt_emoji
-            self.symbol = allt_symbol
-            if allt_price and "usd" in allt_price:
-                self.at_price = human_format(at_handler(allt_price["usd"])) + "$"
-            else:
-                self.at_price = "N/A"
-            if allt_percentage and "usd" in allt_percentage:
-                self.at_percentage = human_format(allt_percentage["usd"]) + "%"
-            else:
-                self.at_percentage = "N/A"
-            if allt_date and "usd" in allt_date:
-                self.date = format_date(allt_date["usd"])
-            else:
-                self.date = "N/A"
 
     at_data = []
     for emoji, label, price, percentage, date in at_data_schema:

@@ -1,4 +1,4 @@
-from service import human_format, format_date, at_handler
+from service import human_format, format_date
 
 
 class PriceChangeEntry:
@@ -25,7 +25,7 @@ class AtEntry:
         self.emoji = allt_emoji
         self.symbol = allt_symbol
         if allt_price and "usd" in allt_price:
-            self.at_price = human_format(at_handler(allt_price["usd"])) + "$"
+            self.at_price = human_format(allt_price["usd"]) + "$"
         else:
             self.at_price = "N/A"
         if allt_percentage and "usd" in allt_percentage:

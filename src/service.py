@@ -10,21 +10,6 @@ def max_column_size(arr):
     return max((len(string) for string in arr))
 
 
-def at_handler(at):
-    if at > 10:
-        return round(at)
-    elif 0.1 < at < 1:
-        return round(at, 2)
-    else:
-        fep = 0
-        at_str = str(at)
-        for i in range(3, len(at_str)):
-            if at_str[i] != 0:
-                fep = i
-                break
-        return round(at, fep)
-
-
 def human_format(num) -> str:
     magnitude = 0
     suffixes = ['', 'K', 'M', 'B', 'T']

@@ -106,3 +106,33 @@ async def get_cmc_price(coin, update: Update, context: ContextTypes.DEFAULT_TYPE
 
 async def ogz_price(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await get_cmc_price('25832', update, context)
+
+
+async def cmc_key_info(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    url = 'https://pro-api.coinmarketcap.com/v1/key/info'
+    r = (requests.get(url, headers={"X-CMC_PRO_API_KEY": CMC_API_KEY})).json()
+    logging.info(f'Request CMC Key Info: {url}')
+
+    data = r['data']
+    credit_limit_monthly = data['plan'].get('credit_limit_monthly', 'N/A')
+    credit_limit_monthly_reset = (data['plan'].get('credit_limit_monthly_reset', 'N/A')).lower()
+    minut_requests_made = data['usage']['current_minute'].get('requests_made', 'N/A')
+    minut_requests_left = data['usage']['current_minute'].get('requests_left', 'N/A')
+    day_credits_made = data['usage']['current_day'].get('credits_used', 'N/A')
+    day_credits_left = data['usage']['current_day'].get('credits_left', 'N/A')
+    month_credits_used = data['usage']['current_month'].get('credits_used', 'N/A')
+    month_credits_left = data['usage']['current_month'].get('credits_left', 'N/A')
+
+    message = f"CoinMarketCap Key Info\n" \
+              f"```\n" \
+              f"Your monthly credit limit is {credit_limit_monthly}\n" \
+              f"Minut requests count is {minut_requests_made} of {minut_requests_left}\n" \
+              f"Daily credits used are {day_credits_made} of {day_credits_left}\n" \
+              f"Monthly credits used are {month_credits_used} of {month_credits_left}\n" \
+              f"Monthly credits limit will be reset {credit_limit_monthly_reset}\n" \
+              f"```"
+
+    await context.bot.send_message(chat_id=update.effective_chat.id,
+                                   text=message,
+                                   parse_mode="markdown",
+                                   disable_web_page_preview=True)

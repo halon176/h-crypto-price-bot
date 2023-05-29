@@ -10,7 +10,7 @@ from telegram.ext import (
 
 from callback import callback_handler
 from cg_calls import get_cg_price, get_cg_id, get_cg_dominance, get_cg_chart
-from cmc_calls import ogz_price, get_cmc_id, get_cmc_price, get_cmc_coin_info
+from cmc_calls import ogz_price, get_cmc_id, get_cmc_price, get_cmc_coin_info, cmc_key_info
 from config import TELEGRAM_TOKEN
 from defilama_calls import get_defilama_price
 from ethersca_calls import gas_handler
@@ -199,6 +199,9 @@ if __name__ == '__main__':
 
     cmc_price_handler = CommandHandler('cmc', cmc_price_handler)
     application.add_handler(cmc_price_handler)
+
+    cmc_key_info = CommandHandler('cmckey', cmc_key_info)
+    application.add_handler(cmc_key_info)
 
     ogz_price_handler = CommandHandler('ogz', ogz_price)
     application.add_handler(ogz_price_handler)

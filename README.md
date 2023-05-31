@@ -14,7 +14,7 @@ Here's a working version of the bot: [@h_crypto_price_bot](https://t.me/h_crypto
 
 ### Manual
 
-1) First, make sure you have Python 3.10 installed on your machine. You can check your Python version by opening a terminal and running the following command: 
+1) First, make sure you have Python 3.11 installed on your machine. You can check your Python version by opening a terminal and running the following command:
 
 ```
 python --version

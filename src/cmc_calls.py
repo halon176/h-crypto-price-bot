@@ -104,10 +104,6 @@ async def get_cmc_price(coin, update: Update, context: ContextTypes.DEFAULT_TYPE
                                    disable_web_page_preview=True)
 
 
-async def ogz_price(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await get_cmc_price('25832', update, context)
-
-
 async def cmc_key_info(update: Update, context: ContextTypes.DEFAULT_TYPE):
     url = 'https://pro-api.coinmarketcap.com/v1/key/info'
     r = (requests.get(url, headers={"X-CMC_PRO_API_KEY": CMC_API_KEY})).json()

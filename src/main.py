@@ -20,7 +20,7 @@ from shared import ChartTemplate, CGCoinList, CMCCoinList
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    level=logging.INFO
+    level=logging.ERROR
 )
 
 cg_coin_list = CGCoinList()

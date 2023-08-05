@@ -8,6 +8,8 @@ WORKDIR crypto_price_bot
 
 COPY requirements.txt .
 
+RUN pip install --upgrade pip
+
 RUN pip install -r requirements.txt
 
 COPY . .

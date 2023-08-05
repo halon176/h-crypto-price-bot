@@ -22,7 +22,7 @@ async def callback_handler(update: Update, context: CallbackContext):
             chat_id=query.message.chat_id,
             message_id=query.message.message_id
         )
-    if selected_option.startswith("cmc_"):
+    elif selected_option.startswith("cmc_"):
         coin_id = selected_option[4:]
         await get_cmc_price(coin_id, update, context)
         await context.bot.delete_message(

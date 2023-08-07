@@ -15,7 +15,7 @@ eth-hash==0.5.1
 eth-keyfile==0.6.1
 eth-keys==0.4.0
 eth-rlp==0.3.0
-eth-typing==3.3.0
+eth-typing==3.4.0
 eth-utils==2.2.0
 feedparser==6.0.10
 fonttools==4.39.4

@@ -22,8 +22,10 @@ class CoinList:
 class CMCCoinList(CoinList):
     def update(self, CMC_PRO_API_KEY=None):
         if (datetime.datetime.now() - self.coin_last_update) >= datetime.timedelta(hours=1):
-            coin_request = requests.get(f"https://pro-api.coinmarketcap.com/v1/cryptocurrency/map",
-                                        headers={"X-CMC_PRO_API_KEY": CMC_API_KEY})
+            coin_request = requests.get(
+                f"https://pro-api.coinmarketcap.com/v1/cryptocurrency/map",
+                headers={"X-CMC_PRO_API_KEY": CMC_API_KEY},
+            )
             coin_list_gc = coin_request.json()
             self.coin_list = coin_list_gc
             self.coin_last_update = datetime.datetime.now()
@@ -32,8 +34,12 @@ class CMCCoinList(CoinList):
 
 class CGCoinList(CoinList):
     def update(self):
-        if (datetime.datetime.now() - self.coin_last_update) >= datetime.timedelta(hours=1):
-            coin_request = requests.get("https://api.coingecko.com/api/v3/coins/list?include_platform=false")
+        if (datetime.datetime.now() - self.coin_last_update) >= datetime.timedelta(
+            hours=1
+        ):
+            coin_request = requests.get(
+                "https://api.coingecko.com/api/v3/coins/list?include_platform=false"
+            )
             coin_list_gc = coin_request.json()
             self.coin_list = coin_list_gc
             self.coin_last_update = datetime.datetime.now()
@@ -48,7 +54,7 @@ class ChartTemplate:
             cls._instance = super().__new__(cls)
         return cls._instance
 
-    def __init__(self, template='plotly_dark'):
+    def __init__(self, template="plotly_dark"):
         self.template = template
 
     def set_template(self, template: str):

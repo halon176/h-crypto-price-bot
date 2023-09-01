@@ -1,16 +1,16 @@
 import logging
 from functools import reduce
 
-import requests
 from telegram import Update
 from telegram.ext import ContextTypes
 
 from config import CMC_API_KEY
 from models import PriceChangeEntry, GeneralDataEntry
-from service import human_format, max_column_size
 from shared import CMCCoinList
+from utility import human_format, max_column_size, fetch_url
 
 coin_list = CMCCoinList()
+headers = {"X-CMC_PRO_API_KEY": CMC_API_KEY}
 
 
 async def get_cmc_id(crypto_symbol: str):
@@ -30,7 +30,7 @@ async def get_cmc_coin_info(coin_id: int):
 
 async def get_cmc_price(coin, update: Update, context: ContextTypes.DEFAULT_TYPE):
     url = f"https://pro-api.coinmarketcap.com/v2/cryptocurrency/quotes/latest?id={coin}"
-    r = (requests.get(url, headers={"X-CMC_PRO_API_KEY": CMC_API_KEY})).json()
+    r = await fetch_url(url, headers)
     logging.info(f"Request CMC URL: {url}")
 
     crypto_data = r["data"][str(coin)]
@@ -131,7 +131,7 @@ async def get_cmc_price(coin, update: Update, context: ContextTypes.DEFAULT_TYPE
 
 async def cmc_key_info(update: Update, context: ContextTypes.DEFAULT_TYPE):
     url = "https://pro-api.coinmarketcap.com/v1/key/info"
-    r = (requests.get(url, headers={"X-CMC_PRO_API_KEY": CMC_API_KEY})).json()
+    r = await fetch_url(url, headers)
     logging.info(f"Request CMC Key Info: {url}")
 
     data = r["data"]

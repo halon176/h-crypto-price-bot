@@ -5,13 +5,12 @@ from functools import reduce
 import pandas as pd
 import plotly.express as px
 import plotly.io as pio
-import requests
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ContextTypes
 
 from models import GeneralDataEntry, AtEntry, PriceChangeEntry
-from service import max_column_size, human_format
 from shared import ChartTemplate, CGCoinList
+from utility import max_column_size, human_format, fetch_url
 
 CRYPTOGECKO_API_COINS = "https://api.coingecko.com/api/v3/coins/"
 CRYPTOGECKO_API_DOMINANCE = "https://api.coingecko.com/api/v3/global/"
@@ -51,16 +50,14 @@ async def get_cg_price(coin, update: Update, context: ContextTypes.DEFAULT_TYPE)
     url = CRYPTOGECKO_API_COINS + coin + url_tail
     logging.info(f"Request CG URL: {url}")
 
-    response = requests.get(url)
+    crypto_data = await fetch_url(url)
 
-    if response.status_code != 200:
+    if not crypto_data:
         await context.bot.send_message(
             chat_id=update.effective_chat.id,
             text="An error occurred. Please try again later.",
         )
         return
-
-    crypto_data = response.json()
 
     if len(crypto_data) == 0:
         await context.bot.send_message(
@@ -212,7 +209,7 @@ async def get_cg_chart(
     coin, update: Update, context: ContextTypes.DEFAULT_TYPE, period="30"
 ):
     url = f"https://api.coingecko.com/api/v3/coins/{coin}/market_chart?vs_currency=usd&days={period}"
-    chart = requests.get(url).json()
+    chart = await fetch_url(url)
     logging.info(f"Request URL: {url}")
     x = [p[0] / 1000 for p in chart["prices"]]
     y = [p[1] for p in chart["prices"]]
@@ -270,14 +267,13 @@ async def get_cg_chart(
 
 
 async def get_cg_dominance(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    response = requests.get(CRYPTOGECKO_API_DOMINANCE)
-    if response.status_code != 200:
+    global_data = await fetch_url(CRYPTOGECKO_API_DOMINANCE)
+    if not global_data:
         await context.bot.send_message(
             chat_id=update.effective_chat.id,
             text="An error occurred. Please try again later.",
         )
         return
-    global_data = response.json()
     logging.info(f"Request coin dominance list")
 
     positional_emoji = ["🥇", "🥈", "🥉", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣", "🔟"]
@@ -285,9 +281,9 @@ async def get_cg_dominance(update: Update, context: ContextTypes.DEFAULT_TYPE):
     dom_percentage = list(global_data["data"]["market_cap_percentage"].items())
 
     class MarketCapEntry:
-        def __init__(self, tplSymbolPercentage):
-            self.strSymbol = tplSymbolPercentage[0].upper()
-            self.strPercentage = f"{tplSymbolPercentage[1]:.1f}%"
+        def __init__(self, tpl_symbol_percentage):
+            self.strSymbol = tpl_symbol_percentage[0].upper()
+            self.strPercentage = f"{tpl_symbol_percentage[1]:.1f}%"
 
     lstmkp = [
         MarketCapEntry(tplSymbolPercentage) for tplSymbolPercentage in dom_percentage

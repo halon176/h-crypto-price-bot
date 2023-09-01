@@ -1,19 +1,18 @@
 import logging
 from functools import reduce
 
-import requests
 from telegram import Update
 from telegram.ext import ContextTypes
 from web3 import Web3
 
 from config import ETHSCAN_API_KEY
-from service import max_column_size
+from utility import max_column_size, fetch_url
 
 
 async def gas_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    gas_request = requests.get(
+    gas_request = await fetch_url(
         f"https://api.etherscan.io/api?module=gastracker&action=gasoracle&apikey={ETHSCAN_API_KEY}"
-    ).json()
+    )
     logging.info("Request etherscan gas price")
 
     if gas_request["status"] == "0":
@@ -30,9 +29,9 @@ async def gas_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         }
 
         def get_eth_price():
-            response = requests.get(
+            response = fetch_url(
                 f"https://api.etherscan.io/api?module=stats&action=ethprice&apikey={ETHSCAN_API_KEY}"
-            ).json()
+            )
             price = float(response["result"]["ethusd"])
             return price
 

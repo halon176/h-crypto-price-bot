@@ -35,6 +35,6 @@ async def bot_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "/help - to receive this message\n\n"
         "This bot is written with open-source and free code, and you can find it all at "
         "[GitHub](https://github.com/halon176/h-crypto-price-bot)\n\n"
-        "`Bot version: 1.1.0`\n",
+        "`Bot version: 1.1.1`\n",
     )
     logging.info(f"Help call")

@@ -19,8 +19,9 @@ from news import news
 from shared import ChartTemplate, CGCoinList, CMCCoinList
 
 logging.basicConfig(
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.ERROR
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
 )
+logging.getLogger("httpx").setLevel(logging.WARNING)
 
 cg_coin_list = CGCoinList()
 cg_coin_list.update()

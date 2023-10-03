@@ -28,14 +28,14 @@ async def gas_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "Suggested": "suggestBaseFee",
         }
 
-        def get_eth_price():
-            response = fetch_url(
+        async def get_eth_price():
+            response = await fetch_url(
                 f"https://api.etherscan.io/api?module=stats&action=ethprice&apikey={ETHSCAN_API_KEY}"
             )
             price = float(response["result"]["ethusd"])
             return price
 
-        eth_price = get_eth_price()
+        eth_price = await get_eth_price()
 
         class GasEntry:
             def __init__(self, gas_entry, entry_price):

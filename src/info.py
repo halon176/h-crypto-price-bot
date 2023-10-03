@@ -28,13 +28,13 @@ async def bot_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "`/c <crypto_symbol>` - to receive the chart in different timeframes of selected crypto\n"
         "`/cmc <crypto_symbol>` - to receive the current price and historical variation from CoinMarketCap\n"
         "`/chart_color` to select chart color theme\n"
-        "/cmckey - to reveive info about CoinMarketCap api key usage"
+        "/cmckey - to reveive info about CoinMarketCap api key usage\n"
         "/dom - to receive the top 10 most capitalized tokens\n"
         "/gas - to receive real time gas information on ERC\n"
         "/news - to receive CoinTelegraph news\n"
         "/help - to receive this message\n\n"
         "This bot is written with open-source and free code, and you can find it all at "
         "[GitHub](https://github.com/halon176/h-crypto-price-bot)\n\n"
-        "`Bot version: 1.1.0`\n",
+        "`Bot version: 1.1.1`\n",
     )
     logging.info(f"Help call")

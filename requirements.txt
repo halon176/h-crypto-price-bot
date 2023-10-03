@@ -31,7 +31,7 @@ jsonschema==4.17.3
 kaleido==0.2.1
 kiwisolver==1.4.4
 lru-dict==1.1.8
-matplotlib==3.7.1
+matplotlib==3.8.0
 multidict==6.0.4
 mypy-extensions==1.0.0
 numpy==1.24.3

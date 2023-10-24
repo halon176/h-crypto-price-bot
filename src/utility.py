@@ -34,7 +34,7 @@ def human_format(num) -> str:
 
 
 async def fetch_url(
-    url: str, headers: Optional[Dict[str, str]] = None
+        url: str, headers: Optional[Dict[str, str]] = None
 ) -> Optional[dict]:
     try:
         async with httpx.AsyncClient() as client:

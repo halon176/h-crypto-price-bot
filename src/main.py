@@ -1,4 +1,5 @@
 import logging
+import warnings
 
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (
@@ -8,20 +9,18 @@ from telegram.ext import (
     CallbackQueryHandler,
 )
 
-from callback import callback_handler
-from cg_calls import get_cg_price, get_cg_id, get_cg_dominance, get_cg_chart
-from cmc_calls import get_cmc_id, get_cmc_price, get_cmc_coin_info, cmc_key_info
-from config import TELEGRAM_TOKEN
-from defilama_calls import get_defilama_price
-from ethersca_calls import gas_handler
-from info import start, bot_help
-from news import news
-from shared import ChartTemplate, CGCoinList, CMCCoinList
-import warnings
+from src.callback import callback_handler
+from src.cg_calls import get_cg_price, get_cg_id, get_cg_dominance, get_cg_chart
+from src.cmc_calls import get_cmc_id, get_cmc_price, get_cmc_coin_info, cmc_key_info
+from src.config import TELEGRAM_TOKEN
+from src.defilama_calls import get_defilama_price
+from src.ethersca_calls import gas_handler
+from src.info import start, bot_help
+from src.news import news
+from src.shared import ChartTemplate, CGCoinList, CMCCoinList
 
 # ignore FutureWarning from pandas, to be fixed in future releases
 warnings.simplefilter("ignore", category=FutureWarning)
-
 
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
@@ -38,7 +37,7 @@ chart_template = ChartTemplate()
 
 
 async def cmc_coin_check(
-    coin, update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs
+        coin, update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs
 ):
     if len(coin) == 0:
         await context.bot.send_message(
@@ -76,7 +75,7 @@ async def cmc_coin_check(
 
 
 async def gc_coin_check(
-    coin, update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs
+        coin, update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs
 ):
     coin_type = kwargs.get("type", None)
     if len(coin) == 0:

@@ -4,10 +4,10 @@ from functools import reduce
 from telegram import Update
 from telegram.ext import ContextTypes
 
-from config import CMC_API_KEY
-from models import PriceChangeEntry, GeneralDataEntry
-from shared import CMCCoinList
-from utility import human_format, max_column_size, fetch_url
+from src.config import CMC_API_KEY
+from src.models import PriceChangeEntry, GeneralDataEntry
+from src.shared import CMCCoinList
+from src.utility import human_format, max_column_size, fetch_url
 
 coin_list = CMCCoinList()
 headers = {"X-CMC_PRO_API_KEY": CMC_API_KEY}
@@ -71,13 +71,13 @@ async def get_cmc_price(coin, update: Update, context: ContextTypes.DEFAULT_TYPE
     )
 
     lst_str_header = (
-        "-"
-        * (
-            len(lst_column_size_changes)
-            + 2
-            + reduce(lambda a, b: a + b, lst_column_size_changes)
-        )
-        + "\n"
+            "-"
+            * (
+                    len(lst_column_size_changes)
+                    + 2
+                    + reduce(lambda a, b: a + b, lst_column_size_changes)
+            )
+            + "\n"
     )
 
     general_data_sheme = (

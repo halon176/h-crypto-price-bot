@@ -3,7 +3,7 @@ import logging
 
 import requests
 
-from config import CMC_API_KEY
+from src.config import CMC_API_KEY
 
 
 class CoinList:
@@ -35,7 +35,7 @@ class CMCCoinList(CoinList):
 class CGCoinList(CoinList):
     def update(self):
         if (datetime.datetime.now() - self.coin_last_update) >= datetime.timedelta(
-            hours=1
+                hours=1
         ):
             coin_request = requests.get(
                 "https://api.coingecko.com/api/v3/coins/list?include_platform=false"

@@ -5,8 +5,8 @@ from telegram import Update
 from telegram.ext import ContextTypes
 from web3 import Web3
 
-from config import ETHSCAN_API_KEY
-from utility import max_column_size, fetch_url
+from src.config import ETHSCAN_API_KEY
+from src.utility import max_column_size, fetch_url
 
 
 async def gas_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):

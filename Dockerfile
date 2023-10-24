@@ -12,6 +12,8 @@ RUN poetry export -f requirements.txt --output requirements.txt --without-hashes
 
 FROM python:3.11-slim-bullseye as production-stage
 
+LABEL org.opencontainers.image.source="https://github.com/halon176/h-crypto-price-bot"
+
 WORKDIR /code
 
 ENV PYTHONUNBUFFERED=1

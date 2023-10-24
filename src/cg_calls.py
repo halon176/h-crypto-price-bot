@@ -12,6 +12,7 @@ from models import GeneralDataEntry, AtEntry, PriceChangeEntry
 from shared import ChartTemplate, CGCoinList
 from utility import max_column_size, human_format, fetch_url
 
+
 CRYPTOGECKO_API_COINS = "https://api.coingecko.com/api/v3/coins/"
 CRYPTOGECKO_API_DOMINANCE = "https://api.coingecko.com/api/v3/global/"
 

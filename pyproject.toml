@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "h-crypto-price-bot"
+version = "1.1.2"
+description = ""
+authors = ["halon176 <acc.github@halon.cc>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.11,<3.13"
+python-telegram-bot = "^20.6"
+web3 = "^6.11.1"
+plotly = "^5.17.0"
+feedparser = "^6.0.10"
+pandas = "^2.1.1"
+kaleido = "0.2.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

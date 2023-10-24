@@ -17,6 +17,11 @@ from ethersca_calls import gas_handler
 from info import start, bot_help
 from news import news
 from shared import ChartTemplate, CGCoinList, CMCCoinList
+import warnings
+
+# ignore FutureWarning from pandas, to be fixed in future releases
+warnings.simplefilter("ignore", category=FutureWarning)
+
 
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO

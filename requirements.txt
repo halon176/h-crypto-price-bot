@@ -50,7 +50,7 @@ python-dateutil==2.8.2
 python-telegram-bot==20.6
 pytz==2023.3
 pyunormalize==15.0.0
-regex==2023.6.3
+regex==2023.10.3
 requests==2.31.0
 rfc3986==2.0.0
 rlp==3.0.0

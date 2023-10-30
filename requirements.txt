@@ -39,7 +39,7 @@ packaging==23.1
 pandas==2.0.2
 parsimonious==0.9.0
 pathspec==0.11.2
-Pillow==9.5.0
+Pillow==10.1.0
 platformdirs==3.10.0
 plotly==5.14.1
 protobuf==4.23.2

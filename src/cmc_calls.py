@@ -113,7 +113,6 @@ async def get_cmc_price(coin, update: Update, context: ContextTypes.DEFAULT_TYPE
 
     message = (
         f"{market_cap_rank}° {crypto_name} {symbol}\n"
-        f"\n"
         f"`Price: {price}$`\n"
         f"`{lst_str_header}`"
         f"`{price_change_message}`\n"

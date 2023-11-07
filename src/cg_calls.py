@@ -187,7 +187,6 @@ async def get_cg_price(coin, update: Update, context: ContextTypes.DEFAULT_TYPE)
 
     message = (
         f"{market_cap_rank} [{crypto_name}]({web}) [{symbol}]({twitter})\n"
-        f"\n"
         f"`Price: {crypto_price}$`\n"
         f"`{lst_str_header}`"
         f"`{price_change_message}`\n"

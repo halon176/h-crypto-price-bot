@@ -104,6 +104,6 @@ async def gas_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await context.bot.send_message(
             chat_id=update.effective_chat.id,
             text=message,
-            parse_mode="markdown",
+            parse_mode="MarkdownV2",
             disable_web_page_preview=True,
         )

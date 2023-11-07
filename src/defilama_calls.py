@@ -14,19 +14,18 @@ async def get_defilama_price(
     if not response["coins"]:
         error_message = "⚠ no coin found with this contract"
         await context.bot.send_message(
-            chat_id=update.effective_chat.id, text=error_message, parse_mode="markdown"
+            chat_id=update.effective_chat.id, text=error_message, parse_mode="MarkdownV2"
         )
         return
     else:
         logging.info(f"Request URL: {url}")
         coin = list(response["coins"].values())[0]
         message = (
-            f"```\n"
-            f'{coin["symbol"].upper()} on {chain.upper()}\n'
-            f'price = {coin["price"]}$'
-            f"```"
+            f"\n"
+            f'`{coin["symbol"].upper()} on {chain.upper()}`\n'
+            f'`price = {coin["price"]}$`'
         )
 
         await context.bot.send_message(
-            chat_id=update.effective_chat.id, text=message, parse_mode="markdown"
+            chat_id=update.effective_chat.id, text=message, parse_mode="MarkdownV2"
         )

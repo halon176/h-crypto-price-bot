@@ -113,18 +113,17 @@ async def get_cmc_price(coin, update: Update, context: ContextTypes.DEFAULT_TYPE
 
     message = (
         f"{market_cap_rank}° {crypto_name} {symbol}\n"
-        f"```\n"
-        f"Price: {price}$\n"
-        f"{lst_str_header}"
-        f"{price_change_message}\n"
-        f"{lst_str_header}"
-        f"{general_data_message}\n"
-        f"```"
+        f"\n"
+        f"`Price: {price}$`\n"
+        f"`{lst_str_header}`"
+        f"`{price_change_message}`\n"
+        f"`{lst_str_header}`"
+        f"`{general_data_message}`\n"
     )
     await context.bot.send_message(
         chat_id=update.effective_chat.id,
         text=message,
-        parse_mode="markdown",
+        parse_mode="MarkdownV2",
         disable_web_page_preview=True,
     )
 
@@ -148,18 +147,17 @@ async def cmc_key_info(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     message = (
         f"CoinMarketCap Key Info\n"
-        f"```\n"
-        f"Your monthly credit limit is {credit_limit_monthly}\n"
-        f"Minut requests count is {minut_requests_made} of {minut_requests_left}\n"
-        f"Daily credits used are {day_credits_made} of {day_credits_left}\n"
-        f"Monthly credits used are {month_credits_used} of {month_credits_left}\n"
-        f"Monthly credits limit will be reset {credit_limit_monthly_reset}\n"
-        f"```"
+        f"\n"
+        f"`Your monthly credit limit is {credit_limit_monthly}`\n"
+        f"`Minut requests count is {minut_requests_made} of {minut_requests_left}`\n"
+        f"`Daily credits used are {day_credits_made} of {day_credits_left}`\n"
+        f"`Monthly credits used are {month_credits_used} of {month_credits_left}`\n"
+        f"`Monthly credits limit will be reset {credit_limit_monthly_reset}`\n"
     )
 
     await context.bot.send_message(
         chat_id=update.effective_chat.id,
         text=message,
-        parse_mode="markdown",
+        parse_mode="MarkdownV2",
         disable_web_page_preview=True,
     )

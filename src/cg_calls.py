@@ -187,20 +187,19 @@ async def get_cg_price(coin, update: Update, context: ContextTypes.DEFAULT_TYPE)
 
     message = (
         f"{market_cap_rank} [{crypto_name}]({web}) [{symbol}]({twitter})\n"
-        f"```\n"
-        f"Price: {crypto_price}$\n"
-        f"{lst_str_header}"
-        f"{price_change_message}\n"
-        f"{lst_str_header}"
-        f"{general_data_message}\n"
-        f"{at_data_message}"
-        f"```"
+        f"\n"
+        f"`Price: {crypto_price}$`\n"
+        f"`{lst_str_header}`"
+        f"`{price_change_message}`\n"
+        f"`{lst_str_header}`"
+        f"`{general_data_message}`\n"
+        f"`{at_data_message}`"
     )
 
     await context.bot.send_message(
         chat_id=update.effective_chat.id,
         text=message,
-        parse_mode="markdown",
+        parse_mode="MarkdownV2",
         disable_web_page_preview=True,
     )
 
@@ -313,6 +312,6 @@ async def get_cg_dominance(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await context.bot.send_message(
         chat_id=update.effective_chat.id,
         text=message,
-        parse_mode="markdown",
+        parse_mode="MarkdownV2",
         disable_web_page_preview=True,
     )

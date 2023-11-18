@@ -10,9 +10,9 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await context.bot.send_message(
         chat_id=update.effective_chat.id,
         parse_mode="MarkdownV2",
-        text="Hi! I am HCryptoPrice, You can ask me for the current price of any crypto by typing:\n\n"
+        text="Hi\! I am HCryptoPrice, You can ask me for the current price of any crypto by typing:\n\n"
              "`/p <crypto_symbol>` \n\n"
-             "For example, `/p btc` will give you the current price of Bitcoin. Enjoy!\n\n"
+             "For example, `/p btc` will give you the current price of Bitcoin\. Enjoy\!\n\n"
              "To display the complete list of commands, type `/help`",
     )
     logging.info("Start call")

@@ -26,7 +26,7 @@ async def get_cg_id(crypto_symbol: str):
     api_ids = []
     for crypto in coin_list.coin_list:
         if crypto["symbol"] == crypto_symbol and all(
-                excluded not in crypto["id"] for excluded in excluded_values
+            excluded not in crypto["id"] for excluded in excluded_values
         ):
             api_ids.append(crypto["id"])
     return api_ids
@@ -176,13 +176,13 @@ async def get_cg_price(coin, update: Update, context: ContextTypes.DEFAULT_TYPE)
     )
 
     lst_str_header = (
-            "-"
-            * (
-                    len(lst_column_size_changes)
-                    + 2
-                    + reduce(lambda a, b: a + b, lst_column_size_changes)
-            )
-            + "\n"
+        "-"
+        * (
+            len(lst_column_size_changes)
+            + 2
+            + reduce(lambda a, b: a + b, lst_column_size_changes)
+        )
+        + "\n"
     )
 
     message = (
@@ -204,7 +204,7 @@ async def get_cg_price(coin, update: Update, context: ContextTypes.DEFAULT_TYPE)
 
 
 async def get_cg_chart(
-        coin, update: Update, context: ContextTypes.DEFAULT_TYPE, period="30"
+    coin, update: Update, context: ContextTypes.DEFAULT_TYPE, period="30"
 ):
     url = f"https://api.coingecko.com/api/v3/coins/{coin}/market_chart?vs_currency=usd&days={period}"
     chart = await fetch_url(url)
@@ -272,7 +272,7 @@ async def get_cg_dominance(update: Update, context: ContextTypes.DEFAULT_TYPE):
             text="An error occurred. Please try again later.",
         )
         return
-    logging.info(f"Request coin dominance list")
+    logging.info("Request coin dominance list")
 
     positional_emoji = ["🥇", "🥈", "🥉", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣", "🔟"]
 

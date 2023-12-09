@@ -7,14 +7,16 @@ from src.utility import fetch_url
 
 
 async def get_defilama_price(
-        contract, chain, update: Update, context: ContextTypes.DEFAULT_TYPE
+    contract, chain, update: Update, context: ContextTypes.DEFAULT_TYPE
 ):
     url = f"https://coins.llama.fi/prices/current/{chain}:{contract}?searchWidth=1h"
     response = await fetch_url(url)
     if not response["coins"]:
         error_message = "⚠ no coin found with this contract"
         await context.bot.send_message(
-            chat_id=update.effective_chat.id, text=error_message, parse_mode="MarkdownV2"
+            chat_id=update.effective_chat.id,
+            text=error_message,
+            parse_mode="MarkdownV2",
         )
         return
     else:

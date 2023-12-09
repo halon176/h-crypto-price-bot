@@ -9,21 +9,23 @@ from src.config import CMC_API_KEY
 class CoinList:
     _instance = None
 
-    def __new__(cls):
+    def __new__(cls) -> None:
         if not cls._instance:
             cls._instance = super().__new__(cls)
         return cls._instance
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.coin_list = None
         self.coin_last_update = datetime.datetime(2023, 1, 1)
 
 
 class CMCCoinList(CoinList):
-    def update(self, CMC_PRO_API_KEY=None):
-        if (datetime.datetime.now() - self.coin_last_update) >= datetime.timedelta(hours=1):
+    def update(self, CMC_PRO_API_KEY=None) -> None:
+        if (datetime.datetime.now() - self.coin_last_update) >= datetime.timedelta(
+            hours=1
+        ):
             coin_request = requests.get(
-                f"https://pro-api.coinmarketcap.com/v1/cryptocurrency/map",
+                "https://pro-api.coinmarketcap.com/v1/cryptocurrency/map",
                 headers={"X-CMC_PRO_API_KEY": CMC_API_KEY},
             )
             coin_list_gc = coin_request.json()
@@ -33,9 +35,9 @@ class CMCCoinList(CoinList):
 
 
 class CGCoinList(CoinList):
-    def update(self):
+    def update(self) -> None:
         if (datetime.datetime.now() - self.coin_last_update) >= datetime.timedelta(
-                hours=1
+            hours=1
         ):
             coin_request = requests.get(
                 "https://api.coingecko.com/api/v3/coins/list?include_platform=false"
@@ -49,16 +51,16 @@ class CGCoinList(CoinList):
 class ChartTemplate:
     _instance = None
 
-    def __new__(cls):
+    def __new__(cls) -> None:
         if not cls._instance:
             cls._instance = super().__new__(cls)
         return cls._instance
 
-    def __init__(self, template="plotly_dark"):
+    def __init__(self, template="plotly_dark") -> None:
         self.template = template
 
-    def set_template(self, template: str):
+    def set_template(self, template: str) -> None:
         self.template = template
 
-    def get_template(self):
+    def get_template(self) -> str:
         return self.template

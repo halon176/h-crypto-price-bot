@@ -1,16 +1,15 @@
 import logging
 from datetime import datetime
-from typing import Optional, Dict
 
 import httpx
 
 
-def format_date(date_str):
+def format_date(date_str: str) -> str:
     date_obj = datetime.fromisoformat(date_str[:-1])
     return date_obj.strftime("%m/%y")
 
 
-def max_column_size(arr):
+def max_column_size(arr: list) -> int:
     return max((len(string) for string in arr))
 
 
@@ -33,9 +32,7 @@ def human_format(num) -> str:
     return "{}{}".format(formatted_num, suffixes[magnitude])
 
 
-async def fetch_url(
-        url: str, headers: Optional[Dict[str, str]] = None
-) -> Optional[dict]:
+async def fetch_url(url: str, headers: dict[str, str] | None = None) -> dict | None:
     try:
         async with httpx.AsyncClient() as client:
             # Utilizza l'argomento headers se è stato fornito, altrimenti usa un dizionario vuoto
@@ -50,3 +47,19 @@ async def fetch_url(
     except Exception as e:
         logging.error(f"Error fetching URL {url}: {str(e)}")
         return None
+
+
+def mk2_formatter(text: str) -> str:
+    """
+    function to place escape character before specific symbols, if there is not one
+    :param text:
+    :return:
+    """
+    symbols: list = ["_", "*", "~", ">", "#", "+", "-", "=", "|", "{", "}", ".", "!"]
+    for symbol in symbols:
+        index = text.find(symbol)
+        while index != -1:
+            if index > 0 and text[index - 1] != "\\":
+                text = text[:index] + "\\" + text[index:]
+            index = text.find(symbol, index + 2)
+    return text

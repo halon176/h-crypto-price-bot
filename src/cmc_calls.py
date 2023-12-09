@@ -71,13 +71,13 @@ async def get_cmc_price(coin, update: Update, context: ContextTypes.DEFAULT_TYPE
     )
 
     lst_str_header = (
-            "-"
-            * (
-                    len(lst_column_size_changes)
-                    + 2
-                    + reduce(lambda a, b: a + b, lst_column_size_changes)
-            )
-            + "\n"
+        "-"
+        * (
+            len(lst_column_size_changes)
+            + 2
+            + reduce(lambda a, b: a + b, lst_column_size_changes)
+        )
+        + "\n"
     )
 
     general_data_sheme = (

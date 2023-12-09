@@ -37,7 +37,7 @@ chart_template = ChartTemplate()
 
 
 async def cmc_coin_check(
-        coin, update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs
+    coin, update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs
 ):
     if len(coin) == 0:
         await context.bot.send_message(
@@ -75,7 +75,7 @@ async def cmc_coin_check(
 
 
 async def gc_coin_check(
-        coin, update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs
+    coin, update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs
 ):
     coin_type = kwargs.get("type", None)
     if len(coin) == 0:

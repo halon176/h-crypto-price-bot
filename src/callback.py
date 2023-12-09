@@ -42,7 +42,7 @@ async def callback_handler(update: Update, context: CallbackContext):
     elif selected_option.startswith("period_"):
         indexdot = selected_option.index(".")
         await get_cg_chart(
-            selected_option[indexdot + 1:],
+            selected_option[indexdot + 1 :],
             update,
             context,
             selected_option[7:indexdot],

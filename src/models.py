@@ -2,7 +2,7 @@ from src.utility import human_format, format_date
 
 
 class PriceChangeEntry:
-    def __init__(self, change_label, change_value):
+    def __init__(self, change_label, change_value) -> None:
         self.strEntry = change_label
         if change_value is None:
             self.strPercentage = "N/A"
@@ -11,7 +11,7 @@ class PriceChangeEntry:
 
 
 class GeneralDataEntry:
-    def __init__(self, data_emoji, data_type, data_value):
+    def __init__(self, data_emoji, data_type, data_value) -> None:
         self.emoji = data_emoji
         self.type = data_type
         if data_value == "N/A" or data_value is None:
@@ -21,7 +21,9 @@ class GeneralDataEntry:
 
 
 class AtEntry:
-    def __init__(self, allt_emoji, allt_symbol, allt_price, allt_percentage, allt_date):
+    def __init__(
+        self, allt_emoji, allt_symbol, allt_price, allt_percentage, allt_date
+    ) -> None:
         self.emoji = allt_emoji
         self.symbol = allt_symbol
         if allt_price and "usd" in allt_price:

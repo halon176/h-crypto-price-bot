@@ -5,7 +5,7 @@ from telegram.ext import (
     ContextTypes,
 )
 
-from utility import mk2_formatter
+from src.utility import mk2_formatter
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:

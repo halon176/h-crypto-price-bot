@@ -9,7 +9,7 @@ from src.config import ETHSCAN_API_KEY
 from src.utility import max_column_size, fetch_url
 
 
-async def gas_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def gas_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     gas_request = await fetch_url(
         f"https://api.etherscan.io/api?module=gastracker&action=gasoracle&apikey={ETHSCAN_API_KEY}"
     )
@@ -28,7 +28,7 @@ async def gas_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "Suggested": "suggestBaseFee",
         }
 
-        async def get_eth_price():
+        async def get_eth_price() -> float:
             response = await fetch_url(
                 f"https://api.etherscan.io/api?module=stats&action=ethprice&apikey={ETHSCAN_API_KEY}"
             )
@@ -38,7 +38,7 @@ async def gas_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         eth_price = await get_eth_price()
 
         class GasEntry:
-            def __init__(self, gas_entry, entry_price):
+            def __init__(self, gas_entry, entry_price) -> None:
                 self.gas_entry = gas_entry
                 self.price_entry = f"{float(entry_price):.1f}"
                 self.emoji = self.assign_emoji(entry_price)
@@ -47,7 +47,7 @@ async def gas_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 )
 
             @staticmethod
-            def assign_emoji(entry_price):
+            def assign_emoji(entry_price) -> str:
                 price = float(entry_price)
                 if price < 20:
                     return mood_emoji[0]
@@ -61,7 +61,7 @@ async def gas_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     return mood_emoji[4]
 
             @staticmethod
-            def estimate_function_cost(gwei_value):
+            def estimate_function_cost(gwei_value) -> float:
                 gas_limit = 21000
                 wei_value = Web3.to_wei(gwei_value, "gwei")
                 cost_in_eth = Web3.from_wei(gas_limit * wei_value, "ether")

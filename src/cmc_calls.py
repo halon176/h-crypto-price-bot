@@ -13,7 +13,7 @@ coin_list = CMCCoinList()
 headers = {"X-CMC_PRO_API_KEY": CMC_API_KEY}
 
 
-async def get_cmc_id(crypto_symbol: str):
+async def get_cmc_id(crypto_symbol: str) -> list[int]:
     crypto_symbol = crypto_symbol.upper()
     api_ids = []
     for crypto in coin_list.coin_list["data"]:
@@ -22,18 +22,27 @@ async def get_cmc_id(crypto_symbol: str):
     return api_ids
 
 
-async def get_cmc_coin_info(coin_id: int):
+async def get_cmc_coin_info(coin_id: int) -> dict[str, str]:
     for crypto in coin_list.coin_list["data"]:
         if coin_id == crypto["id"]:
             return {"name": crypto["name"], "symbol": crypto["symbol"]}
 
 
-async def get_cmc_price(coin, update: Update, context: ContextTypes.DEFAULT_TYPE):
-    url = f"https://pro-api.coinmarketcap.com/v2/cryptocurrency/quotes/latest?id={coin}"
+async def get_cmc_price(
+    coin_id: int, update: Update, context: ContextTypes.DEFAULT_TYPE
+) -> None:
+    """
+    Get the price grid of a coin from CoinMarketCap index
+    :param coin_id: id of the coin in the CoinMarketCap index
+    :param update:
+    :param context:
+    :return: None
+    """
+    url = f"https://pro-api.coinmarketcap.com/v2/cryptocurrency/quotes/latest?id={coin_id}"
     r = await fetch_url(url, headers)
     logging.info(f"Request CMC URL: {url}")
 
-    crypto_data = r["data"][str(coin)]
+    crypto_data = r["data"][str(coin_id)]
 
     market_cap_rank = crypto_data["cmc_rank"]
 
@@ -127,7 +136,7 @@ async def get_cmc_price(coin, update: Update, context: ContextTypes.DEFAULT_TYPE
     )
 
 
-async def cmc_key_info(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def cmc_key_info(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     url = "https://pro-api.coinmarketcap.com/v1/key/info"
     r = await fetch_url(url, headers)
     logging.info(f"Request CMC Key Info: {url}")

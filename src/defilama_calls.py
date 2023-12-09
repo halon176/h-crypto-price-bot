@@ -8,7 +8,7 @@ from src.utility import fetch_url
 
 async def get_defilama_price(
     contract, chain, update: Update, context: ContextTypes.DEFAULT_TYPE
-):
+) -> None:
     url = f"https://coins.llama.fi/prices/current/{chain}:{contract}?searchWidth=1h"
     response = await fetch_url(url)
     if not response["coins"]:

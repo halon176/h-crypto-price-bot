@@ -37,8 +37,8 @@ chart_template = ChartTemplate()
 
 
 async def cmc_coin_check(
-    coin, update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs
-):
+    coin: list, update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs
+) -> str | bool:
     if len(coin) == 0:
         await context.bot.send_message(
             chat_id=update.effective_chat.id, text="Please enter a valid crypto symbol."
@@ -75,8 +75,8 @@ async def cmc_coin_check(
 
 
 async def gc_coin_check(
-    coin, update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs
-):
+    coin: str, update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs
+) -> str:
     coin_type = kwargs.get("type", None)
     if len(coin) == 0:
         await context.bot.send_message(
@@ -120,7 +120,7 @@ async def gc_coin_check(
         )
 
 
-async def cg_price_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def cg_price_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     crypto_symbol = context.args[0].lower()
     coin = await gc_coin_check(crypto_symbol, update, context)
     if coin:
@@ -134,7 +134,7 @@ async def cg_price_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
 
 
-async def cmc_price_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def cmc_price_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     crypto_symbol = context.args[0].lower()
     coin = await cmc_coin_check(crypto_symbol, update, context)
     if coin:
@@ -148,14 +148,16 @@ async def cmc_price_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
 
 
-async def cg_chart_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def cg_chart_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     crypto_symbol = context.args[0].lower()
     coin = await gc_coin_check(crypto_symbol, update, context, type="chart")
     if coin:
         await get_cg_chart(coin, update, context)
 
 
-async def chart_color_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def chart_color_handler(
+    update: Update, context: ContextTypes.DEFAULT_TYPE
+) -> None:
     themes = [
         ["🌕 white", "charttemplate_plotly_white"],
         ["🌑 dark", "charttemplate_plotly_dark"],
@@ -172,7 +174,9 @@ async def chart_color_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
     )
 
 
-async def eth_contract_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def eth_contract_handler(
+    update: Update, context: ContextTypes.DEFAULT_TYPE
+) -> None:
     if len(context.args[0]) == 42 and context.args[0].startswith("0x"):
         await get_defilama_price(context.args[0], "ethereum", update, context)
     else:
@@ -182,7 +186,9 @@ async def eth_contract_handler(update: Update, context: ContextTypes.DEFAULT_TYP
         )
 
 
-async def bsc_contract_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def bsc_contract_handler(
+    update: Update, context: ContextTypes.DEFAULT_TYPE
+) -> None:
     if len(context.args[0]) == 42 and context.args[0].startswith("0x"):
         await get_defilama_price(context.args[0], "bsc", update, context)
     else:

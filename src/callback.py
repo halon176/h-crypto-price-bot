@@ -12,7 +12,7 @@ from src.shared import ChartTemplate
 chart_template = ChartTemplate()
 
 
-async def callback_handler(update: Update, context: CallbackContext):
+async def callback_handler(update: Update, context: CallbackContext) -> None:
     query = update.callback_query
     selected_option = query.data
 

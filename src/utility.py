@@ -13,7 +13,7 @@ def max_column_size(arr: list) -> int:
     return max((len(string) for string in arr))
 
 
-def human_format(num) -> str:
+def human_format(num: float) -> str:
     magnitude = 0
     suffixes = ["", "K", "M", "B", "T"]
     max_suffix_index = len(suffixes) - 1

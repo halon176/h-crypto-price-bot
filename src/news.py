@@ -7,7 +7,7 @@ from utility import mk2_formatter
 RSS_URL = "https://www.coindesk.com/arc/outboundfeeds/rss/"
 
 
-async def news(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def news(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     feed = feedparser.parse(RSS_URL)
 
     latest_entries = feed.entries[:7]

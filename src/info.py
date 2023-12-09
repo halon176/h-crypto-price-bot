@@ -8,11 +8,11 @@ from telegram.ext import (
 from utility import mk2_formatter
 
 
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     response_text = (
         "Hi! I am HCryptoPrice, You can ask me for the current price of any crypto by typing:\n\n"
         "`/p <crypto_symbol>` \n\n"
-        "For example, `/p btc` will give you the current price of Bitcoin. Enjoy\!\n\n"
+        "For example, `/p btc` will give you the current price of Bitcoin. Enjoy!\n\n"
         "To display the complete list of commands, type `/help`"
     )
 
@@ -24,7 +24,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     logging.info("Start call")
 
 
-async def bot_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def bot_help(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     response_text = (
         "📚*List of Commands:*\n\n"
         "`/p <crypto_symbol>` - to receive the current price and historical variation from CoinCecko\n"

@@ -15,12 +15,16 @@ class CoinList:
         return cls._instance
 
     def __init__(self) -> None:
-        self.coin_list = None
+        self.coin_list: list[dict] | None = None
         self.coin_last_update = datetime.datetime(2023, 1, 1)
 
 
 class CMCCoinList(CoinList):
-    def update(self, CMC_PRO_API_KEY=None) -> None:
+    """
+    Singleton class to store the CoinMarketCap coin list
+    """
+
+    def update(self, CMC_PRO_API_KEY: str | None = None) -> None:
         if (datetime.datetime.now() - self.coin_last_update) >= datetime.timedelta(
             hours=1
         ):
@@ -42,8 +46,7 @@ class CGCoinList(CoinList):
             coin_request = requests.get(
                 "https://api.coingecko.com/api/v3/coins/list?include_platform=false"
             )
-            coin_list_gc = coin_request.json()
-            self.coin_list = coin_list_gc
+            self.coin_list = coin_request.json()
             self.coin_last_update = datetime.datetime.now()
             logging.info("Reloaded coin list from CoinGecko API")
 

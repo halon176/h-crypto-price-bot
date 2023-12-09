@@ -21,7 +21,7 @@ chart_template = ChartTemplate()
 coin_list = CGCoinList()
 
 
-async def get_cg_id(crypto_symbol: str):
+async def get_cg_id(crypto_symbol: str) -> list:
     excluded_values = {"-peg-", "-wormhole", "wrapped", "oec-", "-iou", "harrypotter"}
     api_ids = []
     for crypto in coin_list.coin_list:
@@ -32,13 +32,15 @@ async def get_cg_id(crypto_symbol: str):
     return api_ids
 
 
-async def get_cg_coin_info(coin_name: str):
+async def get_cg_coin_info(coin_name: str) -> dict:
     for crypto in coin_list.coin_list:
         if coin_name == crypto["id"]:
             return {"name": crypto["name"], "symbol": crypto["symbol"].upper()}
 
 
-async def get_cg_price(coin, update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def get_cg_price(
+    coin: str, update: Update, context: ContextTypes.DEFAULT_TYPE
+) -> None:
     url_tail = (
         "?localization=false&"
         "tickers=false&market_data=true&"
@@ -107,8 +109,8 @@ async def get_cg_price(coin, update: Update, context: ContextTypes.DEFAULT_TYPE)
 
     lst_column_size_gend = [
         2,
-        max_column_size((gend.type for gend in general_data)),
-        max_column_size((gend.value for gend in general_data)),
+        max_column_size(list(gend.type for gend in general_data)),
+        max_column_size(list(gend.value for gend in general_data)),
     ]
 
     str_format_gend = (
@@ -127,8 +129,8 @@ async def get_cg_price(coin, update: Update, context: ContextTypes.DEFAULT_TYPE)
         price_changes.append(PriceChangeEntry(label, value))
 
     lst_column_size_changes = [
-        max_column_size((prc.strEntry for prc in price_changes)),
-        max_column_size((prc.strPercentage for prc in price_changes)),
+        max_column_size(list(prc.strEntry for prc in price_changes)),
+        max_column_size(list(prc.strPercentage for prc in price_changes)),
     ]
 
     str_format_prc = (
@@ -155,10 +157,10 @@ async def get_cg_price(coin, update: Update, context: ContextTypes.DEFAULT_TYPE)
 
     lst_column_size_at = [
         2,
-        max_column_size((at.symbol for at in at_data)),
-        max_column_size((at.at_price for at in at_data)),
-        max_column_size((at.at_percentage for at in at_data)),
-        max_column_size((at.date for at in at_data)),
+        max_column_size(list(at.symbol for at in at_data)),
+        max_column_size(list(at.at_price for at in at_data)),
+        max_column_size(list(at.at_percentage for at in at_data)),
+        max_column_size(list(at.date for at in at_data)),
     ]
 
     str_format_at = (
@@ -204,8 +206,8 @@ async def get_cg_price(coin, update: Update, context: ContextTypes.DEFAULT_TYPE)
 
 
 async def get_cg_chart(
-    coin, update: Update, context: ContextTypes.DEFAULT_TYPE, period="30"
-):
+    coin: str, update: Update, context: ContextTypes.DEFAULT_TYPE, period="30"
+) -> None:
     url = f"https://api.coingecko.com/api/v3/coins/{coin}/market_chart?vs_currency=usd&days={period}"
     chart = await fetch_url(url)
     logging.info(f"Request URL: {url}")
@@ -264,7 +266,7 @@ async def get_cg_chart(
     os.remove("plot.jpg")
 
 
-async def get_cg_dominance(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def get_cg_dominance(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     global_data = await fetch_url(CRYPTOGECKO_API_DOMINANCE)
     if not global_data:
         await context.bot.send_message(
@@ -289,8 +291,8 @@ async def get_cg_dominance(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     lst_column_size = [
         2,
-        max_column_size((mkp.strSymbol for mkp in lstmkp)),
-        max_column_size((mkp.strPercentage for mkp in lstmkp)),
+        max_column_size(list(mkp.strSymbol for mkp in lstmkp)),
+        max_column_size(list(mkp.strPercentage for mkp in lstmkp)),
     ]
 
     lst_str_header = [

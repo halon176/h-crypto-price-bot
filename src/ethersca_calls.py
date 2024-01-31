@@ -6,7 +6,7 @@ from telegram.ext import ContextTypes
 from web3 import Web3
 
 from .config import ETHSCAN_API_KEY
-from .utility import max_column_size, fetch_url
+from .utility import fetch_url, max_column_size
 
 
 async def gas_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -42,9 +42,7 @@ async def gas_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
                 self.gas_entry = gas_entry
                 self.price_entry = f"{float(entry_price):.1f}"
                 self.emoji = self.assign_emoji(entry_price)
-                self.usd_value = (
-                    f"{float(self.estimate_function_cost(entry_price)):.2f}$"
-                )
+                self.usd_value = f"{float(self.estimate_function_cost(entry_price)):.2f}$"
 
             @staticmethod
             def assign_emoji(entry_price) -> str:
@@ -77,27 +75,21 @@ async def gas_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
 
         gp_column_size = [
             2,
-            max_column_size((gp.gas_entry for gp in gas_price)),
-            max_column_size((gp.price_entry for gp in gas_price)),
-            max_column_size((gp.usd_value for gp in gas_price)),
+            max_column_size(gp.gas_entry for gp in gas_price),
+            max_column_size(gp.price_entry for gp in gas_price),
+            max_column_size(gp.usd_value for gp in gas_price),
         ]
 
         str_format_gp = f"{{}} {{:{gp_column_size[1]}}}  {{:>{gp_column_size[2]}}}  {{:>{gp_column_size[3]}}}"
 
         gas_price_header = [
             "```",
-            "-"
-            * (len(gp_column_size) + 1 + reduce(lambda a, b: a + b, gp_column_size)),
+            "-" * (len(gp_column_size) + 1 + reduce(lambda a, b: a + b, gp_column_size)),
         ]
         message = "\n".join(
             ["⛽ Ethereum Gas Fee"]
             + gas_price_header
-            + [
-                str_format_gp.format(
-                    gp.emoji, gp.gas_entry, gp.price_entry, gp.usd_value
-                )
-                for gp in gas_price
-            ]
+            + [str_format_gp.format(gp.emoji, gp.gas_entry, gp.price_entry, gp.usd_value) for gp in gas_price]
             + list(reversed(gas_price_header))
         )
 

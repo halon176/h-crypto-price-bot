@@ -5,12 +5,12 @@ from functools import reduce
 import pandas as pd
 import plotly.express as px
 import plotly.io as pio
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import ContextTypes
 
-from .models import GeneralDataEntry, AtEntry, PriceChangeEntry
-from .shared import ChartTemplate, CGCoinList
-from .utility import max_column_size, human_format, fetch_url
+from .models import AtEntry, GeneralDataEntry, PriceChangeEntry
+from .shared import CGCoinList, ChartTemplate
+from .utility import fetch_url, human_format, max_column_size
 
 CRYPTOGECKO_API_COINS = "https://api.coingecko.com/api/v3/coins/"
 CRYPTOGECKO_API_DOMINANCE = "https://api.coingecko.com/api/v3/global/"
@@ -25,9 +25,7 @@ async def get_cg_id(crypto_symbol: str) -> list:
     excluded_values = {"-peg-", "-wormhole", "wrapped", "oec-", "-iou", "harrypotter"}
     api_ids = []
     for crypto in coin_list.coin_list:
-        if crypto["symbol"] == crypto_symbol and all(
-            excluded not in crypto["id"] for excluded in excluded_values
-        ):
+        if crypto["symbol"] == crypto_symbol and all(excluded not in crypto["id"] for excluded in excluded_values):
             api_ids.append(crypto["id"])
     return api_ids
 
@@ -38,9 +36,7 @@ async def get_cg_coin_info(coin_name: str) -> dict:
             return {"name": crypto["name"], "symbol": crypto["symbol"].upper()}
 
 
-async def get_cg_price(
-    coin: str, update: Update, context: ContextTypes.DEFAULT_TYPE
-) -> None:
+async def get_cg_price(coin: str, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     url_tail = (
         "?localization=false&"
         "tickers=false&market_data=true&"
@@ -62,9 +58,7 @@ async def get_cg_price(
         return
 
     if len(crypto_data) == 0:
-        await context.bot.send_message(
-            chat_id=update.effective_chat.id, text="Please enter a valid crypto symbol."
-        )
+        await context.bot.send_message(chat_id=update.effective_chat.id, text="Please enter a valid crypto symbol.")
         return
 
     if crypto_data["market_cap_rank"] is None:
@@ -109,18 +103,13 @@ async def get_cg_price(
 
     lst_column_size_gend = [
         2,
-        max_column_size(list(gend.type for gend in general_data)),
-        max_column_size(list(gend.value for gend in general_data)),
+        max_column_size([gend.type for gend in general_data]),
+        max_column_size([gend.value for gend in general_data]),
     ]
 
-    str_format_gend = (
-        f"{{}} {{:{lst_column_size_gend[1]}}}   {{:>{lst_column_size_gend[2]}}}"
-    )
+    str_format_gend = f"{{}} {{:{lst_column_size_gend[1]}}}   {{:>{lst_column_size_gend[2]}}}"
     general_data_message = "\n".join(
-        [
-            str_format_gend.format(gend.emoji, gend.type, gend.value)
-            for gend in general_data
-        ]
+        [str_format_gend.format(gend.emoji, gend.type, gend.value) for gend in general_data]
     )
 
     price_changes = []
@@ -129,19 +118,12 @@ async def get_cg_price(
         price_changes.append(PriceChangeEntry(label, value))
 
     lst_column_size_changes = [
-        max_column_size(list(prc.strEntry for prc in price_changes)),
-        max_column_size(list(prc.strPercentage for prc in price_changes)),
+        max_column_size([prc.strEntry for prc in price_changes]),
+        max_column_size([prc.strPercentage for prc in price_changes]),
     ]
 
-    str_format_prc = (
-        f"{{:{lst_column_size_changes[0]}}}    {{:>{lst_column_size_changes[1]}}}"
-    )
-    price_change_message = "\n".join(
-        [
-            str_format_prc.format(prc.strEntry, prc.strPercentage)
-            for prc in price_changes
-        ]
-    )
+    str_format_prc = f"{{:{lst_column_size_changes[0]}}}    {{:>{lst_column_size_changes[1]}}}"
+    price_change_message = "\n".join([str_format_prc.format(prc.strEntry, prc.strPercentage) for prc in price_changes])
 
     at_data_schema = (
         ("📈", "ATH", "ath", "ath_change_percentage", "ath_date"),
@@ -157,10 +139,10 @@ async def get_cg_price(
 
     lst_column_size_at = [
         2,
-        max_column_size(list(at.symbol for at in at_data)),
-        max_column_size(list(at.at_price for at in at_data)),
-        max_column_size(list(at.at_percentage for at in at_data)),
-        max_column_size(list(at.date for at in at_data)),
+        max_column_size([at.symbol for at in at_data]),
+        max_column_size([at.at_price for at in at_data]),
+        max_column_size([at.at_percentage for at in at_data]),
+        max_column_size([at.date for at in at_data]),
     ]
 
     str_format_at = (
@@ -169,22 +151,11 @@ async def get_cg_price(
     )
 
     at_data_message = "\n".join(
-        [
-            str_format_at.format(
-                atd.emoji, atd.symbol, atd.at_price, atd.at_percentage, atd.date
-            )
-            for atd in at_data
-        ]
+        [str_format_at.format(atd.emoji, atd.symbol, atd.at_price, atd.at_percentage, atd.date) for atd in at_data]
     )
 
     lst_str_header = (
-        "-"
-        * (
-            len(lst_column_size_changes)
-            + 2
-            + reduce(lambda a, b: a + b, lst_column_size_changes)
-        )
-        + "\n"
+        "-" * (len(lst_column_size_changes) + 2 + reduce(lambda a, b: a + b, lst_column_size_changes)) + "\n"
     )
 
     message = (
@@ -205,9 +176,7 @@ async def get_cg_price(
     )
 
 
-async def get_cg_chart(
-    coin: str, update: Update, context: ContextTypes.DEFAULT_TYPE, period="30"
-) -> None:
+async def get_cg_chart(coin: str, update: Update, context: ContextTypes.DEFAULT_TYPE, period="30") -> None:
     url = f"https://api.coingecko.com/api/v3/coins/{coin}/market_chart?vs_currency=usd&days={period}"
     chart = await fetch_url(url)
     logging.info(f"Request URL: {url}")
@@ -228,7 +197,7 @@ async def get_cg_chart(
         labels={"timeframe": bottom, "prices": "price ($)"},
     )
 
-    fig.update_layout(title={"text": title, "y": 0.93, "x": 0.5, "font": dict(size=24)})
+    fig.update_layout(title={"text": title, "y": 0.93, "x": 0.5, "font": {"size": 24}})
 
     pio.write_image(fig, "plot.jpg", format="jpg")
 
@@ -285,14 +254,12 @@ async def get_cg_dominance(update: Update, context: ContextTypes.DEFAULT_TYPE) -
             self.strSymbol = tpl_symbol_percentage[0].upper()
             self.strPercentage = f"{tpl_symbol_percentage[1]:.1f}%"
 
-    lstmkp = [
-        MarketCapEntry(tplSymbolPercentage) for tplSymbolPercentage in dom_percentage
-    ]
+    lstmkp = [MarketCapEntry(tplSymbolPercentage) for tplSymbolPercentage in dom_percentage]
 
     lst_column_size = [
         2,
-        max_column_size(list(mkp.strSymbol for mkp in lstmkp)),
-        max_column_size(list(mkp.strPercentage for mkp in lstmkp)),
+        max_column_size([mkp.strSymbol for mkp in lstmkp]),
+        max_column_size([mkp.strPercentage for mkp in lstmkp]),
     ]
 
     lst_str_header = [

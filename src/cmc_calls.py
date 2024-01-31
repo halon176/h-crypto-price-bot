@@ -5,9 +5,9 @@ from telegram import Update
 from telegram.ext import ContextTypes
 
 from .config import CMC_API_KEY
-from .models import PriceChangeEntry, GeneralDataEntry
+from .models import GeneralDataEntry, PriceChangeEntry
 from .shared import CMCCoinList
-from .utility import human_format, max_column_size, fetch_url
+from .utility import fetch_url, human_format, max_column_size
 
 coin_list = CMCCoinList()
 headers = {"X-CMC_PRO_API_KEY": CMC_API_KEY}
@@ -28,9 +28,7 @@ async def get_cmc_coin_info(coin_id: int) -> dict[str, str]:
             return {"name": crypto["name"], "symbol": crypto["symbol"]}
 
 
-async def get_cmc_price(
-    coin_id: int, update: Update, context: ContextTypes.DEFAULT_TYPE
-) -> None:
+async def get_cmc_price(coin_id: int, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """
     Get the price grid of a coin from CoinMarketCap index
     :param coin_id: id of the coin in the CoinMarketCap index
@@ -65,28 +63,15 @@ async def get_cmc_price(
         price_changes.append(PriceChangeEntry(label, value))
 
     lst_column_size_changes = [
-        max_column_size((prc.strEntry for prc in price_changes)),
-        max_column_size((prc.strPercentage for prc in price_changes)),
+        max_column_size(prc.strEntry for prc in price_changes),
+        max_column_size(prc.strPercentage for prc in price_changes),
     ]
 
-    str_format_prc = (
-        f"{{:{lst_column_size_changes[0]}}}    {{:>{lst_column_size_changes[1]}}}"
-    )
-    price_change_message = "\n".join(
-        [
-            str_format_prc.format(prc.strEntry, prc.strPercentage)
-            for prc in price_changes
-        ]
-    )
+    str_format_prc = f"{{:{lst_column_size_changes[0]}}}    {{:>{lst_column_size_changes[1]}}}"
+    price_change_message = "\n".join([str_format_prc.format(prc.strEntry, prc.strPercentage) for prc in price_changes])
 
     lst_str_header = (
-        "-"
-        * (
-            len(lst_column_size_changes)
-            + 2
-            + reduce(lambda a, b: a + b, lst_column_size_changes)
-        )
-        + "\n"
+        "-" * (len(lst_column_size_changes) + 2 + reduce(lambda a, b: a + b, lst_column_size_changes)) + "\n"
     )
 
     general_data_sheme = (
@@ -106,18 +91,13 @@ async def get_cmc_price(
 
     lst_column_size_gend = [
         2,
-        max_column_size((gend.type for gend in general_data)),
-        max_column_size((gend.value for gend in general_data)),
+        max_column_size(gend.type for gend in general_data),
+        max_column_size(gend.value for gend in general_data),
     ]
 
-    str_format_gend = (
-        f"{{}} {{:{lst_column_size_gend[1]}}}   {{:>{lst_column_size_gend[2]}}}"
-    )
+    str_format_gend = f"{{}} {{:{lst_column_size_gend[1]}}}   {{:>{lst_column_size_gend[2]}}}"
     general_data_message = "\n".join(
-        [
-            str_format_gend.format(gend.emoji, gend.type, gend.value)
-            for gend in general_data
-        ]
+        [str_format_gend.format(gend.emoji, gend.type, gend.value) for gend in general_data]
     )
 
     message = (
@@ -143,9 +123,7 @@ async def cmc_key_info(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
 
     data = r["data"]
     credit_limit_monthly = data["plan"].get("credit_limit_monthly", "N/A")
-    credit_limit_monthly_reset = (
-        data["plan"].get("credit_limit_monthly_reset", "N/A")
-    ).lower()
+    credit_limit_monthly_reset = (data["plan"].get("credit_limit_monthly_reset", "N/A")).lower()
     minut_requests_made = data["usage"]["current_minute"].get("requests_made", "N/A")
     minut_requests_left = data["usage"]["current_minute"].get("requests_left", "N/A")
     day_credits_made = data["usage"]["current_day"].get("credits_used", "N/A")

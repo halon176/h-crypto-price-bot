@@ -11,7 +11,4 @@ async def send_error(e_type: str, update: Update, context: ContextTypes.DEFAULT_
     }
     cur_error = errors.get(e_type, "Generic error.")
 
-    await context.bot.send_message(
-        chat_id=update.effective_chat.id,
-        text=cur_error
-    )
+    await context.bot.send_message(chat_id=update.effective_chat.id, text=cur_error)

@@ -1,4 +1,4 @@
-from .utility import human_format, format_date
+from .utility import format_date, human_format
 
 
 class PriceChangeEntry:
@@ -21,9 +21,7 @@ class GeneralDataEntry:
 
 
 class AtEntry:
-    def __init__(
-        self, allt_emoji, allt_symbol, allt_price, allt_percentage, allt_date
-    ) -> None:
+    def __init__(self, allt_emoji, allt_symbol, allt_price, allt_percentage, allt_date) -> None:
         self.emoji = allt_emoji
         self.symbol = allt_symbol
         if allt_price and "usd" in allt_price:

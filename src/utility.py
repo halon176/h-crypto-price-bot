@@ -10,7 +10,7 @@ def format_date(date_str: str) -> str:
 
 
 def max_column_size(arr: list) -> int:
-    return max((len(string) for string in arr))
+    return max(len(string) for string in arr)
 
 
 def human_format(num: float) -> str:
@@ -22,14 +22,14 @@ def human_format(num: float) -> str:
         magnitude += 1
         num /= 1000.0
 
-    num = float("{:.3g}".format(num))
+    num = float(f"{num:.3g}")
     additional_digits = max(int(magnitude - max_suffix_index), 0)
 
-    formatted_num = "{:f}".format(num).rstrip("0").rstrip(".")
+    formatted_num = f"{num:f}".rstrip("0").rstrip(".")
 
     formatted_num += "0" * additional_digits
 
-    return "{}{}".format(formatted_num, suffixes[magnitude])
+    return f"{formatted_num}{suffixes[magnitude]}"
 
 
 async def fetch_url(url: str, headers: dict[str, str] | None = None) -> dict | None:
@@ -40,9 +40,7 @@ async def fetch_url(url: str, headers: dict[str, str] | None = None) -> dict | N
             if response.status_code == 200:
                 return response.json()
             else:
-                logging.error(
-                    f"Failed to fetch URL {url}, status code: {response.status_code}"
-                )
+                logging.error(f"Failed to fetch URL {url}, status code: {response.status_code}")
                 return None
     except Exception as e:
         logging.error(f"Error fetching URL {url}: {str(e)}")

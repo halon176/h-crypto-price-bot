@@ -25,9 +25,7 @@ class CMCCoinList(CoinList):
     """
 
     def update(self, CMC_PRO_API_KEY: str | None = None) -> None:
-        if (datetime.datetime.now() - self.coin_last_update) >= datetime.timedelta(
-            hours=1
-        ):
+        if (datetime.datetime.now() - self.coin_last_update) >= datetime.timedelta(hours=1):
             coin_request = httpx.get(
                 "https://pro-api.coinmarketcap.com/v1/cryptocurrency/map",
                 headers={"X-CMC_PRO_API_KEY": CMC_API_KEY},
@@ -40,12 +38,8 @@ class CMCCoinList(CoinList):
 
 class CGCoinList(CoinList):
     def update(self) -> None:
-        if (datetime.datetime.now() - self.coin_last_update) >= datetime.timedelta(
-            hours=1
-        ):
-            coin_request = httpx.get(
-                "https://api.coingecko.com/api/v3/coins/list?include_platform=false"
-            )
+        if (datetime.datetime.now() - self.coin_last_update) >= datetime.timedelta(hours=1):
+            coin_request = httpx.get("https://api.coingecko.com/api/v3/coins/list?include_platform=false")
             self.coin_list = coin_request.json()
             self.coin_last_update = datetime.datetime.now()
             logging.info("Reloaded coin list from CoinGecko API")

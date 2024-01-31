@@ -1,31 +1,29 @@
 import logging
 import warnings
 
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import (
     ApplicationBuilder,
-    ContextTypes,
-    CommandHandler,
     CallbackQueryHandler,
+    CommandHandler,
+    ContextTypes,
 )
 
 from .callback import callback_handler
-from .cg_calls import get_cg_price, get_cg_id, get_cg_dominance, get_cg_chart
-from .cmc_calls import get_cmc_id, get_cmc_price, get_cmc_coin_info, cmc_key_info
+from .cg_calls import get_cg_chart, get_cg_dominance, get_cg_id, get_cg_price
+from .cmc_calls import cmc_key_info, get_cmc_coin_info, get_cmc_id, get_cmc_price
 from .config import TELEGRAM_TOKEN
 from .defilama_calls import get_defilama_price
 from .errors import send_error
 from .ethersca_calls import gas_handler
-from .info import start, bot_help
+from .info import bot_help, start
 from .news import news
-from .shared import ChartTemplate, CGCoinList, CMCCoinList
+from .shared import CGCoinList, ChartTemplate, CMCCoinList
 
 # ignore FutureWarning from pandas, to be fixed in future releases
 warnings.simplefilter("ignore", category=FutureWarning)
 
-logging.basicConfig(
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
-)
+logging.basicConfig(format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO)
 logging.getLogger("httpx").setLevel(logging.WARNING)
 
 cg_coin_list = CGCoinList()
@@ -37,9 +35,7 @@ cmc_coin_list.update()
 chart_template = ChartTemplate()
 
 
-async def cmc_coin_check(
-    coin: str, update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs
-) -> int | bool:
+async def cmc_coin_check(coin: str, update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs) -> int | bool:
     error = "symbol"
     if len(coin) == 0:
         await send_error(error, update, context)
@@ -57,11 +53,7 @@ async def cmc_coin_check(
         keyboard = []
         for crypto in coins:
             coin_data = await get_cmc_coin_info(crypto)
-            button = [
-                InlineKeyboardButton(
-                    coin_data["name"], callback_data="cmc_" + str(crypto)
-                )
-            ]
+            button = [InlineKeyboardButton(coin_data["name"], callback_data="cmc_" + str(crypto))]
             keyboard.append(button)
         reply_markup = InlineKeyboardMarkup(keyboard)
         await context.bot.send_message(
@@ -71,9 +63,7 @@ async def cmc_coin_check(
         )
 
 
-async def gc_coin_check(
-    coin: str, update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs
-) -> str:
+async def gc_coin_check(coin: str, update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs) -> str:
     error = "symbol"
     coin_type = kwargs.get("type", None)
     if len(coin) == 0:
@@ -142,9 +132,7 @@ async def cg_chart_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -
         await get_cg_chart(coin, update, context)
 
 
-async def chart_color_handler(
-    update: Update, context: ContextTypes.DEFAULT_TYPE
-) -> None:
+async def chart_color_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     themes = [
         ["🌕 white", "charttemplate_plotly_white"],
         ["🌑 dark", "charttemplate_plotly_dark"],
@@ -161,18 +149,14 @@ async def chart_color_handler(
     )
 
 
-async def eth_contract_handler(
-    update: Update, context: ContextTypes.DEFAULT_TYPE
-) -> None:
+async def eth_contract_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     if len(context.args[0]) == 42 and context.args[0].startswith("0x"):
         await get_defilama_price(context.args[0], "ethereum", update, context)
     else:
         await send_error("erc_contract", update, context)
 
 
-async def bsc_contract_handler(
-    update: Update, context: ContextTypes.DEFAULT_TYPE
-) -> None:
+async def bsc_contract_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     if len(context.args[0]) == 42 and context.args[0].startswith("0x"):
         await get_defilama_price(context.args[0], "bsc", update, context)
     else:

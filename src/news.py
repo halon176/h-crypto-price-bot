@@ -2,7 +2,7 @@ import feedparser
 from telegram import Update
 from telegram.ext import ContextTypes
 
-from src.utility import mk2_formatter
+from .utility import mk2_formatter
 
 RSS_URL = "https://www.coindesk.com/arc/outboundfeeds/rss/"
 

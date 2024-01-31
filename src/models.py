@@ -1,4 +1,4 @@
-from src.utility import human_format, format_date
+from .utility import human_format, format_date
 
 
 class PriceChangeEntry:

@@ -18,3 +18,17 @@ plotly = "^5.17.0"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.ruff]
+select = [
+    "E", # pycodestyle errors
+    "W", # pycodestyle warnings
+    "F", # pyflakes
+    "I", # isort
+    "B", # flake8-bugbear
+    "C4", # flake8-comprehensions
+    "UP", # pyupgrade
+]
+exclude = ["build", "dist", "venv", ".venv", ".git", ".tox", ".mypy_cache", ".pytest_cache", ".vscode", ".idea", "poetry.lock"]
+line-length = 120
+indent-width = 4

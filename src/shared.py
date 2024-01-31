@@ -1,9 +1,9 @@
 import datetime
 import logging
 
-import requests
+import httpx
 
-from src.config import CMC_API_KEY
+from .config import CMC_API_KEY
 
 
 class CoinList:
@@ -28,7 +28,7 @@ class CMCCoinList(CoinList):
         if (datetime.datetime.now() - self.coin_last_update) >= datetime.timedelta(
             hours=1
         ):
-            coin_request = requests.get(
+            coin_request = httpx.get(
                 "https://pro-api.coinmarketcap.com/v1/cryptocurrency/map",
                 headers={"X-CMC_PRO_API_KEY": CMC_API_KEY},
             )
@@ -43,7 +43,7 @@ class CGCoinList(CoinList):
         if (datetime.datetime.now() - self.coin_last_update) >= datetime.timedelta(
             hours=1
         ):
-            coin_request = requests.get(
+            coin_request = httpx.get(
                 "https://api.coingecko.com/api/v3/coins/list?include_platform=false"
             )
             self.coin_list = coin_request.json()

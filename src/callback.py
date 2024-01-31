@@ -5,9 +5,9 @@ from telegram.ext import (
     CallbackContext,
 )
 
-from src.cg_calls import get_cg_price, get_cg_chart
-from src.cmc_calls import get_cmc_price
-from src.shared import ChartTemplate
+from .cg_calls import get_cg_price, get_cg_chart
+from .cmc_calls import get_cmc_price
+from .shared import ChartTemplate
 
 chart_template = ChartTemplate()
 

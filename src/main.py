@@ -9,15 +9,16 @@ from telegram.ext import (
     CallbackQueryHandler,
 )
 
-from src.callback import callback_handler
-from src.cg_calls import get_cg_price, get_cg_id, get_cg_dominance, get_cg_chart
-from src.cmc_calls import get_cmc_id, get_cmc_price, get_cmc_coin_info, cmc_key_info
-from src.config import TELEGRAM_TOKEN
-from src.defilama_calls import get_defilama_price
-from src.ethersca_calls import gas_handler
-from src.info import start, bot_help
-from src.news import news
-from src.shared import ChartTemplate, CGCoinList, CMCCoinList
+from .callback import callback_handler
+from .cg_calls import get_cg_price, get_cg_id, get_cg_dominance, get_cg_chart
+from .cmc_calls import get_cmc_id, get_cmc_price, get_cmc_coin_info, cmc_key_info
+from .config import TELEGRAM_TOKEN
+from .defilama_calls import get_defilama_price
+from .errors import send_error
+from .ethersca_calls import gas_handler
+from .info import start, bot_help
+from .news import news
+from .shared import ChartTemplate, CGCoinList, CMCCoinList
 
 # ignore FutureWarning from pandas, to be fixed in future releases
 warnings.simplefilter("ignore", category=FutureWarning)
@@ -37,22 +38,18 @@ chart_template = ChartTemplate()
 
 
 async def cmc_coin_check(
-    coin: list, update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs
-) -> str | bool:
+    coin: str, update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs
+) -> int | bool:
+    error = "symbol"
     if len(coin) == 0:
-        await context.bot.send_message(
-            chat_id=update.effective_chat.id, text="Please enter a valid crypto symbol."
-        )
+        await send_error(error, update, context)
         return False
     coins = await get_cmc_id(coin)
     if not coins:
         cmc_coin_list.update()
         coins = await get_cmc_id(coin)
         if not coins:
-            await context.bot.send_message(
-                chat_id=update.effective_chat.id,
-                text="Please enter a valid crypto symbol.",
-            )
+            await send_error(error, update, context)
             return False
     if len(coins) == 1:
         return coins[0]
@@ -77,21 +74,17 @@ async def cmc_coin_check(
 async def gc_coin_check(
     coin: str, update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs
 ) -> str:
+    error = "symbol"
     coin_type = kwargs.get("type", None)
     if len(coin) == 0:
-        await context.bot.send_message(
-            chat_id=update.effective_chat.id, text="Please enter a valid crypto symbol."
-        )
+        await send_error(error, update, context)
         return False
     coins = await get_cg_id(coin)
     if not coins:
         cg_coin_list.update()
         coins = await get_cg_id(coin)
         if not coins:
-            await context.bot.send_message(
-                chat_id=update.effective_chat.id,
-                text="Please enter a valid crypto symbol.",
-            )
+            await send_error(error, update, context)
             return False
 
     if len(coins) == 1:
@@ -128,10 +121,7 @@ async def cg_price_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -
             await get_cg_price(coin, update, context)
         except Exception as e:
             logging.error(f"An error occurred: {str(e)}")
-            await context.bot.send_message(
-                chat_id=update.effective_chat.id,
-                text="An error occurred. Please try again later.",
-            )
+            await send_error("generic", update, context)
 
 
 async def cmc_price_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -142,10 +132,7 @@ async def cmc_price_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) 
             await get_cmc_price(coin, update, context)
         except Exception as e:
             logging.error(f"An error occurred: {str(e)}")
-            await context.bot.send_message(
-                chat_id=update.effective_chat.id,
-                text="An error occurred. Please try again later.",
-            )
+            await send_error("generic", update, context)
 
 
 async def cg_chart_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -180,10 +167,7 @@ async def eth_contract_handler(
     if len(context.args[0]) == 42 and context.args[0].startswith("0x"):
         await get_defilama_price(context.args[0], "ethereum", update, context)
     else:
-        error_message = "⚠️ invalid erc20 contract"
-        await context.bot.send_message(
-            chat_id=update.effective_chat.id, text=error_message
-        )
+        await send_error("erc_contract", update, context)
 
 
 async def bsc_contract_handler(
@@ -192,10 +176,7 @@ async def bsc_contract_handler(
     if len(context.args[0]) == 42 and context.args[0].startswith("0x"):
         await get_defilama_price(context.args[0], "bsc", update, context)
     else:
-        error_message = "⚠️ invalid bsc contract"
-        await context.bot.send_message(
-            chat_id=update.effective_chat.id, text=error_message
-        )
+        await send_error("bsc_contract", update, context)
 
 
 if __name__ == "__main__":

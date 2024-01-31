@@ -3,7 +3,7 @@ import logging
 from telegram import Update
 from telegram.ext import ContextTypes
 
-from src.utility import fetch_url
+from .utility import fetch_url
 
 
 async def get_defilama_price(

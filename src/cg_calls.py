@@ -8,9 +8,9 @@ import plotly.io as pio
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ContextTypes
 
-from src.models import GeneralDataEntry, AtEntry, PriceChangeEntry
-from src.shared import ChartTemplate, CGCoinList
-from src.utility import max_column_size, human_format, fetch_url
+from .models import GeneralDataEntry, AtEntry, PriceChangeEntry
+from .shared import ChartTemplate, CGCoinList
+from .utility import max_column_size, human_format, fetch_url
 
 CRYPTOGECKO_API_COINS = "https://api.coingecko.com/api/v3/coins/"
 CRYPTOGECKO_API_DOMINANCE = "https://api.coingecko.com/api/v3/global/"
@@ -281,7 +281,7 @@ async def get_cg_dominance(update: Update, context: ContextTypes.DEFAULT_TYPE) -
     dom_percentage = list(global_data["data"]["market_cap_percentage"].items())
 
     class MarketCapEntry:
-        def __init__(self, tpl_symbol_percentage):
+        def __init__(self, tpl_symbol_percentage) -> None:
             self.strSymbol = tpl_symbol_percentage[0].upper()
             self.strPercentage = f"{tpl_symbol_percentage[1]:.1f}%"
 

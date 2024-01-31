@@ -4,10 +4,10 @@ from functools import reduce
 from telegram import Update
 from telegram.ext import ContextTypes
 
-from src.config import CMC_API_KEY
-from src.models import PriceChangeEntry, GeneralDataEntry
-from src.shared import CMCCoinList
-from src.utility import human_format, max_column_size, fetch_url
+from .config import CMC_API_KEY
+from .models import PriceChangeEntry, GeneralDataEntry
+from .shared import CMCCoinList
+from .utility import human_format, max_column_size, fetch_url
 
 coin_list = CMCCoinList()
 headers = {"X-CMC_PRO_API_KEY": CMC_API_KEY}

@@ -22,10 +22,9 @@ coin_list = CGCoinList()
 
 
 async def get_cg_id(crypto_symbol: str) -> list:
-    excluded_values = {"-peg-", "-wormhole", "wrapped", "oec-", "-iou", "harrypotter"}
     api_ids = []
     for crypto in coin_list.coin_list:
-        if crypto["symbol"] == crypto_symbol and all(excluded not in crypto["id"] for excluded in excluded_values):
+        if crypto["symbol"] == crypto_symbol:
             api_ids.append(crypto["id"])
     return api_ids
 

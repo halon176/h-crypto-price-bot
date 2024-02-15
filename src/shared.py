@@ -42,6 +42,18 @@ class CGCoinList(CoinList):
             coin_request = httpx.get("https://api.coingecko.com/api/v3/coins/list?include_platform=false")
             self.coin_list = coin_request.json()
             self.coin_last_update = datetime.datetime.now()
+            excluded_values = {
+                "-peg-",
+                "-wormhole",
+                "wrapped",
+                "oec-",
+                "-iou",
+                "harrypotter",
+                "blackrocktradingcurrency",
+            }
+            self.coin_list = [
+                crypto for crypto in self.coin_list if all(excluded not in crypto["id"] for excluded in excluded_values)
+            ]
             logging.info("Reloaded coin list from CoinGecko API")
 
 

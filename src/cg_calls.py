@@ -20,6 +20,10 @@ coin_list_gc = []
 chart_template = ChartTemplate()
 coin_list = CGCoinList()
 
+exp_message = (
+    "You have reached the maximum number of requests for this period. It will be reset in the end of the month."
+)
+
 
 async def get_cg_id(crypto_symbol: str) -> list:
     api_ids = []
@@ -43,7 +47,13 @@ async def get_cg_price(coin: str, update: Update, context: ContextTypes.DEFAULT_
         "&developer_data=false"
         "&sparkline=false"
     )
-    await api_call(1, 1, str(update.effective_chat.id), coin)
+    r = await api_call(1, 1, str(update.effective_chat.id), coin)
+    if not r:
+        await context.bot.send_message(
+            chat_id=update.effective_chat.id,
+            text=exp_message,
+        )
+        return
 
     url = CRYPTOGECKO_API_COINS + coin + url_tail
     logging.info(f"Request CG URL: {url}")
@@ -177,7 +187,13 @@ async def get_cg_price(coin: str, update: Update, context: ContextTypes.DEFAULT_
 
 
 async def get_cg_chart(coin: str, update: Update, context: ContextTypes.DEFAULT_TYPE, period="30") -> None:
-    await api_call(1, 2, str(update.effective_chat.id), coin)
+    r = await api_call(1, 2, str(update.effective_chat.id), coin)
+    if not r:
+        await context.bot.send_message(
+            chat_id=update.effective_chat.id,
+            text=exp_message,
+        )
+        return
     url = f"https://api.coingecko.com/api/v3/coins/{coin}/market_chart?vs_currency=usd&days={period}"
     chart = await fetch_url(url)
     if not chart:

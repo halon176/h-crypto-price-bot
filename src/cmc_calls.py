@@ -12,6 +12,10 @@ from .utility import api_call, fetch_url, human_format, max_column_size
 coin_list = CMCCoinList()
 headers = {"X-CMC_PRO_API_KEY": CMC_API_KEY}
 
+exp_message = (
+    "You have reached the maximum number of requests for this period. It will be reset in the end of the month."
+)
+
 
 async def get_cmc_id(crypto_symbol: str) -> list[int]:
     crypto_symbol = crypto_symbol.upper()
@@ -36,7 +40,10 @@ async def get_cmc_price(coin_id: int, update: Update, context: ContextTypes.DEFA
     :param context:
     :return: None
     """
-    await api_call(2, 1, str(update.effective_chat.id), str(coin_id))
+    r = await api_call(2, 1, str(update.effective_chat.id), str(coin_id))
+    if not r:
+        await context.bot.send_message(chat_id=update.effective_chat.id, text=exp_message)
+        return
 
     url = f"https://pro-api.coinmarketcap.com/v2/cryptocurrency/quotes/latest?id={coin_id}"
     r = await fetch_url(url, headers)

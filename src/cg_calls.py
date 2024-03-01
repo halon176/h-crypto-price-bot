@@ -10,7 +10,7 @@ from telegram.ext import ContextTypes
 
 from .models import AtEntry, GeneralDataEntry, PriceChangeEntry
 from .shared import CGCoinList, ChartTemplate
-from .utility import fetch_url, human_format, max_column_size
+from .utility import api_call, fetch_url, human_format, max_column_size
 
 CRYPTOGECKO_API_COINS = "https://api.coingecko.com/api/v3/coins/"
 CRYPTOGECKO_API_DOMINANCE = "https://api.coingecko.com/api/v3/global/"
@@ -43,6 +43,7 @@ async def get_cg_price(coin: str, update: Update, context: ContextTypes.DEFAULT_
         "&developer_data=false"
         "&sparkline=false"
     )
+    await api_call(1, 1, str(update.effective_chat.id), coin)
 
     url = CRYPTOGECKO_API_COINS + coin + url_tail
     logging.info(f"Request CG URL: {url}")
@@ -176,8 +177,15 @@ async def get_cg_price(coin: str, update: Update, context: ContextTypes.DEFAULT_
 
 
 async def get_cg_chart(coin: str, update: Update, context: ContextTypes.DEFAULT_TYPE, period="30") -> None:
+    await api_call(1, 2, str(update.effective_chat.id), coin)
     url = f"https://api.coingecko.com/api/v3/coins/{coin}/market_chart?vs_currency=usd&days={period}"
     chart = await fetch_url(url)
+    if not chart:
+        await context.bot.send_message(
+            chat_id=update.effective_chat.id,
+            text="An error occurred. Please try again later.",
+        )
+        return
     logging.info(f"Request URL: {url}")
     x = [p[0] / 1000 for p in chart["prices"]]
     y = [p[1] for p in chart["prices"]]

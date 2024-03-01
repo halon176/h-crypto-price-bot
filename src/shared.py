@@ -40,6 +40,13 @@ class CGCoinList(CoinList):
     def update(self) -> None:
         if (datetime.datetime.now() - self.coin_last_update) >= datetime.timedelta(hours=1):
             coin_request = httpx.get("https://api.coingecko.com/api/v3/coins/list?include_platform=false")
+            if coin_request.status_code != 200:
+                e = (
+                    f"Failed to fetch CoinGecko coin list, status code: {coin_request.status_code},"
+                    f" probably temporary banned for too many requests, try again later"
+                )
+                logging.error(e)
+                return
             self.coin_list = coin_request.json()
             self.coin_last_update = datetime.datetime.now()
             excluded_values = {

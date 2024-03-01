@@ -12,7 +12,7 @@ from telegram.ext import (
 from .callback import callback_handler
 from .cg_calls import get_cg_chart, get_cg_dominance, get_cg_id, get_cg_price
 from .cmc_calls import cmc_key_info, get_cmc_coin_info, get_cmc_id, get_cmc_price
-from .config import TELEGRAM_TOKEN
+from .config import API_URL, TELEGRAM_TOKEN
 from .defilama_calls import get_defilama_price
 from .errors import send_error
 from .ethersca_calls import gas_handler
@@ -164,6 +164,8 @@ async def bsc_contract_handler(update: Update, context: ContextTypes.DEFAULT_TYP
 
 
 if __name__ == "__main__":
+    if not API_URL:
+        logging.info("API_URL not set, no calls control will be performed")
     application = ApplicationBuilder().token(TELEGRAM_TOKEN).build()
 
     start_handler = CommandHandler("start", start)

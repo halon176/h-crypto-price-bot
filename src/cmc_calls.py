@@ -7,7 +7,7 @@ from telegram.ext import ContextTypes
 from .config import CMC_API_KEY
 from .models import GeneralDataEntry, PriceChangeEntry
 from .shared import CMCCoinList
-from .utility import fetch_url, human_format, max_column_size
+from .utility import api_call, fetch_url, human_format, max_column_size
 
 coin_list = CMCCoinList()
 headers = {"X-CMC_PRO_API_KEY": CMC_API_KEY}
@@ -36,6 +36,8 @@ async def get_cmc_price(coin_id: int, update: Update, context: ContextTypes.DEFA
     :param context:
     :return: None
     """
+    await api_call(2, 1, str(update.effective_chat.id), str(coin_id))
+
     url = f"https://pro-api.coinmarketcap.com/v2/cryptocurrency/quotes/latest?id={coin_id}"
     r = await fetch_url(url, headers)
     logging.info(f"Request CMC URL: {url}")

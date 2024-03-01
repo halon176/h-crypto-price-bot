@@ -3,6 +3,8 @@ from datetime import datetime
 
 import httpx
 
+from src.config import API_URL
+
 
 def format_date(date_str: str) -> str:
     date_obj = datetime.fromisoformat(date_str[:-1])
@@ -61,3 +63,20 @@ def mk2_formatter(text: str) -> str:
                 text = text[:index] + "\\" + text[index:]
             index = text.find(symbol, index + 2)
     return text
+
+
+async def api_call(service_id: int, type_id: int, chat_id: str, coin: str | None = None) -> bool:
+    if not API_URL:
+        return True
+    url = f"{API_URL}/call"
+    data = {"service_id": service_id, "type_id": type_id, "chat_id": chat_id, "coin": coin}
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.post(url, json=data)
+            if response.status_code != 401:
+                return True
+            else:
+                return False
+    except Exception as e:
+        logging.error(f"Error tracking API: {str(e)}")
+        return False

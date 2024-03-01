@@ -79,4 +79,4 @@ async def api_call(service_id: int, type_id: int, chat_id: str, coin: str | None
                 return False
     except Exception as e:
         logging.error(f"Error tracking API: {str(e)}")
-        return False
+        return True

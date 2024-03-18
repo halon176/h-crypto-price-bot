@@ -12,7 +12,7 @@ web3 = "^6.15.0"
 feedparser = "^6.0.10"
 pandas = "^2.1.1"
 kaleido = "0.2.1"
-plotly = "^5.17.0"
+plotly = "^5.20.0"
 
 
 [build-system]

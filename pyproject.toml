@@ -10,7 +10,7 @@ python = ">=3.11,<3.13"
 python-telegram-bot = "^20.8"
 web3 = "^6.15.0"
 feedparser = "^6.0.10"
-pandas = "^2.1.1"
+pandas = "^2.2.2"
 kaleido = "0.2.1"
 plotly = "^5.17.0"
 

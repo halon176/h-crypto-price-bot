@@ -6,6 +6,10 @@
 HCryptoPrice is a Python-based bot that fetches real-time cryptocurrency prices from Coingecko and presents them in an
 easy-to-understand format on Telegram. It also offers historical price data, market cap rankings.
 
+If you want to use more advanced bot features as call limits, you can use the API interaction,
+which is available in the [hcpb-api](https://github.com/halon176/hcpb-api) repository. 
+⚠️ The API is still under development. ⚠️
+
 Here's a working version of the bot: [@h_crypto_price_bot](https://t.me/h_crypto_price_bot)
 
 ## Installation
@@ -26,12 +30,11 @@ python --version
 git clone https://github.com/halon176/h-crypto-price-bot.git
 ```
 
-3) Change into the directory where the bot's code is located, then install the required Python packages by running the
-   following commands:
+3) Change into the directory where the bot's code is located, the install the dependencies using [Poetry](https://python-poetry.org/docs/#installation):
 
 ```
 cd h-crypto-price-bot
-pip install -r requirements.txt
+poetry install
 ```
 
 4) Create a new Telegram bot by following the instructions in the Telegram Bot API
@@ -44,10 +47,12 @@ pip install -r requirements.txt
 export TELEGRAM_TOKEN=<telegram_bot_token>
 ```
 
-To use the gas price feature, you must include an Etherscan API key.
+To use the gas price feature, you must include an Etherscan API key. Other keys are optional.
 
 ```
 export ETHSCAN_API_KEY=<etherscan_api_key>
+export CMC_API_KEY=<coinmarketcap_api_key>
+export API_URL=<api_url>
 ```
 
 6) Run the bot by running the following command:
@@ -101,9 +106,8 @@ To display the list of all available commands, type `/help`
 
 ## Roadmap
 
-- [ ] Display a chart showing the price trend of a single coin in different selectable timeframes.
-- [ ] Create the possibility to query other APIs such as Binance or CoinMarketCap.
-
+- [ ] Build more interactions with API, such as store settings and call limits.
+- 
 ## Contributing
 
 Contributions are welcome! If you have any suggestions or bug reports, please open an issue on the GitHub repository.

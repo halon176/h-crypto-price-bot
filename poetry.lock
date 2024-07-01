@@ -2142,13 +2142,13 @@ zstd = ["zstandard (>=0.18.0)"]
 
 [[package]]
 name = "web3"
-version = "6.19.0"
+version = "6.20.0"
 description = "web3.py"
 optional = false
 python-versions = ">=3.7.2"
 files = [
-    {file = "web3-6.19.0-py3-none-any.whl", hash = "sha256:fb39683d6aa7586ce0ab0be4be392f8acb62c2503958079d61b59f2a0b883718"},
-    {file = "web3-6.19.0.tar.gz", hash = "sha256:d27fbd4ac5aa70d0e0c516bd3e3b802fbe74bc159b407c34052d9301b400f757"},
+    {file = "web3-6.20.0-py3-none-any.whl", hash = "sha256:ec09882d21378b688210cf29385e82b604bdc18fe5c2e238bf3b5fe2a6e6dbbc"},
+    {file = "web3-6.20.0.tar.gz", hash = "sha256:b04725517502cad4f15e39356eaf7c4fcb0127c7728f83eec8cbafb5b6455f33"},
 ]
 
 [package.dependencies]
@@ -2361,4 +2361,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.11,<3.13"
-content-hash = "a38c5cd94143ac7b2f1fd68c87321765388172a62062ce4e01dcee563007164b"
+content-hash = "d22466694afdae940832c152ff6a88777665a171c5fad5c96ad19a1b75797268"

@@ -7,7 +7,7 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = ">=3.11,<3.13"
-python-telegram-bot = "^21.3"
+python-telegram-bot = "^21.4"
 web3 = "^6.18.0"
 feedparser = "^6.0.10"
 pandas = "^2.2.2"

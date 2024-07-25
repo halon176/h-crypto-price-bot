@@ -18,6 +18,11 @@ exp_message = (
 
 
 async def get_cmc_id(crypto_symbol: str) -> list[int]:
+    """
+    Get the id of a coin from the CoinMarketCap index
+    :param crypto_symbol:
+    :return:
+    """
     crypto_symbol = crypto_symbol.upper()
     api_ids = []
     for crypto in coin_list.coin_list["data"]:

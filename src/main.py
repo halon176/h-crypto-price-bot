@@ -13,7 +13,6 @@ from .callback import callback_handler
 from .cg_calls import get_cg_chart, get_cg_dominance, get_cg_id, get_cg_price
 from .cmc_calls import cmc_key_info, get_cmc_coin_info, get_cmc_id, get_cmc_price
 from .config import API_URL, TELEGRAM_TOKEN
-from .defilama_calls import get_defilama_price
 from .errors import send_error
 from .ethersca_calls import gas_handler
 from .info import bot_help, start
@@ -149,20 +148,6 @@ async def chart_color_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
     )
 
 
-async def eth_contract_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    if len(context.args[0]) == 42 and context.args[0].startswith("0x"):
-        await get_defilama_price(context.args[0], "ethereum", update, context)
-    else:
-        await send_error("erc_contract", update, context)
-
-
-async def bsc_contract_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    if len(context.args[0]) == 42 and context.args[0].startswith("0x"):
-        await get_defilama_price(context.args[0], "bsc", update, context)
-    else:
-        await send_error("bsc_contract", update, context)
-
-
 if __name__ == "__main__":
     if not API_URL:
         logging.info("API_URL not set, no calls control will be performed")
@@ -176,12 +161,6 @@ if __name__ == "__main__":
 
     chart_handler = CommandHandler("c", cg_chart_handler)
     application.add_handler(chart_handler)
-
-    eth_contract_handler_b = CommandHandler("eth", eth_contract_handler)
-    application.add_handler(eth_contract_handler_b)
-
-    bsc_contract_handler_b = CommandHandler("bsc", bsc_contract_handler)
-    application.add_handler(bsc_contract_handler_b)
 
     chart_color = CommandHandler("chart_color", chart_color_handler)
     application.add_handler(chart_color)

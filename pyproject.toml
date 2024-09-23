@@ -11,7 +11,7 @@ python = ">=3.11,<3.13"
 python-telegram-bot = "^21.5"
 web3 = "^7.2.0"
 feedparser = "^6.0.10"
-pandas = "^2.2.2"
+pandas = "^2.2.3"
 kaleido = "0.2.1"
 plotly = "^5.22.0"
 aiohttp = {extras = ["speedups"], version = "^3.9.5"}

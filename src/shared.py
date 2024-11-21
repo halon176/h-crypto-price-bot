@@ -3,7 +3,7 @@ import logging
 
 import httpx
 
-from .config import CMC_API_KEY
+from .config import settings as s
 
 
 class CoinList:
@@ -25,10 +25,12 @@ class CMCCoinList(CoinList):
     """
 
     def update(self, CMC_PRO_API_KEY: str | None = None) -> None:
+        if CMC_PRO_API_KEY is None:
+            return
         if (datetime.datetime.now() - self.coin_last_update) >= datetime.timedelta(hours=1):
             coin_request = httpx.get(
                 "https://pro-api.coinmarketcap.com/v1/cryptocurrency/map",
-                headers={"X-CMC_PRO_API_KEY": CMC_API_KEY},
+                headers={"X-CMC_PRO_API_KEY": s.CMC_API_KEY.get_secret_value()},
             )
             coin_list_gc = coin_request.json()
             self.coin_list = coin_list_gc

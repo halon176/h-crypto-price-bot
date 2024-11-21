@@ -1,7 +1,14 @@
-import os
+from pydantic import Field, SecretStr
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
-TELEGRAM_TOKEN = os.environ.get("TELEGRAM_TOKEN")
-ETHSCAN_API_KEY = os.environ.get("ETHSCAN_API_KEY")
-CMC_API_KEY = os.environ.get("CMC_API_KEY")
 
-API_URL = os.environ.get("API_URL") or None
+class Settings(BaseSettings):
+    TELEGRAM_TOKEN: SecretStr = Field(...)
+    ETHSCAN_API_KEY: SecretStr | None = Field(None)
+    CMC_API_KEY: SecretStr | None = Field(None)
+    API_URL: str | None = Field(None)
+
+    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
+
+
+settings = Settings()

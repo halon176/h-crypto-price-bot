@@ -5,13 +5,19 @@ from telegram import Update
 from telegram.ext import ContextTypes
 from web3 import Web3
 
-from .config import ETHSCAN_API_KEY
+from .config import settings as s
 from .utility import fetch_url, max_column_size
 
 
 async def gas_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    if not s.ETHSCAN_API_KEY:
+        await context.bot.send_message(
+            chat_id=update.effective_chat.id,
+            text="The bot has been launched without an Etherscan API KEY.",
+        )
+        return
     gas_request = await fetch_url(
-        f"https://api.etherscan.io/api?module=gastracker&action=gasoracle&apikey={ETHSCAN_API_KEY}"
+        f"https://api.etherscan.io/api?module=gastracker&action=gasoracle&apikey={s.ETHSCAN_API_KEY.get_secret_value()}"
     )
     logging.info("Request etherscan gas price")
 
@@ -30,7 +36,7 @@ async def gas_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
 
         async def get_eth_price() -> float:
             response = await fetch_url(
-                f"https://api.etherscan.io/api?module=stats&action=ethprice&apikey={ETHSCAN_API_KEY}"
+                f"https://api.etherscan.io/api?module=stats&action=ethprice&apikey={s.ETHSCAN_API_KEY.get_secret_value()}"
             )
             price = float(response["result"]["ethusd"])
             return price

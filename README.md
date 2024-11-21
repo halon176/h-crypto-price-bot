@@ -7,7 +7,7 @@ HCryptoPrice is a Python-based bot that fetches real-time cryptocurrency prices 
 easy-to-understand format on Telegram. It also offers historical price data, market cap rankings.
 
 If you want to use more advanced bot features as call limits, you can use the API interaction,
-which is available in the [hcpb-api](https://github.com/halon176/hcpb-api) repository. 
+which is available in the [hcpb-api](https://github.com/halon176/hcpb-api) repository.
 ⚠️ The API is still under development. ⚠️
 
 Here's a working version of the bot: [@h_crypto_price_bot](https://t.me/h_crypto_price_bot)
@@ -30,7 +30,8 @@ python --version
 git clone https://github.com/halon176/h-crypto-price-bot.git
 ```
 
-3) Change into the directory where the bot's code is located, the install the dependencies using [Poetry](https://python-poetry.org/docs/#installation):
+3) Change into the directory where the bot's code is located, the install the dependencies
+   using [Poetry](https://python-poetry.org/docs/#installation):
 
 ```
 cd h-crypto-price-bot
@@ -107,7 +108,8 @@ To display the list of all available commands, type `/help`
 ## Roadmap
 
 - [ ] Build more interactions with API, such as store settings and call limits.
-- 
+-
+
 ## Contributing
 
 Contributions are welcome! If you have any suggestions or bug reports, please open an issue on the GitHub repository.

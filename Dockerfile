@@ -20,7 +20,7 @@ ENV PYTHONUNBUFFERED=1
 
 COPY --from=requirements-stage /tmp/requirements.txt /code/requirements.txt
 
-RUN apt-get update && apt-get install -y --no-install-recommends build-essential && \
+RUN apt update && apt dist-upgrade -y && apt install -y --no-install-recommends build-essential && \
     pip install --upgrade pip && \
     pip install --no-cache-dir -r /code/requirements.txt && \
     apt-get purge -y --auto-remove build-essential && \

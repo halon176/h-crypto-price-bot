@@ -3,7 +3,7 @@ from datetime import datetime
 
 import httpx
 
-from src.config import API_URL
+from src.config import settings as s
 
 
 def format_date(date_str: str) -> str:
@@ -66,9 +66,9 @@ def mk2_formatter(text: str) -> str:
 
 
 async def api_call(service_id: int, type_id: int, chat_id: str, coin: str | None = None) -> bool:
-    if not API_URL:
+    if not s.API_URL:
         return True
-    url = f"{API_URL}/call"
+    url = f"{s.API_URL}/call"
     data = {"service_id": service_id, "type_id": type_id, "chat_id": chat_id, "coin": coin}
     try:
         async with httpx.AsyncClient() as client:

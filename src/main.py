@@ -12,7 +12,7 @@ from telegram.ext import (
 from .callback import callback_handler
 from .cg_calls import get_cg_chart, get_cg_dominance, get_cg_id, get_cg_price
 from .cmc_calls import cmc_key_info, get_cmc_coin_info, get_cmc_id, get_cmc_price
-from .config import API_URL, TELEGRAM_TOKEN
+from .config import settings as s
 from .errors import send_error
 from .ethersca_calls import gas_handler
 from .info import bot_help, start
@@ -148,40 +148,27 @@ async def chart_color_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
     )
 
 
+handlers = {
+    "start": start,
+    "p": cg_price_handler,
+    "c": cg_chart_handler,
+    "chart_color": chart_color_handler,
+    "cmc": cmc_price_handler,
+    "cmckey": cmc_key_info,
+    "gas": gas_handler,
+    "dom": get_cg_dominance,
+    "news": news,
+    "help": bot_help,
+}
+
+
 if __name__ == "__main__":
-    if not API_URL:
+    if not s.API_URL:
         logging.info("API_URL not set, no calls control will be performed")
-    application = ApplicationBuilder().token(TELEGRAM_TOKEN).build()
+    application = ApplicationBuilder().token(s.TELEGRAM_TOKEN.get_secret_value()).build()
 
-    start_handler = CommandHandler("start", start)
-    application.add_handler(start_handler)
-
-    cg_price_handler = CommandHandler("p", cg_price_handler)
-    application.add_handler(cg_price_handler)
-
-    chart_handler = CommandHandler("c", cg_chart_handler)
-    application.add_handler(chart_handler)
-
-    chart_color = CommandHandler("chart_color", chart_color_handler)
-    application.add_handler(chart_color)
-
-    cmc_price_handler = CommandHandler("cmc", cmc_price_handler)
-    application.add_handler(cmc_price_handler)
-
-    cmc_key_info = CommandHandler("cmckey", cmc_key_info)
-    application.add_handler(cmc_key_info)
-
-    crypto_gas_handler = CommandHandler("gas", gas_handler)
-    application.add_handler(crypto_gas_handler)
-
-    crypto_dominance_handler = CommandHandler("dom", get_cg_dominance)
-    application.add_handler(crypto_dominance_handler)
-
-    news_handler = CommandHandler("news", news)
-    application.add_handler(news_handler)
-
-    help_handler = CommandHandler("help", bot_help)
-    application.add_handler(help_handler)
+    for handler_name, handler in handlers.items():
+        application.add_handler(CommandHandler(handler_name, handler))
 
     menu_handler = CallbackQueryHandler(callback_handler)
     application.add_handler(menu_handler)

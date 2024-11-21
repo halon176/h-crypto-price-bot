@@ -1,9 +1,7 @@
 import logging
 
 from telegram import Update
-from telegram.ext import (
-    CallbackContext,
-)
+from telegram.ext import CallbackContext
 
 from .cg_calls import get_cg_chart, get_cg_price
 from .cmc_calls import get_cmc_price
@@ -18,15 +16,15 @@ async def callback_handler(update: Update, context: CallbackContext) -> None:
 
     if selected_option.startswith("chart_"):
         await get_cg_chart(selected_option[6:], update, context)
-        await context.bot.delete_message(chat_id=query.message.chat_id, message_id=query.message.message_id)
+        await context.bot.delete_message(chat_id=query.message.chat.id, message_id=query.message.message_id)
     elif selected_option.startswith("cmc_"):
         coin_id = selected_option[4:]
         await get_cmc_price(coin_id, update, context)
-        await context.bot.delete_message(chat_id=query.message.chat_id, message_id=query.message.message_id)
+        await context.bot.delete_message(chat_id=query.message.chat.id, message_id=query.message.message_id)
 
     elif selected_option.startswith("charttemplate_"):
         chart_template.set_template(selected_option[14:])
-        await context.bot.delete_message(chat_id=query.message.chat_id, message_id=query.message.message_id)
+        await context.bot.delete_message(chat_id=query.message.chat.id, message_id=query.message.message_id)
 
         await context.bot.send_message(
             chat_id=update.effective_chat.id,
@@ -41,7 +39,7 @@ async def callback_handler(update: Update, context: CallbackContext) -> None:
             context,
             selected_option[7:indexdot],
         )
-        await context.bot.delete_message(chat_id=query.message.chat_id, message_id=query.message.message_id)
+        await context.bot.delete_message(chat_id=query.message.chat.id, message_id=query.message.message_id)
 
     else:
         try:
@@ -52,4 +50,4 @@ async def callback_handler(update: Update, context: CallbackContext) -> None:
                 chat_id=update.effective_chat.id,
                 text="An error occurred. Please try again later.",
             )
-        await context.bot.delete_message(chat_id=query.message.chat_id, message_id=query.message.message_id)
+        await context.bot.delete_message(chat_id=query.message.chat.id, message_id=query.message.message_id)

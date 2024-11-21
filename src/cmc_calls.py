@@ -4,13 +4,16 @@ from functools import reduce
 from telegram import Update
 from telegram.ext import ContextTypes
 
-from .config import CMC_API_KEY
+from .config import settings as s
 from .models import GeneralDataEntry, PriceChangeEntry
 from .shared import CMCCoinList
 from .utility import api_call, fetch_url, human_format, max_column_size
 
 coin_list = CMCCoinList()
-headers = {"X-CMC_PRO_API_KEY": CMC_API_KEY}
+headers = {"X-CMC_PRO_API_KEY": ""}
+
+if s.CMC_API_KEY:
+    headers["X-CMC_PRO_API_KEY"] = s.CMC_API_KEY.get_secret_value()
 
 exp_message = (
     "You have reached the maximum number of requests for this period. It will be reset in the end of the month."

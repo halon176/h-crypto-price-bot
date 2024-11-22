@@ -22,11 +22,6 @@ jobs:
       - name: Install dependencies
         run: |
           poetry install --no-interaction
-      - name: Lint with Ruff
-        run: |
-          poetry run pip install ruff
-          poetry run ruff --format=github --target-version=py312 .
-        continue-on-error: true
       - name: Test with pytest
         run: |
           poetry run coverage run -m pytest -v -s

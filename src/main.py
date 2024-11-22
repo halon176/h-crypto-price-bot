@@ -165,12 +165,12 @@ handlers = {
 if __name__ == "__main__":
     if not s.API_URL:
         logging.info("API_URL not set, no calls control will be performed")
+
     application = ApplicationBuilder().token(s.TELEGRAM_TOKEN.get_secret_value()).build()
 
     for handler_name, handler in handlers.items():
         application.add_handler(CommandHandler(handler_name, handler))
 
-    menu_handler = CallbackQueryHandler(callback_handler)
-    application.add_handler(menu_handler)
+    application.add_handler(CallbackQueryHandler(callback_handler))
 
     application.run_polling()

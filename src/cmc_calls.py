@@ -80,8 +80,8 @@ async def get_cmc_price(coin_id: int, update: Update, context: ContextTypes.DEFA
         price_changes.append(PriceChangeEntry(label, value))
 
     lst_column_size_changes = [
-        max_column_size(prc.strEntry for prc in price_changes),
-        max_column_size(prc.strPercentage for prc in price_changes),
+        max_column_size([prc.strEntry for prc in price_changes]),
+        max_column_size([prc.strPercentage for prc in price_changes]),
     ]
 
     str_format_prc = f"{{:{lst_column_size_changes[0]}}}    {{:>{lst_column_size_changes[1]}}}"
@@ -108,8 +108,8 @@ async def get_cmc_price(coin_id: int, update: Update, context: ContextTypes.DEFA
 
     lst_column_size_gend = [
         2,
-        max_column_size(gend.type for gend in general_data),
-        max_column_size(gend.value for gend in general_data),
+        max_column_size([gend.type for gend in general_data]),
+        max_column_size([gend.value for gend in general_data]),
     ]
 
     str_format_gend = f"{{}} {{:{lst_column_size_gend[1]}}}   {{:>{lst_column_size_gend[2]}}}"

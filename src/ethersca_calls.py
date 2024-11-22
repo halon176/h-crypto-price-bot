@@ -81,9 +81,9 @@ async def gas_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
 
         gp_column_size = [
             2,
-            max_column_size(gp.gas_entry for gp in gas_price),
-            max_column_size(gp.price_entry for gp in gas_price),
-            max_column_size(gp.usd_value for gp in gas_price),
+            max_column_size([gp.gas_entry for gp in gas_price]),
+            max_column_size([gp.price_entry for gp in gas_price]),
+            max_column_size([gp.usd_value for gp in gas_price]),
         ]
 
         str_format_gp = f"{{}} {{:{gp_column_size[1]}}}  {{:>{gp_column_size[2]}}}  {{:>{gp_column_size[3]}}}"

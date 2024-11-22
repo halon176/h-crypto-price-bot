@@ -11,8 +11,11 @@ def format_date(date_str: str) -> str:
     return date_obj.strftime("%m/%y")
 
 
-def max_column_size(arr: list) -> int:
-    return max(len(string) for string in arr)
+def max_column_size(arr: list[str]) -> int:
+    try:
+        return max(len(string) for string in arr)
+    except ValueError:
+        return 0
 
 
 def human_format(num: float) -> str:
@@ -37,7 +40,6 @@ def human_format(num: float) -> str:
 async def fetch_url(url: str, headers: dict[str, str] | None = None) -> dict | None:
     try:
         async with httpx.AsyncClient() as client:
-            # Utilizza l'argomento headers se è stato fornito, altrimenti usa un dizionario vuoto
             response = await client.get(url, headers=headers)
             if response.status_code == 200:
                 return response.json()

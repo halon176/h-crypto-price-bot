@@ -16,6 +16,7 @@ kaleido = "0.2.1"
 plotly = "^5.22.0"
 aiohttp = { extras = ["speedups"], version = "^3.9.5" }
 pydantic-settings = "^2.6.1"
+pytest = "^8.3.3"
 
 
 [build-system]
@@ -35,3 +36,6 @@ select = [
 exclude = ["build", "dist", "venv", ".venv", ".git", ".tox", ".mypy_cache", ".pytest_cache", ".vscode", ".idea", "poetry.lock"]
 line-length = 120
 indent-width = 4
+
+[tool.pytest.ini_options]
+addopts = "-v"

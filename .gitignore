@@ -3,5 +3,6 @@ idea
 venv
 .env
 .directory
+.coverage
 
 __pycache__

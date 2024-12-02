@@ -16,7 +16,7 @@ kaleido = "0.2.1"
 plotly = "^5.22.0"
 aiohttp = { extras = ["speedups"], version = "^3.9.5" }
 pydantic-settings = "^2.6.1"
-pytest = "^8.3.3"
+pytest = "^8.3.4"
 pytest-cov = "^6.0.0"
 
 

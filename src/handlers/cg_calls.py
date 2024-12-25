@@ -1,5 +1,5 @@
 import logging
-import os
+import io
 from functools import reduce
 
 import pandas as pd
@@ -218,7 +218,9 @@ async def get_cg_chart(coin: str, update: Update, context: ContextTypes.DEFAULT_
 
     fig.update_layout(title={"text": title, "y": 0.93, "x": 0.5, "font": {"size": 24}})
 
-    pio.write_image(fig, "plot.jpg", format="jpg")
+    buffer = io.BytesIO()
+    pio.write_image(fig, buffer, format="jpg")
+    buffer.seek(0)
 
     periods = [
         {"1": "24h"},
@@ -248,10 +250,10 @@ async def get_cg_chart(coin: str, update: Update, context: ContextTypes.DEFAULT_
     reply_markup = InlineKeyboardMarkup(keyboard)
     await context.bot.send_photo(
         chat_id=update.effective_chat.id,
-        photo=open("plot.jpg", "rb"),
+        photo=buffer,
         reply_markup=reply_markup,
     )
-    os.remove("plot.jpg")
+    buffer.close()
 
 
 async def get_cg_dominance(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:

@@ -5,9 +5,7 @@ from telegram.ext import CallbackContext
 
 from src.handlers.cg_calls import get_cg_chart, get_cg_price
 from src.handlers.cmc_calls import get_cmc_price
-from src.utils.shared import ChartTemplate
-
-chart_template = ChartTemplate()
+from src.utils.shared import chart_template
 
 
 async def callback_handler(update: Update, context: CallbackContext) -> None:

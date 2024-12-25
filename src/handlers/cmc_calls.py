@@ -6,12 +6,10 @@ from telegram.ext import ContextTypes
 
 from src.config import settings as s
 from src.errors import send_error
-from src.main import cmc_coin_list
 from src.utils.formatters import human_format, max_column_size
-from src.utils.shared import CMCCoinList, GeneralDataEntry, PriceChangeEntry
+from src.utils.shared import GeneralDataEntry, PriceChangeEntry, cmc_coin_list
 from src.utils.http import api_call, fetch_url
 
-coin_list = CMCCoinList()
 headers = {"X-CMC_PRO_API_KEY": ""}
 
 if s.CMC_API_KEY:
@@ -30,14 +28,14 @@ async def get_cmc_id(crypto_symbol: str) -> list[int]:
     """
     crypto_symbol = crypto_symbol.upper()
     api_ids = []
-    for crypto in coin_list.coin_list["data"]:
+    for crypto in cmc_coin_list.coin_list["data"]:
         if crypto["symbol"] == crypto_symbol:
             api_ids.append(crypto["id"])
     return api_ids
 
 
 async def get_cmc_coin_info(coin_id: int) -> dict[str, str]:
-    for crypto in coin_list.coin_list["data"]:
+    for crypto in cmc_coin_list.coin_list["data"]:
         if coin_id == crypto["id"]:
             return {"name": crypto["name"], "symbol": crypto["symbol"]}
 

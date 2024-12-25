@@ -1,10 +1,10 @@
 import datetime
 import logging
 
-import httpx
 
 from src.config import settings as s
 from src.utils.formatters import format_date, human_format
+from src.utils.http import fetch_url
 
 
 class CoinList:
@@ -25,33 +25,33 @@ class CMCCoinList(CoinList):
     Singleton class to store the CoinMarketCap coin list
     """
 
-    def update(self, CMC_PRO_API_KEY: str | None = None) -> None:
-        if CMC_PRO_API_KEY is None:
+    async def update(self) -> None:
+        cmc_api_key = s.CMC_API_KEY.get_secret_value()
+        if not cmc_api_key:
             return
-        if (datetime.datetime.now() - self.coin_last_update) >= datetime.timedelta(hours=1):
-            coin_request = httpx.get(
-                "https://pro-api.coinmarketcap.com/v1/cryptocurrency/map",
-                headers={"X-CMC_PRO_API_KEY": s.CMC_API_KEY.get_secret_value()},
-            )
-            coin_list_gc = coin_request.json()
-            self.coin_list = coin_list_gc
-            self.coin_last_update = datetime.datetime.now()
+        now = datetime.datetime.now()
+        if (now - self.coin_last_update) >= datetime.timedelta(hours=1):
+            url = "https://pro-api.coinmarketcap.com/v1/cryptocurrency/map"
+            coin_list_cmc = await fetch_url(url, headers={"X-CMC_PRO_API_KEY": cmc_api_key})
+            if not coin_list_cmc:
+                logging.error("Failed to fetch CoinMarketCap, list not updated")
+                return
+            self.coin_list = coin_list_cmc
+            self.coin_last_update = now
             logging.info("Reloaded coin list from CoinMarketCap API")
 
 
 class CGCoinList(CoinList):
-    def update(self) -> None:
-        if (datetime.datetime.now() - self.coin_last_update) >= datetime.timedelta(hours=1):
-            coin_request = httpx.get("https://api.coingecko.com/api/v3/coins/list?include_platform=false")
-            if coin_request.status_code != 200:
-                e = (
-                    f"Failed to fetch CoinGecko coin list, status code: {coin_request.status_code},"
-                    f" probably temporary banned for too many requests, try again later"
-                )
-                logging.error(e)
+    async def update(self) -> None:
+        now = datetime.datetime.now()
+        if (now - self.coin_last_update) >= datetime.timedelta(hours=1):
+            url = "https://api.coingecko.com/api/v3/coins/list?include_platform=false"
+            coin_request = await fetch_url(url)
+            if not coin_request:
+                logging.error("Failed to fetch CoinGecko, list not updated")
                 return
-            self.coin_list = coin_request.json()
-            self.coin_last_update = datetime.datetime.now()
+            self.coin_list = coin_request
+            self.coin_last_update = now
             excluded_values = {
                 "-peg-",
                 "-wormhole",
@@ -120,3 +120,8 @@ class AtEntry:
             self.date = format_date(allt_date["usd"])
         else:
             self.date = "N/A"
+
+
+cg_coin_list = CGCoinList()
+cmc_coin_list = CMCCoinList()
+chart_template = ChartTemplate()

@@ -9,19 +9,12 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import ContextTypes
 
 from src.errors import send_error
-from src.main import cg_coin_list
-
 from src.utils.formatters import human_format, max_column_size
-from src.utils.shared import AtEntry, CGCoinList, ChartTemplate, GeneralDataEntry, PriceChangeEntry
 from src.utils.http import api_call, fetch_url
+from src.utils.shared import AtEntry, GeneralDataEntry, PriceChangeEntry, chart_template, cg_coin_list
 
-CRYPTOGECKO_API_COINS = "https://api.coingecko.com/api/v3/coins/"
-CRYPTOGECKO_API_DOMINANCE = "https://api.coingecko.com/api/v3/global/"
-
-coin_list_gc = []
-
-chart_template = ChartTemplate()
-coin_list = CGCoinList()
+COINGECKO_API_COINS = "https://api.coingecko.com/api/v3/coins/"
+COINGECKO_API_DOMINANCE = "https://api.coingecko.com/api/v3/global/"
 
 exp_message = (
     "You have reached the maximum number of requests for this period. It will be reset in the end of the month."
@@ -30,14 +23,14 @@ exp_message = (
 
 async def get_cg_id(crypto_symbol: str) -> list:
     api_ids = []
-    for crypto in coin_list.coin_list:
+    for crypto in cg_coin_list.coin_list:
         if crypto["symbol"] == crypto_symbol:
             api_ids.append(crypto["id"])
     return api_ids
 
 
 async def get_cg_coin_info(coin_name: str) -> dict:
-    for crypto in coin_list.coin_list:
+    for crypto in cg_coin_list.coin_list:
         if coin_name == crypto["id"]:
             return {"name": crypto["name"], "symbol": crypto["symbol"].upper()}
 
@@ -58,7 +51,7 @@ async def get_cg_price(coin: str, update: Update, context: ContextTypes.DEFAULT_
         )
         return
 
-    url = CRYPTOGECKO_API_COINS + coin + url_tail
+    url = COINGECKO_API_COINS + coin + url_tail
     logging.info(f"Request CG URL: {url}")
 
     crypto_data = await fetch_url(url)
@@ -262,7 +255,7 @@ async def get_cg_chart(coin: str, update: Update, context: ContextTypes.DEFAULT_
 
 
 async def get_cg_dominance(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    global_data = await fetch_url(CRYPTOGECKO_API_DOMINANCE)
+    global_data = await fetch_url(COINGECKO_API_DOMINANCE)
     if not global_data:
         await context.bot.send_message(
             chat_id=update.effective_chat.id,

@@ -1,5 +1,5 @@
-import logging
 import io
+import logging
 from functools import reduce
 
 import pandas as pd

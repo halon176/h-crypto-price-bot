@@ -3,9 +3,9 @@ import logging
 from telegram import Update
 from telegram.ext import CallbackContext
 
-from .cg_calls import get_cg_chart, get_cg_price
-from .cmc_calls import get_cmc_price
-from .shared import ChartTemplate
+from src.handlers.cg_calls import get_cg_chart, get_cg_price
+from src.handlers.cmc_calls import get_cmc_price
+from src.utils.shared import ChartTemplate
 
 chart_template = ChartTemplate()
 

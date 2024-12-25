@@ -1,13 +1,15 @@
 import logging
 from functools import reduce
 
-from telegram import Update
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ContextTypes
 
-from .config import settings as s
-from .models import GeneralDataEntry, PriceChangeEntry
-from .shared import CMCCoinList
-from .utility import api_call, fetch_url, human_format, max_column_size
+from src.config import settings as s
+from src.errors import send_error
+from src.main import cmc_coin_list
+from src.utils.formatters import human_format, max_column_size
+from src.utils.shared import CMCCoinList, GeneralDataEntry, PriceChangeEntry
+from src.utils.http import api_call, fetch_url
 
 coin_list = CMCCoinList()
 headers = {"X-CMC_PRO_API_KEY": ""}
@@ -164,3 +166,42 @@ async def cmc_key_info(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         parse_mode="MarkdownV2",
         disable_web_page_preview=True,
     )
+
+
+async def cmc_coin_check(coin: str, update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs) -> int | bool:
+    error = "symbol"
+    if len(coin) == 0:
+        await send_error(error, update, context)
+        return False
+    coins = await get_cmc_id(coin)
+    if not coins:
+        cmc_coin_list.update()
+        coins = await get_cmc_id(coin)
+        if not coins:
+            await send_error(error, update, context)
+            return False
+    if len(coins) == 1:
+        return coins[0]
+    else:
+        keyboard = []
+        for crypto in coins:
+            coin_data = await get_cmc_coin_info(crypto)
+            button = [InlineKeyboardButton(coin_data["name"], callback_data="cmc_" + str(crypto))]
+            keyboard.append(button)
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        await context.bot.send_message(
+            chat_id=update.message.chat_id,
+            text="🟠 There are multiple coins with the same symbol, please select the desired one:",
+            reply_markup=reply_markup,
+        )
+
+
+async def cmc_price_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    crypto_symbol = context.args[0].lower()
+    coin = await cmc_coin_check(crypto_symbol, update, context)
+    if coin:
+        try:
+            await get_cmc_price(coin, update, context)
+        except Exception as e:
+            logging.error(f"An error occurred: {str(e)}")
+            await send_error("generic", update, context)

@@ -1,4 +1,4 @@
-from src.utility import max_column_size
+from src.utils.formatters import max_column_size
 
 
 def test_max_column_size():

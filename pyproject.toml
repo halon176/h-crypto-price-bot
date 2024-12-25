@@ -18,6 +18,7 @@ aiohttp = { extras = ["speedups"], version = "^3.9.5" }
 pydantic-settings = "^2.6.1"
 pytest = "^8.3.3"
 pytest-cov = "^6.0.0"
+telegramify-markdown = "^0.3.1"
 
 
 [build-system]
@@ -25,6 +26,11 @@ requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.ruff]
+exclude = ["build", "dist", "venv", ".venv", ".git", ".tox", ".mypy_cache", ".pytest_cache", ".vscode", ".idea", "poetry.lock"]
+line-length = 120
+indent-width = 4
+
+[lint.select]
 select = [
     "E", # pycodestyle errors
     "W", # pycodestyle warnings
@@ -34,9 +40,6 @@ select = [
     "C4", # flake8-comprehensions
     "UP", # pyupgrade
 ]
-exclude = ["build", "dist", "venv", ".venv", ".git", ".tox", ".mypy_cache", ".pytest_cache", ".vscode", ".idea", "poetry.lock"]
-line-length = 120
-indent-width = 4
 
 [tool.pytest.ini_options]
 addopts = "-v"

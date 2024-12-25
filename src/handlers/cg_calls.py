@@ -21,7 +21,7 @@ exp_message = (
 )
 
 
-async def get_cg_id(crypto_symbol: str) -> list:
+def get_cg_id(crypto_symbol: str) -> list:
     api_ids = []
     for crypto in cg_coin_list.coin_list:
         if crypto["symbol"] == crypto_symbol:
@@ -323,23 +323,25 @@ async def chart_color_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
     )
 
 
-async def gc_coin_check(coin: str, update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs) -> str:
-    error = "symbol"
-    coin_type = kwargs.get("type", None)
-    if len(coin) == 0:
-        await send_error(error, update, context)
-        return False
-    coins = await get_cg_id(coin)
+async def gc_coin_check(
+    coin: str, update: Update, context: ContextTypes.DEFAULT_TYPE, call_type: str = "price"
+) -> str | None:
+    if not coin:
+        await send_error("symbol", update, context)
+        return None
+
+    coins = get_cg_id(coin)
+
     if not coins:
-        cg_coin_list.update()
-        coins = await get_cg_id(coin)
+        await cg_coin_list.update()
+        coins = get_cg_id(coin)
         if not coins:
-            await send_error(error, update, context)
-            return False
+            await send_error("symbol", update, context)
+            return None
 
     if len(coins) == 1:
         return coins[0]
-    elif coin_type == "chart":
+    elif call_type == "chart":
         keyboard = []
         for crypto in coins:
             button = [InlineKeyboardButton(crypto, callback_data="chart_" + crypto)]
@@ -376,6 +378,6 @@ async def cg_price_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -
 
 async def cg_chart_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     crypto_symbol = context.args[0].lower()
-    coin = await gc_coin_check(crypto_symbol, update, context, type="chart")
+    coin = await gc_coin_check(crypto_symbol, update, context, "chart")
     if coin:
         await get_cg_chart(coin, update, context)

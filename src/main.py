@@ -44,7 +44,7 @@ async def setup_bot():
 
 
 if __name__ == "__main__":
-    if not s.API_URL:
+    if not s.hcpb_api_url:
         logging.info("API_URL not set, no calls control will be performed")
 
     loop = asyncio.new_event_loop()

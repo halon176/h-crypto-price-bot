@@ -4,7 +4,7 @@ import logging
 
 from src.config import settings as s
 from src.utils.formatters import format_date, human_format
-from src.utils.http import fetch_url
+from src.utils.http import fetch_url, get_excluded
 
 
 class CoinList:
@@ -52,15 +52,7 @@ class CGCoinList(CoinList):
                 return
             self.coin_list = coin_request
             self.coin_last_update = now
-            excluded_values = {
-                "-peg-",
-                "-wormhole",
-                "wrapped",
-                "oec-",
-                "-iou",
-                "harrypotter",
-                "blackrocktradingcurrency",
-            }
+            excluded_values = await get_excluded()
             self.coin_list = [
                 crypto for crypto in self.coin_list if all(excluded not in crypto["id"] for excluded in excluded_values)
             ]

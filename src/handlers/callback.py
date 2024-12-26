@@ -7,7 +7,7 @@ from src.handlers.cg_calls import get_cg_chart, get_cg_price
 from src.handlers.cmc_calls import get_cmc_price
 from src.utils.shared import chart_template
 from src.utils.bot import send_tg
-from src.errors import send_error
+from src.utils.errors import send_error
 
 
 async def callback_handler(update: Update, context: CallbackContext) -> None:
@@ -27,7 +27,6 @@ async def callback_handler(update: Update, context: CallbackContext) -> None:
         await context.bot.delete_message(chat_id=query.message.chat.id, message_id=query.message.message_id)
 
         await send_tg(context, update.effective_chat.id, f"{selected_option[21:]} theme selected")
-
 
     elif selected_option.startswith("period_"):
         indexdot = selected_option.index(".")

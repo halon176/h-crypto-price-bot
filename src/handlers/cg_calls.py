@@ -8,10 +8,10 @@ import plotly.io as pio
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import ContextTypes
 
-from src.errors import send_error
+from src.utils.errors import send_error
 from src.utils.bot import send_tg
 from src.utils.formatters import human_format, max_column_size
-from src.utils.http import api_call, fetch_url
+from src.utils.http import write_call, fetch_url
 from src.utils.shared import AtEntry, GeneralDataEntry, PriceChangeEntry, chart_template, cg_coin_list
 
 COINGECKO_API_COINS = "https://api.coingecko.com/api/v3/coins/"
@@ -44,7 +44,7 @@ async def get_cg_price(coin: str, update: Update, context: ContextTypes.DEFAULT_
         "&developer_data=false"
         "&sparkline=false"
     )
-    r = await api_call(1, 1, str(update.effective_chat.id), coin)
+    r = await write_call(1, 1, str(update.effective_chat.id), coin)
     if not r:
         await context.bot.send_message(
             chat_id=update.effective_chat.id,
@@ -179,7 +179,7 @@ async def get_cg_price(coin: str, update: Update, context: ContextTypes.DEFAULT_
 
 
 async def get_cg_chart(coin: str, update: Update, context: ContextTypes.DEFAULT_TYPE, period="30") -> None:
-    r = await api_call(1, 2, str(update.effective_chat.id), coin)
+    r = await write_call(1, 2, str(update.effective_chat.id), coin)
     if not r:
         await context.bot.send_message(
             chat_id=update.effective_chat.id,

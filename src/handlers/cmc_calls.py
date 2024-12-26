@@ -5,10 +5,10 @@ from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ContextTypes
 
 from src.config import settings as s
-from src.errors import send_error
+from src.utils.errors import send_error
 from src.utils.formatters import human_format, max_column_size
 from src.utils.shared import GeneralDataEntry, PriceChangeEntry, cmc_coin_list
-from src.utils.http import api_call, fetch_url
+from src.utils.http import write_call, fetch_url
 from src.utils.bot import send_tg
 
 
@@ -50,7 +50,7 @@ async def get_cmc_price(coin_id: int, update: Update, context: ContextTypes.DEFA
     :param context:
     :return: None
     """
-    r = await api_call(2, 1, str(update.effective_chat.id), str(coin_id))
+    r = await write_call(2, 1, str(update.effective_chat.id), str(coin_id))
     if not r:
         await send_tg(context, update.effective_chat.id, exp_message)
         return

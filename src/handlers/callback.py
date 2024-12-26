@@ -6,6 +6,8 @@ from telegram.ext import CallbackContext
 from src.handlers.cg_calls import get_cg_chart, get_cg_price
 from src.handlers.cmc_calls import get_cmc_price
 from src.utils.shared import chart_template
+from src.utils.bot import send_tg
+from src.errors import send_error
 
 
 async def callback_handler(update: Update, context: CallbackContext) -> None:
@@ -24,10 +26,8 @@ async def callback_handler(update: Update, context: CallbackContext) -> None:
         chart_template.set_template(selected_option[14:])
         await context.bot.delete_message(chat_id=query.message.chat.id, message_id=query.message.message_id)
 
-        await context.bot.send_message(
-            chat_id=update.effective_chat.id,
-            text=f"{selected_option[21:]} theme selected",
-        )
+        await send_tg(context, update.effective_chat.id, f"{selected_option[21:]} theme selected")
+
 
     elif selected_option.startswith("period_"):
         indexdot = selected_option.index(".")
@@ -44,8 +44,6 @@ async def callback_handler(update: Update, context: CallbackContext) -> None:
             await get_cg_price(selected_option, update, context)
         except Exception as e:
             logging.error(f"An error occurred: {str(e)}")
-            await context.bot.send_message(
-                chat_id=update.effective_chat.id,
-                text="An error occurred. Please try again later.",
-            )
+            await send_error("generic", update, context)
+
         await context.bot.delete_message(chat_id=query.message.chat.id, message_id=query.message.message_id)

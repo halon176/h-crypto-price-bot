@@ -8,25 +8,25 @@ from web3 import Web3
 from src.config import settings as s
 from src.utils.formatters import max_column_size
 from src.utils.http import fetch_url
+from src.utils.bot import send_tg
+
 
 
 async def gas_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    eth_scan_api_error = "The bot has been launched without an Etherscan API KEY."
     if not s.ETHSCAN_API_KEY:
-        await context.bot.send_message(
-            chat_id=update.effective_chat.id,
-            text="The bot has been launched without an Etherscan API KEY.",
-        )
+        await send_tg(context, update.effective_chat.id, eth_scan_api_error)
         return
+
     gas_request = await fetch_url(
         f"https://api.etherscan.io/api?module=gastracker&action=gasoracle&apikey={s.ETHSCAN_API_KEY.get_secret_value()}"
     )
     logging.info("Request etherscan gas price")
 
     if gas_request["status"] == "0":
-        await context.bot.send_message(
-            chat_id=update.effective_chat.id,
-            text="The bot has been launched without an Etherscan API KEY.",
-        )
+        await send_tg(context, update.effective_chat.id, eth_scan_api_error)
+        return
+
     if gas_request["status"] == "1":
         mood_emoji = ["😎", "😄", "🤨", "😰", "💀"]
         gas_data = {
@@ -100,9 +100,4 @@ async def gas_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
             + list(reversed(gas_price_header))
         )
 
-        await context.bot.send_message(
-            chat_id=update.effective_chat.id,
-            text=message,
-            parse_mode="MarkdownV2",
-            disable_web_page_preview=True,
-        )
+        await send_tg(context, update.effective_chat.id, message)

@@ -9,6 +9,8 @@ from src.errors import send_error
 from src.utils.formatters import human_format, max_column_size
 from src.utils.shared import GeneralDataEntry, PriceChangeEntry, cmc_coin_list
 from src.utils.http import api_call, fetch_url
+from src.utils.bot import send_tg
+
 
 headers = {"X-CMC_PRO_API_KEY": ""}
 
@@ -50,7 +52,7 @@ async def get_cmc_price(coin_id: int, update: Update, context: ContextTypes.DEFA
     """
     r = await api_call(2, 1, str(update.effective_chat.id), str(coin_id))
     if not r:
-        await context.bot.send_message(chat_id=update.effective_chat.id, text=exp_message)
+        await send_tg(context, update.effective_chat.id, exp_message)
         return
 
     url = f"https://pro-api.coinmarketcap.com/v2/cryptocurrency/quotes/latest?id={coin_id}"
@@ -125,12 +127,7 @@ async def get_cmc_price(coin_id: int, update: Update, context: ContextTypes.DEFA
         f"`{lst_str_header}`"
         f"`{general_data_message}`\n"
     )
-    await context.bot.send_message(
-        chat_id=update.effective_chat.id,
-        text=message,
-        parse_mode="MarkdownV2",
-        disable_web_page_preview=True,
-    )
+    await send_tg(context, update.effective_chat.id, message, mk_parse=False)
 
 
 async def cmc_key_info(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -141,8 +138,8 @@ async def cmc_key_info(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     data = r["data"]
     credit_limit_monthly = data["plan"].get("credit_limit_monthly", "N/A")
     credit_limit_monthly_reset = (data["plan"].get("credit_limit_monthly_reset", "N/A")).lower()
-    minut_requests_made = data["usage"]["current_minute"].get("requests_made", "N/A")
-    minut_requests_left = data["usage"]["current_minute"].get("requests_left", "N/A")
+    minute_requests_made = data["usage"]["current_minute"].get("requests_made", "N/A")
+    minute_requests_left = data["usage"]["current_minute"].get("requests_left", "N/A")
     day_credits_made = data["usage"]["current_day"].get("credits_used", "N/A")
     day_credits_left = data["usage"]["current_day"].get("credits_left", "N/A")
     month_credits_used = data["usage"]["current_month"].get("credits_used", "N/A")
@@ -152,21 +149,16 @@ async def cmc_key_info(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         f"CoinMarketCap Key Info\n"
         f"\n"
         f"`Your monthly credit limit is {credit_limit_monthly}`\n"
-        f"`Minut requests count is {minut_requests_made} of {minut_requests_left}`\n"
+        f"`Minute requests count is {minute_requests_made} of {minute_requests_left}`\n"
         f"`Daily credits used are {day_credits_made} of {day_credits_left}`\n"
         f"`Monthly credits used are {month_credits_used} of {month_credits_left}`\n"
         f"`Monthly credits limit will be reset {credit_limit_monthly_reset}`\n"
     )
 
-    await context.bot.send_message(
-        chat_id=update.effective_chat.id,
-        text=message,
-        parse_mode="MarkdownV2",
-        disable_web_page_preview=True,
-    )
+    await send_tg(context, update.effective_chat.id, message)
 
 
-async def cmc_coin_check(coin: str, update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs) -> int | bool:
+async def cmc_coin_check(coin: str, update: Update, context: ContextTypes.DEFAULT_TYPE) -> int | bool:
     error = "symbol"
     if len(coin) == 0:
         await send_error(error, update, context)
@@ -187,11 +179,8 @@ async def cmc_coin_check(coin: str, update: Update, context: ContextTypes.DEFAUL
             button = [InlineKeyboardButton(coin_data["name"], callback_data="cmc_" + str(crypto))]
             keyboard.append(button)
         reply_markup = InlineKeyboardMarkup(keyboard)
-        await context.bot.send_message(
-            chat_id=update.message.chat_id,
-            text="🟠 There are multiple coins with the same symbol, please select the desired one:",
-            reply_markup=reply_markup,
-        )
+        text = "🟠 There are multiple coins with the same symbol, please select the desired one:"
+        await send_tg(context, update.effective_chat.id, text, reply_markup=reply_markup)
 
 
 async def cmc_price_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:

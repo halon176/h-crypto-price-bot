@@ -9,6 +9,7 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import ContextTypes
 
 from src.errors import send_error
+from src.utils.bot import send_tg
 from src.utils.formatters import human_format, max_column_size
 from src.utils.http import api_call, fetch_url
 from src.utils.shared import AtEntry, GeneralDataEntry, PriceChangeEntry, chart_template, cg_coin_list
@@ -174,12 +175,7 @@ async def get_cg_price(coin: str, update: Update, context: ContextTypes.DEFAULT_
         f"`{at_data_message}`"
     )
 
-    await context.bot.send_message(
-        chat_id=update.effective_chat.id,
-        text=message,
-        parse_mode="MarkdownV2",
-        disable_web_page_preview=True,
-    )
+    await send_tg(context, update.effective_chat.id, message, mk_parse=False)
 
 
 async def get_cg_chart(coin: str, update: Update, context: ContextTypes.DEFAULT_TYPE, period="30") -> None:
@@ -193,10 +189,7 @@ async def get_cg_chart(coin: str, update: Update, context: ContextTypes.DEFAULT_
     url = f"https://api.coingecko.com/api/v3/coins/{coin}/market_chart?vs_currency=usd&days={period}"
     chart = await fetch_url(url)
     if not chart:
-        await context.bot.send_message(
-            chat_id=update.effective_chat.id,
-            text="An error occurred. Please try again later.",
-        )
+        await send_error("generic", update, context)
         return
     logging.info(f"Request URL: {url}")
     x = [p[0] / 1000 for p in chart["prices"]]
@@ -248,21 +241,15 @@ async def get_cg_chart(coin: str, update: Update, context: ContextTypes.DEFAULT_
     ]
 
     reply_markup = InlineKeyboardMarkup(keyboard)
-    await context.bot.send_photo(
-        chat_id=update.effective_chat.id,
-        photo=buffer,
-        reply_markup=reply_markup,
-    )
+    await send_tg(context, update.effective_chat.id, photo=buffer, reply_markup=reply_markup)
+
     buffer.close()
 
 
 async def get_cg_dominance(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     global_data = await fetch_url(COINGECKO_API_DOMINANCE)
     if not global_data:
-        await context.bot.send_message(
-            chat_id=update.effective_chat.id,
-            text="An error occurred. Please try again later.",
-        )
+        await send_error("generic", update, context)
         return
     logging.info("Request coin dominance list")
 
@@ -298,12 +285,7 @@ async def get_cg_dominance(update: Update, context: ContextTypes.DEFAULT_TYPE) -
         + list(reversed(lst_str_header))
     )
 
-    await context.bot.send_message(
-        chat_id=update.effective_chat.id,
-        text=message,
-        parse_mode="MarkdownV2",
-        disable_web_page_preview=True,
-    )
+    await send_tg(context, update.effective_chat.id, message)
 
 
 async def chart_color_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -316,11 +298,8 @@ async def chart_color_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
         button = [InlineKeyboardButton(theme[0], callback_data=theme[1])]
         keyboard.append(button)
     reply_markup = InlineKeyboardMarkup(keyboard)
-    await context.bot.send_message(
-        chat_id=update.message.chat_id,
-        text="🟠 select desired chart theme",
-        reply_markup=reply_markup,
-    )
+
+    await send_tg(context, update.effective_chat.id, text="🟠 select desired chart theme", reply_markup=reply_markup)
 
 
 async def gc_coin_check(
@@ -339,6 +318,8 @@ async def gc_coin_check(
             await send_error("symbol", update, context)
             return None
 
+    text = "🟠 There are multiple coins with the same symbol, please select the desired one:"
+
     if len(coins) == 1:
         return coins[0]
     elif call_type == "chart":
@@ -347,22 +328,16 @@ async def gc_coin_check(
             button = [InlineKeyboardButton(crypto, callback_data="chart_" + crypto)]
             keyboard.append(button)
         reply_markup = InlineKeyboardMarkup(keyboard)
-        await context.bot.send_message(
-            chat_id=update.message.chat_id,
-            text="🟠 There are multiple coins with the same symbol, please select the desired one:",
-            reply_markup=reply_markup,
-        )
+
+        await send_tg(context, update.effective_chat.id, text, reply_markup=reply_markup)
     else:
         keyboard = []
         for crypto in coins:
             button = [InlineKeyboardButton(crypto, callback_data=crypto)]
             keyboard.append(button)
         reply_markup = InlineKeyboardMarkup(keyboard)
-        await context.bot.send_message(
-            chat_id=update.message.chat_id,
-            text="🟠 There are multiple coins with the same symbol, please select the desired one:",
-            reply_markup=reply_markup,
-        )
+
+        await send_tg(context, update.effective_chat.id, text, reply_markup=reply_markup)
 
 
 async def cg_price_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:

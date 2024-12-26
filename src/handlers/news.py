@@ -2,7 +2,7 @@ import feedparser
 from telegram import Update
 from telegram.ext import ContextTypes
 
-from src.utils.formatters import mk2_formatter
+from src.utils.bot import send_tg
 
 RSS_URL = "https://www.coindesk.com/arc/outboundfeeds/rss/"
 
@@ -14,9 +14,5 @@ async def news(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     message = "    📰 News feed from CoinDesk 📰\n\n"
     for entry in latest_entries:
         message += f"🗞️ [{entry['title']}]({entry['link']})\n\n"
-    await context.bot.send_message(
-        chat_id=update.effective_chat.id,
-        text=mk2_formatter(message),
-        parse_mode="MarkdownV2",
-        disable_web_page_preview=True,
-    )
+
+    await send_tg(context, update.effective_chat.id, message)

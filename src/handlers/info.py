@@ -5,7 +5,7 @@ from telegram.ext import (
     ContextTypes,
 )
 
-from src.utils.formatters import mk2_formatter
+from src.utils.bot import send_tg
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -16,11 +16,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         "To display the complete list of commands, type `/help`"
     )
 
-    await context.bot.send_message(
-        chat_id=update.effective_chat.id,
-        parse_mode="MarkdownV2",
-        text=mk2_formatter(response_text),
-    )
+    await send_tg(context, update.effective_chat.id, response_text)
     logging.info("Start call")
 
 
@@ -41,11 +37,5 @@ async def bot_help(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         "`Bot version: 1.2.1`\n"
     )
 
-    await context.bot.send_message(
-        chat_id=update.effective_chat.id,
-        parse_mode="MarkdownV2",
-        disable_web_page_preview=True,
-        text=mk2_formatter(response_text),
-    )
-
+    await send_tg(context, update.effective_chat.id, response_text)
     logging.info("Help call")

@@ -35,4 +35,4 @@ def human_format(num: float) -> str:
 
 
 def mk2_formatter(text: str) -> str:
-    return markdownify(text, max_line_length=None, normalize_whitespace=False)
+    return markdownify(text, max_line_length=None, normalize_whitespace=False, latex_escape=False)

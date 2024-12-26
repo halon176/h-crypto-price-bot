@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "h-crypto-price-bot"
-version = "1.1.2"
+version = "1.2.0"
 description = ""
 authors = ["halon176 <acc.github@halon.cc>"]
 readme = "README.md"

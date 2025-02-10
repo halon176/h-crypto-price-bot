@@ -9,7 +9,7 @@ package-mode = false
 [tool.poetry.dependencies]
 python = ">=3.11,<3.13"
 python-telegram-bot = "^21.5"
-web3 = "^7.2.0"
+web3 = "^7.8.0"
 feedparser = "^6.0.10"
 pandas = "^2.2.2"
 kaleido = "0.2.1"

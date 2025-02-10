@@ -2280,13 +2280,13 @@ zstd = ["zstandard (>=0.18.0)"]
 
 [[package]]
 name = "web3"
-version = "7.6.1"
+version = "7.8.0"
 description = "web3: A Python library for interacting with Ethereum"
 optional = false
 python-versions = "<4,>=3.8"
 files = [
-    {file = "web3-7.6.1-py3-none-any.whl", hash = "sha256:8f6b315fe1da12754930c4f809d27e33091bd7e2e1613bea1328bb5710acc5e3"},
-    {file = "web3-7.6.1.tar.gz", hash = "sha256:0cce0f33bef9096fc976ee00c38e71cdd10a61d4302a6b13b56ab58327764f9a"},
+    {file = "web3-7.8.0-py3-none-any.whl", hash = "sha256:c8771b3d8772f7104a0462804449beb57d36cef7bd8b411140f95a92fc46b559"},
+    {file = "web3-7.8.0.tar.gz", hash = "sha256:712bc9fd6b1ef6e467ee24c25b581e1951cab2cba17f9f548f12587734f2c857"},
 ]
 
 [package.dependencies]
@@ -2306,8 +2306,8 @@ typing-extensions = ">=4.0.1"
 websockets = ">=10.0.0,<14.0.0"
 
 [package.extras]
-dev = ["build (>=0.9.0)", "bumpversion (>=0.5.3)", "eth-tester[py-evm] (>=0.12.0b1,<0.13.0b1)", "flaky (>=3.7.0)", "hypothesis (>=3.31.2)", "ipython", "mypy (==1.10.0)", "pre-commit (>=3.4.0)", "py-geth (>=5.1.0)", "pytest (>=7.0.0)", "pytest-asyncio (>=0.18.1,<0.23)", "pytest-mock (>=1.10)", "pytest-xdist (>=2.4.0)", "setuptools (>=38.6.0)", "sphinx (>=6.0.0)", "sphinx-autobuild (>=2021.3.14)", "sphinx-rtd-theme (>=1.0.0)", "towncrier (>=21,<22)", "tox (>=4.0.0)", "tqdm (>4.32)", "twine (>=1.13)", "wheel"]
-docs = ["sphinx (>=6.0.0)", "sphinx-autobuild (>=2021.3.14)", "sphinx-rtd-theme (>=1.0.0)", "towncrier (>=21,<22)"]
+dev = ["build (>=0.9.0)", "bumpversion (>=0.5.3)", "eth-tester[py-evm] (>=0.12.0b1,<0.13.0b1)", "flaky (>=3.7.0)", "hypothesis (>=3.31.2)", "ipython", "mypy (==1.10.0)", "pre-commit (>=3.4.0)", "py-geth (>=5.1.0)", "pytest (>=7.0.0)", "pytest-asyncio (>=0.18.1,<0.23)", "pytest-mock (>=1.10)", "pytest-xdist (>=2.4.0)", "setuptools (>=38.6.0)", "sphinx (>=6.0.0)", "sphinx-autobuild (>=2021.3.14)", "sphinx_rtd_theme (>=1.0.0)", "towncrier (>=21,<22)", "tox (>=4.0.0)", "tqdm (>4.32)", "twine (>=1.13)", "wheel"]
+docs = ["sphinx (>=6.0.0)", "sphinx-autobuild (>=2021.3.14)", "sphinx_rtd_theme (>=1.0.0)", "towncrier (>=21,<22)"]
 test = ["eth-tester[py-evm] (>=0.12.0b1,<0.13.0b1)", "flaky (>=3.7.0)", "hypothesis (>=3.31.2)", "mypy (==1.10.0)", "pre-commit (>=3.4.0)", "py-geth (>=5.1.0)", "pytest (>=7.0.0)", "pytest-asyncio (>=0.18.1,<0.23)", "pytest-mock (>=1.10)", "pytest-xdist (>=2.4.0)", "tox (>=4.0.0)"]
 tester = ["eth-tester[py-evm] (>=0.12.0b1,<0.13.0b1)", "py-geth (>=5.1.0)"]
 
@@ -2505,4 +2505,4 @@ propcache = ">=0.2.0"
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.11,<3.13"
-content-hash = "a2cc2ca4ad340bcf8fa610d3898c8cd51b28f0b08fa43437fffbdd45b53c0430"
+content-hash = "9d6358c50623351159fa08bba4e0cfb24f171a3e74d285e68f89b36df41a8b57"

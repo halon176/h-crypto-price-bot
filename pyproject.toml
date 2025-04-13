@@ -8,16 +8,16 @@ package-mode = false
 
 [tool.poetry.dependencies]
 python = ">=3.11,<3.13"
-python-telegram-bot = "^21.5"
+python-telegram-bot = "^22.0"
 web3 = "^7.2.0"
 feedparser = "^6.0.10"
 pandas = "^2.2.2"
 kaleido = "0.2.1"
-plotly = "^5.22.0"
+plotly = "^6.0.1"
 pydantic-settings = "^2.6.1"
 pytest = "^8.3.3"
 pytest-cov = "^6.0.0"
-telegramify-markdown = "^0.3.1"
+telegramify-markdown = "^0.5.1"
 
 
 [build-system]

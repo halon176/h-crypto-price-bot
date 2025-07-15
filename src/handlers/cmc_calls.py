@@ -36,10 +36,11 @@ async def get_cmc_id(crypto_symbol: str) -> list[int]:
     return api_ids
 
 
-async def get_cmc_coin_info(coin_id: int) -> dict[str, str]:
+async def get_cmc_coin_info(coin_id: int) -> dict[str, str] | None:
     for crypto in cmc_coin_list.coin_list["data"]:
         if coin_id == crypto["id"]:
             return {"name": crypto["name"], "symbol": crypto["symbol"]}
+    return None
 
 
 async def get_cmc_price(coin_id: int, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -158,7 +159,7 @@ async def cmc_key_info(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     await send_tg(context, update.effective_chat.id, message)
 
 
-async def cmc_coin_check(coin: str, update: Update, context: ContextTypes.DEFAULT_TYPE) -> int | bool:
+async def cmc_coin_check(coin: str, update: Update, context: ContextTypes.DEFAULT_TYPE) -> int | bool | None:
     error = "symbol"
     if len(coin) == 0:
         await send_error(error, update, context)

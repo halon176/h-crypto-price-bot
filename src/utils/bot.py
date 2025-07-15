@@ -1,4 +1,6 @@
 import io
+from typing import Any
+
 from telegram import InlineKeyboardMarkup, ReplyKeyboardMarkup, ReplyKeyboardRemove, ForceReply
 from telegram.constants import ParseMode
 
@@ -16,7 +18,7 @@ async def send_tg(
     mk_parse: bool = True,
 ) -> None:
     try:
-        send_kwargs = {
+        send_kwargs: dict[str, Any] = {
             "chat_id": chat_id,
             "reply_markup": reply_markup,
             "parse_mode": ParseMode.MARKDOWN_V2,

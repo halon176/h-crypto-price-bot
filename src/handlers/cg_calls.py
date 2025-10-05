@@ -217,7 +217,7 @@ async def get_cg_chart(coin: str, update: Update, context: ContextTypes.DEFAULT_
         {"30": "30d"},
         {"90": "90d"},
         {"365": "1y"},
-        {"max": "max"},
+        # {"max": "max"},
     ]
     checkbox = [""] * 6
 

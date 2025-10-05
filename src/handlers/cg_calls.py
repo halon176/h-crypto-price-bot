@@ -38,11 +38,7 @@ async def get_cg_coin_info(coin_name: str) -> dict:
 
 async def get_cg_price(coin: str, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     url_tail = (
-        "?localization=false&"
-        "tickers=false&market_data=true&"
-        "community_data=false"
-        "&developer_data=false"
-        "&sparkline=false"
+        "?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=false"
     )
     r = await write_call(1, 1, str(update.effective_chat.id), coin)
     if not r:
@@ -198,8 +194,8 @@ async def get_cg_chart(coin: str, update: Update, context: ContextTypes.DEFAULT_
     df = pd.DataFrame({"timeframe": x, "prices": y})
     df["timeframe"] = pd.to_datetime(df["timeframe"], unit="s")
     info = await get_cg_coin_info(coin)
-    title = f'{info["name"]} ({info["symbol"]})'
-    bottom = f'{period} day{"s" if period != "1" else ""} chart'
+    title = f"{info['name']} ({info['symbol']})"
+    bottom = f"{period} day{'s' if period != '1' else ''} chart"
     template = chart_template.get_template()
     fig = px.line(
         df,

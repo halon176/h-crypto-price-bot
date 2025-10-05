@@ -11,7 +11,6 @@ from src.utils.http import fetch_url
 from src.utils.bot import send_tg
 
 
-
 async def gas_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     eth_scan_api_error = "The bot has been launched without an Etherscan API KEY."
     if not s.ETHSCAN_API_KEY:

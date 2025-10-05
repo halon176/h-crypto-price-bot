@@ -4,7 +4,7 @@ WORKDIR /tmp
 
 RUN pip install --upgrade pip
 
-RUN pip install poetry
+RUN pip install poetry poetry-plugin-export
 
 COPY ./pyproject.toml ./poetry.lock* /tmp/
 

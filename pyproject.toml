@@ -4,10 +4,10 @@ version = "1.4.0"
 description = "Telegram bot per prezzi crypto"
 readme = "README.md"
 authors = [{ name = "halon176", email = "acc.github@halon.cc" }]
-requires-python = ">=3.11,<3.13"
+requires-python = ">=3.13,<3.14"
 
 dependencies = [
-    "python-telegram-bot>=22.0,<23.0",
+    "python-telegram-bot>=22.0,<22.6",
     "web3>=7.2.0,<8.0.0",
     "feedparser>=6.0.10,<7.0.0",
     "pandas>=2.2.2,<3.0.0",
@@ -21,7 +21,7 @@ dependencies = [
 dev = [
     "pytest>=8.3.3,<9.0.0",
     "pytest-cov>=6.0.0,<7.0.0",
-    "ruff>=0.13.3,<1.0.0",
+    "ruff>=0.13.3",
 ]
 
 

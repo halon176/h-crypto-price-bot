@@ -1,33 +1,31 @@
-FROM python:3.12-slim-bullseye as requirements-stage
+FROM python:3.13-slim-bullseye AS builder
 
-WORKDIR /tmp
+WORKDIR /app
 
-RUN pip install --upgrade pip
+ENV PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
 
-RUN pip install poetry poetry-plugin-export
+RUN apt-get update && apt-get install -y --no-install-recommends build-essential \
+    && pip install --upgrade pip uv \
+    && rm -rf /var/lib/apt/lists/*
 
-COPY ./pyproject.toml ./poetry.lock* /tmp/
+COPY pyproject.toml uv.lock* ./
+RUN uv sync --frozen --no-dev
 
-RUN poetry export -f requirements.txt --output requirements.txt --without-hashes
-
-FROM python:3.12-slim-bullseye as production-stage
+FROM python:3.13-slim-bullseye AS production
 
 LABEL org.opencontainers.image.source="https://github.com/halon176/h-crypto-price-bot"
 
 WORKDIR /code
 
-ENV PYTHONUNBUFFERED=1
+ENV PYTHONUNBUFFERED=1 \
+    PATH="/code/.venv/bin:$PATH"
 
-COPY --from=requirements-stage /tmp/requirements.txt /code/requirements.txt
-
-RUN apt update && apt dist-upgrade -y && apt install -y --no-install-recommends build-essential && \
-    pip install --upgrade pip && \
-    pip install --no-cache-dir -r /code/requirements.txt && \
-    apt-get purge -y --auto-remove build-essential && \
-    rm -rf /var/lib/apt/lists/*
-
+COPY --from=builder /app/.venv /code/.venv
 COPY ./src /code/src
 
-RUN rm -rf /tmp/* /var/tmp/*
+RUN apt-get purge -y --auto-remove && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 CMD ["python", "-m", "src.main"]

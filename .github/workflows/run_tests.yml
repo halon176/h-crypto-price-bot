@@ -1,33 +1,41 @@
 name: Run Unit Test via Pytest
 
-on: [push]
+on: [ push ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.12"]
+        python-version: [ "3.13" ]
 
     steps:
       - uses: actions/checkout@v3
+
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Install Poetry
+
+      - name: Install pipx
         run: |
-          curl -sSL https://install.python-poetry.org | python3 -
-          echo "$HOME/.local/bin" >> $GITHUB_PATH
+          python -m pip install --upgrade pip
+          python -m pip install --user pipx
+          python -m pipx ensurepath
+          export PATH="$HOME/.local/bin:$PATH"
+
+      - name: Install uv via pipx
+        run: pipx install uv
+
       - name: Install dependencies
         run: |
-          poetry install --no-interaction
+          uv sync --group dev
+
       - name: Set Telegram token as environment variable
-        run: |
-          echo "TELEGRAM_TOKEN=${{ secrets.TELEGRAM_TOKEN }}" >> $GITHUB_ENV
+        run: echo "TELEGRAM_TOKEN=${{ secrets.TELEGRAM_TOKEN }}" >> $GITHUB_ENV
+
       - name: Test with pytest
-        run: |
-          poetry run coverage run -m pytest -v -s
+        run: uv run coverage run -m pytest -v -s
+
       - name: Generate Coverage Report
-        run: |
-          poetry run coverage report -m
+        run: uv run coverage report -m

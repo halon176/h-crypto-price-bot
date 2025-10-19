@@ -17,10 +17,10 @@ dependencies = [
     "telegramify-markdown>=0.5.1,<1.0.0",
 ]
 
-[project.optional-dependencies]
+[dependency-groups]
 dev = [
     "pytest>=8.3.3,<9.0.0",
-    "pytest-cov>=6.0.0,<7.0.0",
+    "pytest-cov>=7.0.0,<8.0.0",
     "ruff>=0.13.3",
 ]
 

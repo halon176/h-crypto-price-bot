@@ -34,7 +34,7 @@ async def bot_help(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         "/help - to receive this message\n\n"
         "This bot is written with open-source and free code, and you can find it all at "
         "[GitHub](https://github.com/halon176/h-crypto-price-bot)\n\n"
-        "`Bot version: 1.4.0`\n"
+        "`Bot version: 1.5.0`\n"
     )
 
     await send_tg(context, update.effective_chat.id, response_text)

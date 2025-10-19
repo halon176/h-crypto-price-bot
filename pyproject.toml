@@ -2,9 +2,6 @@
 name = "h-crypto-price-bot"
 version = "1.5.0"
 description = ""
-authors = ["halon176 <acc.github@halon.cc>"]
-version = "1.4.0"
-description = "Telegram bot per prezzi crypto"
 readme = "README.md"
 authors = [{ name = "halon176", email = "acc.github@halon.cc" }]
 requires-python = ">=3.13,<3.14"

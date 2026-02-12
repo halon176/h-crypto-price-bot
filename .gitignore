@@ -4,5 +4,6 @@ venv
 .env
 .directory
 .coverage
+.claude
 
 __pycache__

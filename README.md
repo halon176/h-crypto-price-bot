@@ -1,114 +1,100 @@
 # HCryptoPrice
 
 [![build](https://github.com/halon176/h-crypto-price-bot/workflows/CI/badge.svg)](https://github.com/halon176/h-crypto-price-bot/actions/workflows/docker-image.yml)
+[![tests](https://github.com/halon176/h-crypto-price-bot/workflows/Run%20Unit%20Test%20via%20Pytest/badge.svg)](https://github.com/halon176/h-crypto-price-bot/actions/workflows/run_tests.yml)
+[![coverage](https://img.shields.io/badge/coverage-97%25-brightgreen)](https://github.com/halon176/h-crypto-price-bot/tree/master/tests)
 [![license: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/halon176/h-crypto-price-bot/blob/master/LICENSE)
+[![Python 3.13](https://img.shields.io/badge/python-3.13-blue.svg)](https://www.python.org/downloads/release/python-3130/)
 
-HCryptoPrice is a Python-based bot that fetches real-time cryptocurrency prices from Coingecko and presents them in an
-easy-to-understand format on Telegram. It also offers historical price data, market cap rankings.
+A Python-based Telegram bot for fetching real-time cryptocurrency prices from CoinGecko. Provides price data, historical charts, market cap rankings, and Ethereum gas prices.
 
-If you want to use more advanced bot features as call limits, you can use the API interaction,
-which is available in the [hcpb-api](https://github.com/halon176/hcpb-api) repository.
-⚠️ The API is still under development. ⚠️
+**Live bot**: [@h_crypto_price_bot](https://t.me/h_crypto_price_bot)
 
-Here's a working version of the bot: [@h_crypto_price_bot](https://t.me/h_crypto_price_bot)
+For advanced features like rate limits and usage tracking, check out the [hcpb-api](https://github.com/halon176/hcpb-api) repository (work in progress).
 
 ## Installation
 
 ### Manual
 
-1) First, make sure you have Python 3.13 installed on your machine. You can check your Python version by opening a
-   terminal and running the following command:
+1. Make sure you have Python 3.13 installed:
 
-```
-python --version
-```
+   ```bash
+   python --version
+   ```
 
-2) Next, clone the h-crypto-price-bot repository to your local machine. You can do this by running the following command
-   in your terminal:
+2. Clone the repository:
 
-```
-git clone https://github.com/halon176/h-crypto-price-bot.git
-```
+   ```bash
+   git clone https://github.com/halon176/h-crypto-price-bot.git
+   cd h-crypto-price-bot
+   ```
 
-3) Change into the directory where the bot's code is located, the install the dependencies
-   using [Poetry](https://python-poetry.org/docs/#installation):
+3. Install dependencies using [uv](https://docs.astral.sh/uv/):
 
-```
-cd h-crypto-price-bot
-poetry install
-```
+   ```bash
+   uv sync
+   ```
 
-4) Create a new Telegram bot by following the instructions in the Telegram Bot API
-   documentation: https://core.telegram.org/bots#6-botfather
+4. Create a Telegram bot via [BotFather](https://core.telegram.org/bots#6-botfather) and copy the token.
 
-5) After creating your bot, copy the token provided by BotFather. Then, set up an environment variable named TOKEN with
-   the bot token using the following command, replacing **<telegram_bot_token>** with your bot token:
+5. Set up environment variables:
 
-```
-export TELEGRAM_TOKEN=<telegram_bot_token>
-```
+   ```bash
+   export TELEGRAM_TOKEN=<your_telegram_bot_token>
+   export ETHSCAN_API_KEY=<your_etherscan_api_key>  # Required for gas prices
+   export CMC_API_KEY=<your_coinmarketcap_api_key>  # Optional
+   export API_URL=<api_url>  # Optional
+   ```
 
-To use the gas price feature, you must include an Etherscan API key. Other keys are optional.
+6. Run the bot:
 
-```
-export ETHSCAN_API_KEY=<etherscan_api_key>
-export CMC_API_KEY=<coinmarketcap_api_key>
-export API_URL=<api_url>
-```
-
-6) Run the bot by running the following command:
-
-```
-python src/main.py
-```
-
-Your bot should now be up and running! You can add it to a Telegram group or start a chat with it to test it out.
+   ```bash
+   uv run python src/main.py
+   ```
 
 ### Docker
 
-1) Clone the h-crypto-price-bot repository to your local machine. You can do this by running the following command in
-   your terminal:
+1. Clone the repository:
 
-```
-git clone https://github.com/halon176/h-crypto-price-bot.git
-```
+   ```bash
+   git clone https://github.com/halon176/h-crypto-price-bot.git
+   ```
 
-2) Launch the 'docker build' command to build your Docker image.
+2. Build the Docker image:
 
-```
-docker build -t h-crypto-price h-crypto-price-bot/.
-```
+   ```bash
+   docker build -t h-crypto-price h-crypto-price-bot/.
+   ```
 
-3) Now you can start the container using the command, replacing **<telegram_bot_token>** with your bot token:
+3. Run the container:
 
-```
-docker run -d -e TELEGRAM_TOKEN=<telegram_bot_token> --name h-crypto-price h-crypto-price
-```
+   ```bash
+   # Basic setup
+   docker run -d \
+     -e TELEGRAM_TOKEN=<your_telegram_bot_token> \
+     --name h-crypto-price \
+     h-crypto-price
 
-To use the gas price feature, you must include an Etherscan API key. ETHSCAN_API_KEY=<etherscan_api_key>
-
-```
-docker run -d -e TELEGRAM_TOKEN=<telegram_bot_token> -e ETHSCAN_API_KEY=<etherscan_api_key> --name h-crypto-price h-crypto-price
-```
-
-The bot is now up and running within the Docker container!
+   # With optional API keys
+   docker run -d \
+     -e TELEGRAM_TOKEN=<your_telegram_bot_token> \
+     -e ETHSCAN_API_KEY=<your_etherscan_api_key> \
+     -e CMC_API_KEY=<your_coinmarketcap_api_key> \
+     --name h-crypto-price \
+     h-crypto-price
+   ```
 
 ## Usage
 
-The bot can receive requests using the command **/p** followed by the cryptocurrency symbol, for example:
+Get cryptocurrency prices using `/p` followed by the symbol:
 
 ```
 /p btc
 /p eth
-/p cro
+/p sol
 ```
 
-To display the list of all available commands, type `/help`
-
-## Roadmap
-
-- [ ] Build more interactions with API, such as store settings and call limits.
--
+Type `/help` for a full list of available commands.
 
 ## Contributing
 

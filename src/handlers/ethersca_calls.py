@@ -6,9 +6,9 @@ from telegram.ext import ContextTypes
 from web3 import Web3
 
 from src.config import settings as s
+from src.utils.bot import send_tg
 from src.utils.formatters import max_column_size
 from src.utils.http import fetch_url
-from src.utils.bot import send_tg
 
 
 async def gas_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:

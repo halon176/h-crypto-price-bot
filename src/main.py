@@ -4,12 +4,13 @@ import logging
 from telegram.ext import ApplicationBuilder, CallbackQueryHandler, CommandHandler
 
 from src.handlers.callback import callback_handler
-from src.handlers.cg_calls import get_cg_dominance, chart_color_handler, cg_price_handler, cg_chart_handler
+from src.handlers.cg_calls import cg_chart_handler, cg_price_handler, chart_color_handler, get_cg_dominance
 from src.handlers.cmc_calls import cmc_key_info, cmc_price_handler
 from src.handlers.ethersca_calls import gas_handler
 from src.handlers.info import bot_help, start
 from src.handlers.news import news
-from src.utils.shared import cmc_coin_list, cg_coin_list
+from src.utils.shared import cg_coin_list, cmc_coin_list
+
 from .config import settings as s
 
 logging.basicConfig(format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO)

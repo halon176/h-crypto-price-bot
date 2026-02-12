@@ -1,25 +1,26 @@
+"""CoinMarketCap API handlers for cryptocurrency data."""
+
 import logging
 from functools import reduce
 
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import ContextTypes
 
 from src.config import settings as s
+from src.constants import MESSAGE_RATE_LIMIT_EXCEEDED
+from src.models import GeneralDataEntry, PriceChangeEntry
+from src.utils.bot import send_tg
 from src.utils.errors import send_error
 from src.utils.formatters import human_format, max_column_size
-from src.utils.shared import GeneralDataEntry, PriceChangeEntry, cmc_coin_list
-from src.utils.http import write_call, fetch_url
-from src.utils.bot import send_tg
+from src.utils.http import fetch_url, write_call
+from src.utils.shared import cmc_coin_list
 
+logger = logging.getLogger(__name__)
 
+# Prepare API headers
 headers = {"X-CMC_PRO_API_KEY": ""}
-
 if s.CMC_API_KEY:
     headers["X-CMC_PRO_API_KEY"] = s.CMC_API_KEY.get_secret_value()
-
-exp_message = (
-    "You have reached the maximum number of requests for this period. It will be reset in the end of the month."
-)
 
 
 async def get_cmc_id(crypto_symbol: str) -> list[int]:
@@ -51,9 +52,9 @@ async def get_cmc_price(coin_id: int, update: Update, context: ContextTypes.DEFA
     :param context:
     :return: None
     """
-    r = await write_call(2, 1, str(update.effective_chat.id), str(coin_id))
-    if not r:
-        await send_tg(context, update.effective_chat.id, exp_message)
+    rate_limit_ok = await write_call(2, 1, str(update.effective_chat.id), str(coin_id))
+    if not rate_limit_ok:
+        await send_tg(context, update.effective_chat.id, MESSAGE_RATE_LIMIT_EXCEEDED)
         return
 
     url = f"https://pro-api.coinmarketcap.com/v2/cryptocurrency/quotes/latest?id={coin_id}"
@@ -166,7 +167,7 @@ async def cmc_coin_check(coin: str, update: Update, context: ContextTypes.DEFAUL
         return False
     coins = await get_cmc_id(coin)
     if not coins:
-        cmc_coin_list.update()
+        await cmc_coin_list.update()
         coins = await get_cmc_id(coin)
         if not coins:
             await send_error(error, update, context)

@@ -1,7 +1,9 @@
 import asyncio
 import logging
+import re
 
 import logfire
+from logfire import ScrubMatch, ScrubbingOptions
 from telegram.ext import ApplicationBuilder, CallbackQueryHandler, CommandHandler
 
 from src.handlers.callback import callback_handler
@@ -17,10 +19,19 @@ from .config import settings as s
 logging.basicConfig(format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO)
 logging.getLogger("httpx").setLevel(logging.WARNING)
 
+
+def _scrub_callback(match: ScrubMatch) -> str | None:
+    """Redact API key values embedded in URLs (e.g. ?apikey=SECRET) instead of the full URL."""
+    if isinstance(match.value, str) and re.search(r"apikey=", match.value, re.IGNORECASE):
+        return re.sub(r"(?i)(apikey)=[^&\s#]+", r"\1=[REDACTED]", match.value)
+    return None
+
+
 logfire.configure(
     token=s.LOGFIRE_TOKEN.get_secret_value() if s.LOGFIRE_TOKEN else None,
     service_name="h-crypto-price-bot",
     distributed_tracing=True,
+    scrubbing=ScrubbingOptions(callback=_scrub_callback),
 )
 logfire.instrument_httpx()
 

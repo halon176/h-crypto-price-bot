@@ -4,6 +4,8 @@ import logging
 from functools import reduce
 
 import logfire
+from opentelemetry import propagate as otel_propagate
+from opentelemetry import trace as otel_trace
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import ContextTypes
 
@@ -54,6 +56,9 @@ async def get_cmc_price(coin_id: int, update: Update, context: ContextTypes.DEFA
     :param context:
     :return: None
     """
+    span = otel_trace.get_current_span()
+    span.set_attribute("chat.id", str(update.effective_chat.id))
+    span.set_attribute("user.id", str(update.effective_user.id))
     rate_limit_ok = await write_call(2, 1, str(update.effective_chat.id), str(coin_id))
     if not rate_limit_ok:
         await send_tg(context, update.effective_chat.id, MESSAGE_RATE_LIMIT_EXCEEDED)
@@ -66,11 +71,15 @@ async def get_cmc_price(coin_id: int, update: Update, context: ContextTypes.DEFA
     crypto_data = r["data"][str(coin_id)]
 
     market_cap_rank = crypto_data["cmc_rank"]
-
     crypto_name = crypto_data["name"]
     symbol = crypto_data["symbol"]
+    raw_price = crypto_data["quote"]["USD"]["price"]
+    price = human_format(raw_price)
 
-    price = human_format(crypto_data["quote"]["USD"]["price"])
+    span.set_attribute("coin.name", crypto_name)
+    span.set_attribute("coin.symbol", symbol)
+    span.set_attribute("coin.market_cap_rank", market_cap_rank)
+    span.set_attribute("coin.price_usd", raw_price)
 
     price_change_data = {
         "24h": "percent_change_24h",
@@ -136,6 +145,9 @@ async def get_cmc_price(coin_id: int, update: Update, context: ContextTypes.DEFA
 
 @logfire.instrument("cmc_key_info")
 async def cmc_key_info(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    span = otel_trace.get_current_span()
+    span.set_attribute("chat.id", str(update.effective_chat.id))
+    span.set_attribute("user.id", str(update.effective_user.id))
     url = "https://pro-api.coinmarketcap.com/v1/key/info"
     r = await fetch_url(url, headers)
     logging.info(f"Request CMC Key Info: {url}")
@@ -177,24 +189,35 @@ async def cmc_coin_check(coin: str, update: Update, context: ContextTypes.DEFAUL
             return False
     if len(coins) == 1:
         return coins[0]
-    else:
-        keyboard = []
-        for crypto in coins:
-            coin_data = await get_cmc_coin_info(crypto)
-            button = [InlineKeyboardButton(coin_data["name"], callback_data="cmc_" + str(crypto))]
-            keyboard.append(button)
-        reply_markup = InlineKeyboardMarkup(keyboard)
-        text = "🟠 There are multiple coins with the same symbol, please select the desired one:"
-        await send_tg(context, update.effective_chat.id, text, reply_markup=reply_markup)
+
+    # Propagate current trace context so the callback handler can link back to this trace
+    carrier: dict[str, str] = {}
+    otel_propagate.inject(carrier)
+    if carrier:
+        context.user_data["_trace_carrier"] = carrier
+
+    keyboard = []
+    for crypto in coins:
+        coin_data = await get_cmc_coin_info(crypto)
+        button = [InlineKeyboardButton(coin_data["name"], callback_data="cmc_" + str(crypto))]
+        keyboard.append(button)
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    text = "🟠 There are multiple coins with the same symbol, please select the desired one:"
+    await send_tg(context, update.effective_chat.id, text, reply_markup=reply_markup)
 
 
 @logfire.instrument("cmc_price_handler")
 async def cmc_price_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    span = otel_trace.get_current_span()
+    span.set_attribute("chat.id", str(update.effective_chat.id))
+    span.set_attribute("user.id", str(update.effective_user.id))
     crypto_symbol = context.args[0].lower()
+    span.set_attribute("crypto.symbol", crypto_symbol)
     coin = await cmc_coin_check(crypto_symbol, update, context)
     if coin:
         try:
             await get_cmc_price(coin, update, context)
         except Exception as e:
+            span.record_exception(e)
             logging.error(f"An error occurred: {str(e)}")
             await send_error("generic", update, context)

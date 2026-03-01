@@ -2,6 +2,7 @@ import logging
 from functools import reduce
 
 import logfire
+from opentelemetry import trace as otel_trace
 from telegram import Update
 from telegram.ext import ContextTypes
 from web3 import Web3
@@ -14,6 +15,9 @@ from src.utils.http import fetch_url
 
 @logfire.instrument("gas_handler")
 async def gas_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    span = otel_trace.get_current_span()
+    span.set_attribute("chat.id", str(update.effective_chat.id))
+    span.set_attribute("user.id", str(update.effective_user.id))
     eth_scan_api_error = "The bot has been launched without an Etherscan API KEY."
     if not s.ETHSCAN_API_KEY:
         await send_tg(context, update.effective_chat.id, eth_scan_api_error)
@@ -76,6 +80,11 @@ async def gas_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
                 return cost_in_usd
 
         gas_result = gas_request["result"]
+
+        span.set_attribute("eth.price_usd", eth_price)
+        span.set_attribute("eth.gas.safe_gwei", float(gas_result["SafeGasPrice"]))
+        span.set_attribute("eth.gas.fast_gwei", float(gas_result["FastGasPrice"]))
+        span.set_attribute("eth.gas.suggested_base_fee_gwei", float(gas_result["suggestBaseFee"]))
 
         gas_price = []
         for label, data_key in gas_data.items():

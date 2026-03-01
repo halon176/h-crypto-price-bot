@@ -6,6 +6,8 @@ from functools import reduce
 
 import logfire
 import pandas as pd
+from opentelemetry import propagate as otel_propagate
+from opentelemetry import trace as otel_trace
 import plotly.express as px
 import plotly.io as pio
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
@@ -70,6 +72,10 @@ async def get_cg_price(coin: str, update: Update, context: ContextTypes.DEFAULT_
         update: Telegram update object
         context: Telegram context
     """
+    span = otel_trace.get_current_span()
+    span.set_attribute("chat.id", str(update.effective_chat.id))
+    span.set_attribute("user.id", str(update.effective_user.id))
+
     url_params = (
         "?localization=false&tickers=false&market_data=true&"
         "community_data=false&developer_data=false&sparkline=false"
@@ -106,6 +112,13 @@ async def get_cg_price(coin: str, update: Update, context: ContextTypes.DEFAULT_
     crypto_name = crypto_data["name"]
     usd_price = crypto_data["market_data"]["current_price"].get("usd")
     crypto_price = human_format(usd_price) if usd_price is not None else "N/A"
+
+    span.set_attribute("coin.name", crypto_name)
+    span.set_attribute("coin.symbol", crypto_data["symbol"].upper())
+    if crypto_data.get("market_cap_rank"):
+        span.set_attribute("coin.market_cap_rank", crypto_data["market_cap_rank"])
+    if usd_price is not None:
+        span.set_attribute("coin.price_usd", usd_price)
 
     # Clean homepage URL (remove query parameters)
     homepage = crypto_data["links"]["homepage"][0]
@@ -227,6 +240,10 @@ async def get_cg_price(coin: str, update: Update, context: ContextTypes.DEFAULT_
 
 @logfire.instrument("get_cg_chart {coin} period={period}")
 async def get_cg_chart(coin: str, update: Update, context: ContextTypes.DEFAULT_TYPE, period="30") -> None:
+    span = otel_trace.get_current_span()
+    span.set_attribute("chat.id", str(update.effective_chat.id))
+    span.set_attribute("user.id", str(update.effective_user.id))
+    span.set_attribute("chart.period_days", str(period))
     r = await write_call(1, 2, str(update.effective_chat.id), coin)
     if not r:
         await context.bot.send_message(
@@ -302,6 +319,9 @@ async def get_cg_dominance(update: Update, context: ContextTypes.DEFAULT_TYPE) -
         update: Telegram update object
         context: Telegram context
     """
+    span = otel_trace.get_current_span()
+    span.set_attribute("chat.id", str(update.effective_chat.id))
+    span.set_attribute("user.id", str(update.effective_user.id))
     global_data = await fetch_url(COINGECKO_API_GLOBAL)
     if not global_data:
         await send_error("generic", update, context)
@@ -369,7 +389,14 @@ async def gc_coin_check(
 
     if len(coins) == 1:
         return coins[0]
-    elif call_type == "chart":
+
+    # Propagate current trace context so the callback handler can link back to this trace
+    carrier: dict[str, str] = {}
+    otel_propagate.inject(carrier)
+    if carrier:
+        context.user_data["_trace_carrier"] = carrier
+
+    if call_type == "chart":
         keyboard = []
         for crypto in coins:
             button = [InlineKeyboardButton(crypto, callback_data=f"chart.{crypto}")]
@@ -395,17 +422,23 @@ async def cg_price_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -
         update: Telegram update object
         context: Telegram context with args containing crypto symbol
     """
+    span = otel_trace.get_current_span()
+    span.set_attribute("chat.id", str(update.effective_chat.id))
+    span.set_attribute("user.id", str(update.effective_user.id))
+
     if not context.args:
         await send_error("symbol", update, context)
         return
 
     crypto_symbol = context.args[0].lower()
+    span.set_attribute("crypto.symbol", crypto_symbol)
     coin = await gc_coin_check(crypto_symbol, update, context)
 
     if coin:
         try:
             await get_cg_price(coin, update, context)
         except Exception as e:
+            span.record_exception(e)
             logger.error(f"Error fetching price for {crypto_symbol}: {e}", exc_info=True)
             await send_error("generic", update, context)
 
@@ -418,16 +451,22 @@ async def cg_chart_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -
         update: Telegram update object
         context: Telegram context with args containing crypto symbol
     """
+    span = otel_trace.get_current_span()
+    span.set_attribute("chat.id", str(update.effective_chat.id))
+    span.set_attribute("user.id", str(update.effective_user.id))
+
     if not context.args:
         await send_error("symbol", update, context)
         return
 
     crypto_symbol = context.args[0].lower()
+    span.set_attribute("crypto.symbol", crypto_symbol)
     coin = await gc_coin_check(crypto_symbol, update, context, "chart")
 
     if coin:
         try:
             await get_cg_chart(coin, update, context)
         except Exception as e:
+            span.record_exception(e)
             logger.error(f"Error fetching chart for {crypto_symbol}: {e}", exc_info=True)
             await send_error("generic", update, context)

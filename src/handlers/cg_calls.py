@@ -3,11 +3,13 @@
 import io
 import logging
 from functools import reduce
+from time import perf_counter
 
 import logfire
 import pandas as pd
 import plotly.express as px
 import plotly.io as pio
+from opentelemetry import metrics as otel_metrics
 from opentelemetry import propagate as otel_propagate
 from opentelemetry import trace as otel_trace
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
@@ -31,6 +33,60 @@ from src.utils.http import fetch_url, write_call
 from src.utils.shared import cg_coin_list, chart_template
 
 logger = logging.getLogger(__name__)
+
+meter = otel_metrics.get_meter("h-crypto-price-bot.cg_calls")
+chart_generation_total = meter.create_counter(
+    "bot.chart.generation.total",
+    unit="1",
+    description="Total number of chart image generation attempts",
+)
+chart_generation_errors_total = meter.create_counter(
+    "bot.chart.generation.errors_total",
+    unit="1",
+    description="Total number of chart image generation failures",
+)
+chart_generation_duration_seconds = meter.create_histogram(
+    "bot.chart.generation.duration_seconds",
+    unit="s",
+    description="Duration of chart image generation using Plotly",
+)
+
+
+def _render_chart_image(df: pd.DataFrame, title: str, bottom: str, template: str, coin: str, period: str) -> io.BytesIO:
+    metric_attributes = {
+        "chart.period_days": str(period),
+        "chart.template": template,
+    }
+
+    chart_generation_total.add(1, metric_attributes)
+    started_at = perf_counter()
+
+    with logfire.span("cg_chart.generate_image"):
+        span = otel_trace.get_current_span()
+        span.set_attribute("coin.id", coin)
+        span.set_attribute("chart.period_days", str(period))
+        span.set_attribute("chart.template", template)
+        span.set_attribute("chart.points", len(df))
+
+        try:
+            fig = px.line(
+                df,
+                x="timeframe",
+                y="prices",
+                template=template,
+                labels={"timeframe": bottom, "prices": "price ($)"},
+            )
+            fig.update_layout(title={"text": title, "y": 0.93, "x": 0.5, "font": {"size": 24}})
+
+            buffer = io.BytesIO()
+            pio.write_image(fig, buffer, format="jpg")
+            buffer.seek(0)
+            return buffer
+        except Exception:
+            chart_generation_errors_total.add(1, metric_attributes)
+            raise
+        finally:
+            chart_generation_duration_seconds.record(perf_counter() - started_at, metric_attributes)
 
 
 def get_cg_id(crypto_symbol: str) -> list[str]:
@@ -263,23 +319,12 @@ async def get_cg_chart(coin: str, update: Update, context: ContextTypes.DEFAULT_
 
     df = pd.DataFrame({"timeframe": x, "prices": y})
     df["timeframe"] = pd.to_datetime(df["timeframe"], unit="s")
+    span.set_attribute("chart.points", len(df))
     info = await get_cg_coin_info(coin)
     title = f"{info['name']} ({info['symbol']})"
     bottom = f"{period} day{'s' if period != '1' else ''} chart"
     template = chart_template.get_template()
-    fig = px.line(
-        df,
-        x="timeframe",
-        y="prices",
-        template=template,
-        labels={"timeframe": bottom, "prices": "price ($)"},
-    )
-
-    fig.update_layout(title={"text": title, "y": 0.93, "x": 0.5, "font": {"size": 24}})
-
-    buffer = io.BytesIO()
-    pio.write_image(fig, buffer, format="jpg")
-    buffer.seek(0)
+    buffer = _render_chart_image(df, title, bottom, template, coin, period)
 
     periods = [
         {"1": "24h"},

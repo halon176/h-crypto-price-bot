@@ -1,9 +1,13 @@
 import asyncio
 import logging
 import re
+from functools import wraps
+from time import perf_counter
+from typing import Any
 
 import logfire
 from logfire import ScrubbingOptions, ScrubMatch
+from opentelemetry import metrics
 from telegram.ext import ApplicationBuilder, CallbackQueryHandler, CommandHandler
 
 from src.handlers.callback import callback_handler
@@ -18,6 +22,23 @@ from .config import settings as s
 
 logging.basicConfig(format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO)
 logging.getLogger("httpx").setLevel(logging.WARNING)
+
+meter = metrics.get_meter("h-crypto-price-bot")
+handler_calls_total = meter.create_counter(
+    "bot.handler.calls_total",
+    unit="1",
+    description="Total number of Telegram handler calls",
+)
+handler_errors_total = meter.create_counter(
+    "bot.handler.errors_total",
+    unit="1",
+    description="Total number of Telegram handler errors",
+)
+handler_duration_seconds = meter.create_histogram(
+    "bot.handler.duration_seconds",
+    unit="s",
+    description="Execution time of Telegram handlers",
+)
 
 
 def _scrub_callback(match: ScrubMatch) -> str | None:
@@ -34,6 +55,24 @@ logfire.configure(
     scrubbing=ScrubbingOptions(callback=_scrub_callback),
 )
 logfire.instrument_httpx()
+
+
+def _instrument_handler(handler_name: str, handler_type: str, handler: Any):
+    @wraps(handler)
+    async def wrapped(update, context):
+        attributes = {"handler.name": handler_name, "handler.type": handler_type}
+        started_at = perf_counter()
+        handler_calls_total.add(1, attributes)
+
+        try:
+            return await handler(update, context)
+        except Exception:
+            handler_errors_total.add(1, attributes)
+            raise
+        finally:
+            handler_duration_seconds.record(perf_counter() - started_at, attributes)
+
+    return wrapped
 
 
 async def setup_bot():
@@ -56,9 +95,9 @@ async def setup_bot():
     application = ApplicationBuilder().token(s.TELEGRAM_TOKEN.get_secret_value()).build()
 
     for handler_name, handler in handlers.items():
-        application.add_handler(CommandHandler(handler_name, handler))
+        application.add_handler(CommandHandler(handler_name, _instrument_handler(handler_name, "command", handler)))
 
-    application.add_handler(CallbackQueryHandler(callback_handler))
+    application.add_handler(CallbackQueryHandler(_instrument_handler("callback_handler", "callback", callback_handler)))
 
     return application
 

@@ -43,8 +43,17 @@ For advanced features like rate limits and usage tracking, check out the [hcpb-a
    export TELEGRAM_TOKEN=<your_telegram_bot_token>
    export ETHSCAN_API_KEY=<your_etherscan_api_key>  # Required for gas prices
    export CMC_API_KEY=<your_coinmarketcap_api_key>  # Optional
+   export LOGFIRE_TOKEN=<your_logfire_token>  # Optional, enables telemetry in Logfire
    export API_URL=<api_url>  # Optional
    ```
+
+   With `LOGFIRE_TOKEN` configured, the bot exports logs, traces and these metrics:
+   - `bot.handler.calls_total`
+   - `bot.handler.errors_total`
+   - `bot.handler.duration_seconds`
+   - `bot.chart.generation.total`
+   - `bot.chart.generation.errors_total`
+   - `bot.chart.generation.duration_seconds`
 
 6. Run the bot:
 

@@ -20,6 +20,7 @@ logging.getLogger("httpx").setLevel(logging.WARNING)
 logfire.configure(
     token=s.LOGFIRE_TOKEN.get_secret_value() if s.LOGFIRE_TOKEN else None,
     service_name="h-crypto-price-bot",
+    distributed_tracing=True,
 )
 logfire.instrument_httpx()
 

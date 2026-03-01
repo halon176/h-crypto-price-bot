@@ -59,7 +59,7 @@ async def _handle_cmc_callback(
         update: Telegram update object
         context: Telegram callback context
     """
-    await get_cmc_price(callback_data.value, update, context)
+    await get_cmc_price(int(callback_data.value), update, context)
 
 
 async def _handle_theme_callback(

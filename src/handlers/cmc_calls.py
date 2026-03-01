@@ -199,7 +199,7 @@ async def cmc_coin_check(coin: str, update: Update, context: ContextTypes.DEFAUL
     keyboard = []
     for crypto in coins:
         coin_data = await get_cmc_coin_info(crypto)
-        button = [InlineKeyboardButton(coin_data["name"], callback_data="cmc_" + str(crypto))]
+        button = [InlineKeyboardButton(coin_data["name"], callback_data="cmc." + str(crypto))]
         keyboard.append(button)
     reply_markup = InlineKeyboardMarkup(keyboard)
     text = "🟠 There are multiple coins with the same symbol, please select the desired one:"

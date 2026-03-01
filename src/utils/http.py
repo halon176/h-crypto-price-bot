@@ -10,10 +10,10 @@ api_headers = {"X-API-KEY": s.hcpb_api_key.get_secret_value()} if s.hcpb_api_key
 
 
 @logfire.instrument("fetch_url {url}")
-async def fetch_url(url: str, headers: dict[str, str] | None = None) -> dict | list | None:
+async def fetch_url(url: str, headers: dict[str, str] | None = None, timeout: float = 30.0) -> dict | list | None:
     span = otel_trace.get_current_span()
     try:
-        async with httpx.AsyncClient() as client:
+        async with httpx.AsyncClient(timeout=timeout) as client:
             response = await client.get(url, headers=headers)
             span.set_attribute("http.response.status_code", response.status_code)
             if response.status_code == 200:

@@ -21,9 +21,7 @@ logfire.configure(
     token=s.LOGFIRE_TOKEN.get_secret_value() if s.LOGFIRE_TOKEN else None,
     service_name="h-crypto-price-bot",
 )
-logfire.instrument_httpx(
-    url_filter=lambda url: "api.telegram.org" not in str(url),
-)
+logfire.instrument_httpx()
 
 
 async def setup_bot():
@@ -62,4 +60,15 @@ if __name__ == "__main__":
 
     bot = loop.run_until_complete(setup_bot())
 
-    bot.run_polling()
+    if s.WEBHOOK_URL:
+        logging.info(f"Starting webhook mode on port {s.WEBHOOK_PORT} → {s.WEBHOOK_URL}")
+        bot.run_webhook(
+            listen="0.0.0.0",
+            port=s.WEBHOOK_PORT,
+            url_path="webhook",
+            webhook_url=s.WEBHOOK_URL,
+            secret_token=s.WEBHOOK_SECRET_TOKEN.get_secret_value() if s.WEBHOOK_SECRET_TOKEN else None,
+        )
+    else:
+        logging.info("Starting polling mode (no WEBHOOK_URL set)")
+        bot.run_polling()

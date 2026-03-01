@@ -4,42 +4,62 @@ from dataclasses import dataclass
 from typing import Any
 
 
+@dataclass
 class PriceChangeEntry:
-    """Represents a price change entry with label and percentage."""
+    """Represents a price change entry with label and formatted percentage."""
 
-    def __init__(self, change_label: str, change_value: float | None) -> None:
-        """Initialize price change entry.
+    label: str
+    """Time period label (e.g., '24h', '7d')."""
+    formatted_percentage: str
+    """Formatted percentage string (e.g., '1.5%' or 'N/A')."""
+
+    @classmethod
+    def from_raw(cls, label: str, value: float | None) -> "PriceChangeEntry":
+        """Create a PriceChangeEntry from a raw percentage value.
 
         Args:
-            change_label: Label for the time period (e.g., '24h', '7d')
-            change_value: Percentage change value, or None if not available
+            label: Time period label (e.g., '24h', '7d')
+            value: Raw percentage change value, or None if not available
+
+        Returns:
+            PriceChangeEntry with formatted percentage
         """
-        self.entry = change_label
-        if change_value is None:
-            self.percentage = "N/A"
-        else:
-            self.percentage = f"{change_value:.1f}%"
+        return cls(
+            label=label,
+            formatted_percentage="N/A" if value is None else f"{value:.1f}%",
+        )
 
 
+@dataclass
 class GeneralDataEntry:
-    """Represents a general data entry with emoji, label and value."""
+    """Represents a general data entry with emoji, label and formatted value."""
 
-    def __init__(self, data_emoji: str, data_type: str, data_value: Any) -> None:
-        """Initialize general data entry.
+    emoji: str
+    """Display emoji (e.g., '💰')."""
+    label: str
+    """Display label (e.g., 'M. Cap', 'Circ. S')."""
+    formatted_value: str
+    """Human-formatted value (e.g., '1.2B') or 'N/A'."""
+
+    @classmethod
+    def from_raw(cls, emoji: str, label: str, value: Any) -> "GeneralDataEntry":
+        """Create a GeneralDataEntry from a raw numeric value.
 
         Args:
-            data_emoji: Emoji to display
-            data_type: Type/label of the data
-            data_value: Value to display (will be formatted with human_format)
+            emoji: Display emoji
+            label: Display label
+            value: Raw numeric value, 'N/A', or None
+
+        Returns:
+            GeneralDataEntry with human-formatted value
         """
         from src.utils.formatters import human_format
 
-        self.emoji = data_emoji
-        self.entry = data_type
-        if data_value == "N/A" or data_value is None:
-            self.value = "N/A"
-        else:
-            self.value = human_format(float(data_value))
+        return cls(
+            emoji=emoji,
+            label=label,
+            formatted_value="N/A" if (value == "N/A" or value is None) else human_format(float(value)),
+        )
 
 
 class AtEntry:

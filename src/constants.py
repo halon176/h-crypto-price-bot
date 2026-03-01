@@ -59,6 +59,8 @@ CHART_PERIOD_LABELS: Final[dict[ChartPeriod, str]] = {
 # Callback Data Prefixes
 class CallbackPrefix(StrEnum):
     """Prefixes for callback query data."""
+    CG = "cg"
+    CMC = "cmc"
     CHART = "chart"
     THEME = "theme"
     PERIOD = "period"

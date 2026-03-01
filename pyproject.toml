@@ -30,6 +30,8 @@ dev = [
 exclude = ["build", "dist", "venv", ".venv", ".git", ".tox", ".mypy_cache", ".pytest_cache", ".vscode", ".idea", "poetry.lock"]
 line-length = 120
 indent-width = 4
+
+[tool.ruff.lint]
 select = ["E", "W", "F", "I", "B", "C4", "UP"]
 
 [tool.pytest.ini_options]

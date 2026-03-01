@@ -92,15 +92,17 @@ async def get_cmc_price(coin_id: int, update: Update, context: ContextTypes.DEFA
     price_changes = []
     for label, data_key in price_change_data.items():
         value = crypto_data["quote"]["USD"].get(data_key)
-        price_changes.append(PriceChangeEntry(label, value))
+        price_changes.append(PriceChangeEntry.from_raw(label, value))
 
     lst_column_size_changes = [
-        max_column_size([prc.entry for prc in price_changes]),
-        max_column_size([prc.percentage for prc in price_changes]),
+        max_column_size([prc.label for prc in price_changes]),
+        max_column_size([prc.formatted_percentage for prc in price_changes]),
     ]
 
     str_format_prc = f"{{:{lst_column_size_changes[0]}}}    {{:>{lst_column_size_changes[1]}}}"
-    price_change_message = "\n".join([str_format_prc.format(prc.entry, prc.percentage) for prc in price_changes])
+    price_change_message = "\n".join(
+        [str_format_prc.format(prc.label, prc.formatted_percentage) for prc in price_changes]
+    )
 
     lst_str_header = (
         "-" * (len(lst_column_size_changes) + 2 + reduce(lambda a, b: a + b, lst_column_size_changes)) + "\n"
@@ -119,17 +121,17 @@ async def get_cmc_price(coin_id: int, update: Update, context: ContextTypes.DEFA
             value = crypto_data["quote"]["USD"].get(data_key, "N/A")
         else:
             value = crypto_data.get(data_key, "N/A")
-        general_data.append(GeneralDataEntry(emoji, label, value))
+        general_data.append(GeneralDataEntry.from_raw(emoji, label, value))
 
     lst_column_size_gend = [
         2,
-        max_column_size([gend.entry for gend in general_data]),
-        max_column_size([gend.value for gend in general_data]),
+        max_column_size([gend.label for gend in general_data]),
+        max_column_size([gend.formatted_value for gend in general_data]),
     ]
 
     str_format_gend = f"{{}} {{:{lst_column_size_gend[1]}}}   {{:>{lst_column_size_gend[2]}}}"
     general_data_message = "\n".join(
-        [str_format_gend.format(gend.emoji, gend.entry, gend.value) for gend in general_data]
+        [str_format_gend.format(gend.emoji, gend.label, gend.formatted_value) for gend in general_data]
     )
 
     message = (

@@ -6,10 +6,10 @@ from functools import reduce
 
 import logfire
 import pandas as pd
-from opentelemetry import propagate as otel_propagate
-from opentelemetry import trace as otel_trace
 import plotly.express as px
 import plotly.io as pio
+from opentelemetry import propagate as otel_propagate
+from opentelemetry import trace as otel_trace
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import ContextTypes
 
@@ -18,6 +18,7 @@ from src.constants import (
     COINGECKO_API_GLOBAL,
     MESSAGE_RATE_LIMIT_EXCEEDED,
     POSITIONAL_EMOJIS,
+    CallbackPrefix,
 )
 from src.models import AtEntry, GeneralDataEntry, MarketCapEntry, PriceChangeEntry
 from src.utils.bot import send_tg
@@ -156,35 +157,35 @@ async def get_cg_price(coin: str, update: Update, context: ContextTypes.DEFAULT_
             value = crypto_data["market_data"].get(data_key, {}).get("usd", "N/A")
         else:
             value = crypto_data["market_data"].get(data_key, "N/A")
-        general_data.append(GeneralDataEntry(emoji, label, value))
+        general_data.append(GeneralDataEntry.from_raw(emoji, label, value))
 
     # Format general data table
     column_sizes_general = [
         2,
-        max_column_size([item.entry for item in general_data]),
-        max_column_size([item.value for item in general_data]),
+        max_column_size([item.label for item in general_data]),
+        max_column_size([item.formatted_value for item in general_data]),
     ]
 
     format_general = f"{{}} {{:{column_sizes_general[1]}}}   {{:>{column_sizes_general[2]}}}"
     general_data_message = "\n".join(
-        [format_general.format(item.emoji, item.entry, item.value) for item in general_data]
+        [format_general.format(item.emoji, item.label, item.formatted_value) for item in general_data]
     )
 
     # Build price change entries
     price_changes = []
     for label, data_key in price_change_config.items():
         value = crypto_data["market_data"].get(data_key)
-        price_changes.append(PriceChangeEntry(label, value))
+        price_changes.append(PriceChangeEntry.from_raw(label, value))
 
     # Format price changes table
     column_sizes_changes = [
-        max_column_size([pc.entry for pc in price_changes]),
-        max_column_size([pc.percentage for pc in price_changes]),
+        max_column_size([pc.label for pc in price_changes]),
+        max_column_size([pc.formatted_percentage for pc in price_changes]),
     ]
 
     format_price_change = f"{{:{column_sizes_changes[0]}}}    {{:>{column_sizes_changes[1]}}}"
     price_change_message = "\n".join(
-        [format_price_change.format(pc.entry, pc.percentage) for pc in price_changes]
+        [format_price_change.format(pc.label, pc.formatted_percentage) for pc in price_changes]
     )
 
     # All-time high/low data schema
@@ -357,12 +358,13 @@ async def get_cg_dominance(update: Update, context: ContextTypes.DEFAULT_TYPE) -
 
 async def chart_color_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     themes = [
-        ["🌕 white", "charttemplate_plotly_white"],
-        ["🌑 dark", "charttemplate_plotly_dark"],
+        ("🌕 white", "plotly_white"),
+        ("🌑 dark", "plotly_dark"),
     ]
     keyboard = []
-    for theme in themes:
-        button = [InlineKeyboardButton(theme[0], callback_data=theme[1])]
+    for label, template in themes:
+        callback = f"{CallbackPrefix.THEME}_{template}.x"
+        button = [InlineKeyboardButton(label, callback_data=callback)]
         keyboard.append(button)
     reply_markup = InlineKeyboardMarkup(keyboard)
 
@@ -407,7 +409,7 @@ async def gc_coin_check(
     else:
         keyboard = []
         for crypto in coins:
-            button = [InlineKeyboardButton(crypto, callback_data=crypto)]
+            button = [InlineKeyboardButton(crypto, callback_data=f"{CallbackPrefix.CG}.{crypto}")]
             keyboard.append(button)
         reply_markup = InlineKeyboardMarkup(keyboard)
 

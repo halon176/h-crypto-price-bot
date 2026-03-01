@@ -3,12 +3,12 @@
 import pytest
 
 from src.models import (
-    PriceChangeEntry,
-    GeneralDataEntry,
     AtEntry,
-    MarketCapEntry,
-    CoinInfo,
     CallbackData,
+    CoinInfo,
+    GeneralDataEntry,
+    MarketCapEntry,
+    PriceChangeEntry,
 )
 
 
@@ -17,32 +17,32 @@ class TestPriceChangeEntry:
 
     def test_price_change_with_value(self):
         """Test price change entry with valid value."""
-        entry = PriceChangeEntry("24h", 5.2)
-        assert entry.entry == "24h"
-        assert entry.percentage == "5.2%"
+        entry = PriceChangeEntry.from_raw("24h", 5.2)
+        assert entry.label == "24h"
+        assert entry.formatted_percentage == "5.2%"
 
     def test_price_change_with_negative_value(self):
         """Test price change entry with negative value."""
-        entry = PriceChangeEntry("7d", -3.1)
-        assert entry.entry == "7d"
-        assert entry.percentage == "-3.1%"
+        entry = PriceChangeEntry.from_raw("7d", -3.1)
+        assert entry.label == "7d"
+        assert entry.formatted_percentage == "-3.1%"
 
     def test_price_change_with_none_value(self):
         """Test price change entry with None value."""
-        entry = PriceChangeEntry("30d", None)
-        assert entry.entry == "30d"
-        assert entry.percentage == "N/A"
+        entry = PriceChangeEntry.from_raw("30d", None)
+        assert entry.label == "30d"
+        assert entry.formatted_percentage == "N/A"
 
     def test_price_change_with_zero_value(self):
         """Test price change entry with zero value."""
-        entry = PriceChangeEntry("1y", 0.0)
-        assert entry.entry == "1y"
-        assert entry.percentage == "0.0%"
+        entry = PriceChangeEntry.from_raw("1y", 0.0)
+        assert entry.label == "1y"
+        assert entry.formatted_percentage == "0.0%"
 
     def test_price_change_formatting_precision(self):
         """Test that percentage is formatted to 1 decimal place."""
-        entry = PriceChangeEntry("24h", 5.6789)
-        assert entry.percentage == "5.7%"
+        entry = PriceChangeEntry.from_raw("24h", 5.6789)
+        assert entry.formatted_percentage == "5.7%"
 
 
 class TestGeneralDataEntry:
@@ -50,30 +50,30 @@ class TestGeneralDataEntry:
 
     def test_general_data_with_number(self):
         """Test general data entry with numeric value."""
-        entry = GeneralDataEntry("💰", "M. Cap", 1500000000)
+        entry = GeneralDataEntry.from_raw("💰", "M. Cap", 1500000000)
         assert entry.emoji == "💰"
-        assert entry.entry == "M. Cap"
-        assert entry.value == "1.5B"  # Should be human formatted
+        assert entry.label == "M. Cap"
+        assert entry.formatted_value == "1.5B"  # Should be human formatted
 
     def test_general_data_with_string_number(self):
         """Test general data entry with string numeric value."""
-        entry = GeneralDataEntry("💵", "Circ. S", "2500000")
-        assert entry.value == "2.5M"
+        entry = GeneralDataEntry.from_raw("💵", "Circ. S", "2500000")
+        assert entry.formatted_value == "2.5M"
 
     def test_general_data_with_na_string(self):
         """Test general data entry with 'N/A' string."""
-        entry = GeneralDataEntry("🖨", "Total S", "N/A")
-        assert entry.value == "N/A"
+        entry = GeneralDataEntry.from_raw("🖨", "Total S", "N/A")
+        assert entry.formatted_value == "N/A"
 
     def test_general_data_with_none(self):
         """Test general data entry with None value."""
-        entry = GeneralDataEntry("💎", "Max S", None)
-        assert entry.value == "N/A"
+        entry = GeneralDataEntry.from_raw("💎", "Max S", None)
+        assert entry.formatted_value == "N/A"
 
     def test_general_data_small_number(self):
         """Test general data entry with small number."""
-        entry = GeneralDataEntry("💰", "Price", 500)
-        assert entry.value == "500"
+        entry = GeneralDataEntry.from_raw("💰", "Price", 500)
+        assert entry.formatted_value == "500"
 
 
 class TestAtEntry:

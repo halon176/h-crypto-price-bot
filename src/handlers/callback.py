@@ -159,38 +159,39 @@ async def callback_handler(update: Update, context: CallbackContext) -> None:
             span.set_attribute("user.id", str(update.effective_user.id))
 
             try:
-                # Parse callback data
-                if "." in callback_string:
-                    callback_data = CallbackData.parse(callback_string)
-                    prefix = callback_data.prefix
-                else:
-                    # Default case: just coin_id
-                    prefix = None
-                    callback_data = None
+                # Parse callback data — all callbacks must use "prefix.value" format
+                if "." not in callback_string:
+                    logging.warning(f"Callback missing prefix format: {callback_string!r}")
+                    return
+                callback_data = CallbackData.parse(callback_string)
+                prefix = callback_data.prefix
 
                 # Route to appropriate handler
-                if prefix == CallbackPrefix.CHART.value:
-                    span.set_attribute("callback.type", "chart")
-                    span.set_attribute("coin.id", callback_data.value)
-                    await _handle_chart_callback(callback_data, update, context)
-                elif prefix == "cmc":  # Keep as string for backward compatibility
-                    span.set_attribute("callback.type", "cmc_price")
-                    span.set_attribute("coin.id", str(callback_data.value))
-                    await _handle_cmc_callback(callback_data, update, context)
-                elif prefix == "charttemplate" or prefix == CallbackPrefix.THEME.value:
-                    span.set_attribute("callback.type", "chart_theme")
-                    span.set_attribute("chart.theme", callback_data.action)
-                    await _handle_theme_callback(callback_data, update, context)
-                elif prefix == CallbackPrefix.PERIOD.value:
-                    span.set_attribute("callback.type", "chart_period")
-                    span.set_attribute("coin.id", callback_data.value)
-                    span.set_attribute("chart.period_days", callback_data.action)
-                    await _handle_period_callback(callback_data, update, context)
-                else:
-                    # Default: treat as coin_id (CG price disambiguation)
-                    span.set_attribute("callback.type", "cg_price")
-                    span.set_attribute("coin.id", callback_string)
-                    await _handle_default_callback(callback_string, update, context)
+                match prefix:
+                    case CallbackPrefix.CG:
+                        span.set_attribute("callback.type", "cg_price")
+                        span.set_attribute("coin.id", callback_data.value)
+                        await _handle_default_callback(callback_data.value, update, context)
+                    case CallbackPrefix.CMC:
+                        span.set_attribute("callback.type", "cmc_price")
+                        span.set_attribute("coin.id", callback_data.value)
+                        await _handle_cmc_callback(callback_data, update, context)
+                    case CallbackPrefix.CHART:
+                        span.set_attribute("callback.type", "chart")
+                        span.set_attribute("coin.id", callback_data.value)
+                        await _handle_chart_callback(callback_data, update, context)
+                    case CallbackPrefix.THEME:
+                        span.set_attribute("callback.type", "chart_theme")
+                        span.set_attribute("chart.theme", callback_data.action)
+                        await _handle_theme_callback(callback_data, update, context)
+                    case CallbackPrefix.PERIOD:
+                        span.set_attribute("callback.type", "chart_period")
+                        span.set_attribute("coin.id", callback_data.value)
+                        span.set_attribute("chart.period_days", callback_data.action)
+                        await _handle_period_callback(callback_data, update, context)
+                    case _:
+                        span.set_attribute("callback.type", "unknown")
+                        logging.warning(f"Unknown callback prefix: {prefix!r} in {callback_string!r}")
 
             except ValueError as e:
                 span.record_exception(e)

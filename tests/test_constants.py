@@ -1,19 +1,18 @@
 """Tests for constants module."""
 
-import pytest
 
 from src.constants import (
-    ChartPeriod,
-    ChartTheme,
-    CallbackPrefix,
+    CHART_PERIOD_LABELS,
     COINGECKO_API_BASE,
     COINGECKO_API_COINS,
     COINMARKETCAP_API_BASE,
-    POSITIONAL_EMOJIS,
-    CHART_PERIOD_LABELS,
-    MESSAGE_RATE_LIMIT_EXCEEDED,
     GAS_LIMIT_STANDARD_TRANSFER,
     GWEI_TO_ETH,
+    MESSAGE_RATE_LIMIT_EXCEEDED,
+    POSITIONAL_EMOJIS,
+    CallbackPrefix,
+    ChartPeriod,
+    ChartTheme,
 )
 
 

@@ -3,7 +3,7 @@ import logging
 import re
 
 import logfire
-from logfire import ScrubMatch, ScrubbingOptions
+from logfire import ScrubbingOptions, ScrubMatch
 from telegram.ext import ApplicationBuilder, CallbackQueryHandler, CommandHandler
 
 from src.handlers.callback import callback_handler

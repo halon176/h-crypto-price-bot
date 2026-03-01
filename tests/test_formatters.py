@@ -1,14 +1,13 @@
 """Tests for formatting utilities."""
 
-import pytest
 
 from src.utils.formatters import (
     format_date,
-    max_column_size,
-    human_format,
-    format_table,
-    format_price,
     format_percentage,
+    format_price,
+    format_table,
+    human_format,
+    max_column_size,
 )
 
 
@@ -165,7 +164,7 @@ class TestFormatTable:
         result = format_table(entries)
         lines = result.split("\n")
         # All lines should have the same length
-        assert len(set(len(line) for line in lines)) == 1
+        assert len({len(line) for line in lines}) == 1
 
 
 class TestFormatPrice:

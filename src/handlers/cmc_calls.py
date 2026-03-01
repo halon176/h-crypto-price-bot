@@ -3,6 +3,7 @@
 import logging
 from functools import reduce
 
+import logfire
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import ContextTypes
 
@@ -44,6 +45,7 @@ async def get_cmc_coin_info(coin_id: int) -> dict[str, str] | None:
     return None
 
 
+@logfire.instrument("get_cmc_price {coin_id}")
 async def get_cmc_price(coin_id: int, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """
     Get the price grid of a coin from CoinMarketCap index
@@ -132,6 +134,7 @@ async def get_cmc_price(coin_id: int, update: Update, context: ContextTypes.DEFA
     await send_tg(context, update.effective_chat.id, message, mk_parse=False)
 
 
+@logfire.instrument("cmc_key_info")
 async def cmc_key_info(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     url = "https://pro-api.coinmarketcap.com/v1/key/info"
     r = await fetch_url(url, headers)
@@ -185,6 +188,7 @@ async def cmc_coin_check(coin: str, update: Update, context: ContextTypes.DEFAUL
         await send_tg(context, update.effective_chat.id, text, reply_markup=reply_markup)
 
 
+@logfire.instrument("cmc_price_handler")
 async def cmc_price_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     crypto_symbol = context.args[0].lower()
     coin = await cmc_coin_check(crypto_symbol, update, context)

@@ -2,6 +2,7 @@
 
 import logging
 
+import logfire
 from telegram import Update
 from telegram.ext import CallbackContext
 
@@ -111,6 +112,7 @@ async def _handle_default_callback(
         await send_error("generic", update, context)
 
 
+@logfire.instrument("callback_handler")
 async def callback_handler(update: Update, context: CallbackContext) -> None:
     """Main callback query handler for inline keyboard interactions.
 

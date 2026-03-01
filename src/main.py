@@ -1,6 +1,7 @@
 import asyncio
 import logging
 
+import logfire
 from telegram.ext import ApplicationBuilder, CallbackQueryHandler, CommandHandler
 
 from src.handlers.callback import callback_handler
@@ -15,6 +16,14 @@ from .config import settings as s
 
 logging.basicConfig(format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO)
 logging.getLogger("httpx").setLevel(logging.WARNING)
+
+logfire.configure(
+    token=s.LOGFIRE_TOKEN.get_secret_value() if s.LOGFIRE_TOKEN else None,
+    service_name="h-crypto-price-bot",
+)
+logfire.instrument_httpx(
+    url_filter=lambda url: "api.telegram.org" not in str(url),
+)
 
 
 async def setup_bot():

@@ -4,6 +4,7 @@ import io
 import logging
 from functools import reduce
 
+import logfire
 import pandas as pd
 import plotly.express as px
 import plotly.io as pio
@@ -60,6 +61,7 @@ async def get_cg_coin_info(coin_id: str) -> dict[str, str] | None:
     return None
 
 
+@logfire.instrument("get_cg_price {coin}")
 async def get_cg_price(coin: str, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Fetch and display detailed price information for a cryptocurrency.
 
@@ -223,6 +225,7 @@ async def get_cg_price(coin: str, update: Update, context: ContextTypes.DEFAULT_
     await send_tg(context, update.effective_chat.id, message, mk_parse=False)
 
 
+@logfire.instrument("get_cg_chart {coin} period={period}")
 async def get_cg_chart(coin: str, update: Update, context: ContextTypes.DEFAULT_TYPE, period="30") -> None:
     r = await write_call(1, 2, str(update.effective_chat.id), coin)
     if not r:
@@ -291,6 +294,7 @@ async def get_cg_chart(coin: str, update: Update, context: ContextTypes.DEFAULT_
     buffer.close()
 
 
+@logfire.instrument("get_cg_dominance")
 async def get_cg_dominance(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Fetch and display cryptocurrency market dominance rankings.
 
@@ -383,6 +387,7 @@ async def gc_coin_check(
         await send_tg(context, update.effective_chat.id, text, reply_markup=reply_markup)
 
 
+@logfire.instrument("cg_price_handler")
 async def cg_price_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Handle /cgprice command to display cryptocurrency price.
 
@@ -405,6 +410,7 @@ async def cg_price_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -
             await send_error("generic", update, context)
 
 
+@logfire.instrument("cg_chart_handler")
 async def cg_chart_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Handle /cgchart command to display cryptocurrency chart.
 

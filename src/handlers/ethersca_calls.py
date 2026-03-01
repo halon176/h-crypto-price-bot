@@ -1,6 +1,7 @@
 import logging
 from functools import reduce
 
+import logfire
 from telegram import Update
 from telegram.ext import ContextTypes
 from web3 import Web3
@@ -11,6 +12,7 @@ from src.utils.formatters import max_column_size
 from src.utils.http import fetch_url
 
 
+@logfire.instrument("gas_handler")
 async def gas_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     eth_scan_api_error = "The bot has been launched without an Etherscan API KEY."
     if not s.ETHSCAN_API_KEY:

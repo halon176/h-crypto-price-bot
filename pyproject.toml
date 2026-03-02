@@ -34,5 +34,9 @@ indent-width = 4
 [tool.ruff.lint]
 select = ["E", "W", "F", "I", "B", "C4", "UP"]
 
+[tool.ruff.lint.per-file-ignores]
+# configure_telemetry() must be called before handler imports; E402 is intentional here.
+"src/main.py" = ["E402"]
+
 [tool.pytest.ini_options]
 addopts = "-v"

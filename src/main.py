@@ -1,12 +1,14 @@
 import asyncio
 import logging
-import re
 from functools import wraps
 from time import perf_counter
 from typing import Any
 
-import logfire
-from logfire import ScrubbingOptions, ScrubMatch
+from .telemetry import configure as configure_telemetry
+
+# Must be called before importing handler modules so that all meters are
+# registered on the real MeterProvider rather than the default no-op one.
+configure_telemetry()
 from opentelemetry import metrics
 from telegram.ext import ApplicationBuilder, CallbackQueryHandler, CommandHandler
 
@@ -39,22 +41,6 @@ handler_duration_seconds = meter.create_histogram(
     unit="s",
     description="Execution time of Telegram handlers",
 )
-
-
-def _scrub_callback(match: ScrubMatch) -> str | None:
-    """Redact API key values embedded in URLs (e.g. ?apikey=SECRET) instead of the full URL."""
-    if isinstance(match.value, str) and re.search(r"apikey=", match.value, re.IGNORECASE):
-        return re.sub(r"(?i)(apikey)=[^&\s#]+", r"\1=[REDACTED]", match.value)
-    return None
-
-
-logfire.configure(
-    token=s.LOGFIRE_TOKEN.get_secret_value() if s.LOGFIRE_TOKEN else None,
-    service_name="h-crypto-price-bot",
-    distributed_tracing=True,
-    scrubbing=ScrubbingOptions(callback=_scrub_callback),
-)
-logfire.instrument_httpx()
 
 
 def _instrument_handler(handler_name: str, handler_type: str, handler: Any):

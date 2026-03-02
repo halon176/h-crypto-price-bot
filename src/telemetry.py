@@ -9,10 +9,18 @@ from src.config import settings as s
 
 
 def _scrub_callback(match: ScrubMatch) -> str | None:
-    """Redact API key values embedded in URLs (e.g. ?apikey=SECRET)."""
-    if isinstance(match.value, str) and re.search(r"apikey=", match.value, re.IGNORECASE):
-        return re.sub(r"(?i)(apikey)=[^&\s#]+", r"\1=[REDACTED]", match.value)
-    return None
+    """Redact API key values embedded in URLs (e.g. ?apikey=SECRET or Telegram bot tokens in path)."""
+    if not isinstance(match.value, str):
+        return None
+    value = match.value
+    changed = False
+    if re.search(r"apikey=", value, re.IGNORECASE):
+        value = re.sub(r"(?i)(apikey)=[^&\s#]+", r"\1=[REDACTED]", value)
+        changed = True
+    if re.search(r"/bot\d+:[A-Za-z0-9_-]+/", value):
+        value = re.sub(r"/bot\d+:[A-Za-z0-9_-]+/", "/bot[REDACTED]/", value)
+        changed = True
+    return value if changed else None
 
 
 def configure() -> None:

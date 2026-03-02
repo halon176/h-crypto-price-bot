@@ -5,6 +5,7 @@ import httpx
 import logfire
 from opentelemetry import metrics as otel_metrics
 from opentelemetry import trace as otel_trace
+from opentelemetry.trace import StatusCode
 
 from src.config import settings as s
 
@@ -50,9 +51,11 @@ async def fetch_url(
             else:
                 logging.error(f"Failed to fetch URL {url}, status code: {response.status_code}")
                 api_errors_total.add(1, metric_attrs)
+                span.set_status(StatusCode.ERROR, f"HTTP {response.status_code}")
                 return None
     except Exception as e:
         span.record_exception(e)
+        span.set_status(StatusCode.ERROR, str(e))
         logging.error(f"Error fetching URL {url}: {str(e)}")
         api_errors_total.add(1, metric_attrs)
         return None

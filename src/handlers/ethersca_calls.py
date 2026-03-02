@@ -24,7 +24,8 @@ async def gas_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
         return
 
     gas_request = await fetch_url(
-        f"https://api.etherscan.io/api?module=gastracker&action=gasoracle&apikey={s.ETHSCAN_API_KEY.get_secret_value()}"
+        f"https://api.etherscan.io/api?module=gastracker&action=gasoracle&apikey={s.ETHSCAN_API_KEY.get_secret_value()}",
+        service="etherscan",
     )
     logging.info("Request etherscan gas price")
 
@@ -42,7 +43,8 @@ async def gas_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
 
         async def get_eth_price() -> float:
             response = await fetch_url(
-                f"https://api.etherscan.io/api?module=stats&action=ethprice&apikey={s.ETHSCAN_API_KEY.get_secret_value()}"
+                f"https://api.etherscan.io/api?module=stats&action=ethprice&apikey={s.ETHSCAN_API_KEY.get_secret_value()}",
+                service="etherscan",
             )
             price = float(response["result"]["ethusd"])
             return price

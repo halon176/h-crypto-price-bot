@@ -150,7 +150,7 @@ async def get_cg_price(coin: str, update: Update, context: ContextTypes.DEFAULT_
     url = COINGECKO_API_COINS + coin + url_params
     logger.info(f"Fetching CoinGecko price data: {url}")
 
-    crypto_data = await fetch_url(url)
+    crypto_data = await fetch_url(url, service="coingecko")
 
     if not crypto_data:
         await send_error("generic", update, context)
@@ -309,7 +309,7 @@ async def get_cg_chart(coin: str, update: Update, context: ContextTypes.DEFAULT_
         )
         return
     url = f"https://api.coingecko.com/api/v3/coins/{coin}/market_chart?vs_currency=usd&days={period}"
-    chart = await fetch_url(url)
+    chart = await fetch_url(url, service="coingecko")
     if not chart:
         await send_error("generic", update, context)
         return
@@ -352,6 +352,14 @@ async def get_cg_chart(coin: str, update: Update, context: ContextTypes.DEFAULT_
     ]
 
     reply_markup = InlineKeyboardMarkup(keyboard)
+
+    # Store current trace context so period-change callbacks are linked back to
+    # this chart request and appear in the same trace rather than as independent roots.
+    carrier: dict[str, str] = {}
+    otel_propagate.inject(carrier)
+    if carrier:
+        context.user_data["_trace_carrier"] = carrier
+
     await send_tg(context, update.effective_chat.id, photo=buffer, reply_markup=reply_markup)
 
     buffer.close()
@@ -368,7 +376,7 @@ async def get_cg_dominance(update: Update, context: ContextTypes.DEFAULT_TYPE) -
     span = otel_trace.get_current_span()
     span.set_attribute("chat.id", str(update.effective_chat.id))
     span.set_attribute("user.id", str(update.effective_user.id))
-    global_data = await fetch_url(COINGECKO_API_GLOBAL)
+    global_data = await fetch_url(COINGECKO_API_GLOBAL, service="coingecko")
     if not global_data:
         await send_error("generic", update, context)
         return

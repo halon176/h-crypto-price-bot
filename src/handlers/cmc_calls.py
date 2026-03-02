@@ -65,7 +65,7 @@ async def get_cmc_price(coin_id: int, update: Update, context: ContextTypes.DEFA
         return
 
     url = f"https://pro-api.coinmarketcap.com/v2/cryptocurrency/quotes/latest?id={coin_id}"
-    r = await fetch_url(url, headers)
+    r = await fetch_url(url, headers, service="coinmarketcap")
     logging.info(f"Request CMC URL: {url}")
 
     crypto_data = r["data"][str(coin_id)]
@@ -151,7 +151,7 @@ async def cmc_key_info(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     span.set_attribute("chat.id", str(update.effective_chat.id))
     span.set_attribute("user.id", str(update.effective_user.id))
     url = "https://pro-api.coinmarketcap.com/v1/key/info"
-    r = await fetch_url(url, headers)
+    r = await fetch_url(url, headers, service="coinmarketcap")
     logging.info(f"Request CMC Key Info: {url}")
 
     data = r["data"]

@@ -67,7 +67,7 @@ class ChartTemplate:
             cls._instance = super().__new__(cls)
         return cls._instance
 
-    def __init__(self, template="plotly_dark") -> None:
+    def __init__(self, template="dark") -> None:
         self.template = template
 
     def set_template(self, template: str) -> None:

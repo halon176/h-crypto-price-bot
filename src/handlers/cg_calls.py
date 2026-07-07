@@ -6,14 +6,18 @@ from functools import reduce
 from time import perf_counter
 
 import logfire
+import matplotlib
+import matplotlib.dates as mdates
+import matplotlib.pyplot as plt
+import matplotlib.ticker as mticker
 import pandas as pd
-import plotly.express as px
-import plotly.io as pio
 from opentelemetry import metrics as otel_metrics
 from opentelemetry import propagate as otel_propagate
 from opentelemetry import trace as otel_trace
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import ContextTypes
+
+matplotlib.use("Agg")  # non-interactive backend for server rendering
 
 from src.constants import (
     COINGECKO_API_COINS,
@@ -48,7 +52,7 @@ chart_generation_errors_total = meter.create_counter(
 chart_generation_duration_seconds = meter.create_histogram(
     "bot.chart.generation.duration_seconds",
     unit="s",
-    description="Duration of chart image generation using Plotly",
+    description="Duration of chart image generation using matplotlib",
 )
 
 
@@ -69,17 +73,58 @@ def _render_chart_image(df: pd.DataFrame, title: str, bottom: str, template: str
         span.set_attribute("chart.points", len(df))
 
         try:
-            fig = px.line(
-                df,
-                x="timeframe",
-                y="prices",
-                template=template,
-                labels={"timeframe": bottom, "prices": "price ($)"},
-            )
-            fig.update_layout(title={"text": title, "y": 0.93, "x": 0.5, "font": {"size": 24}})
+            is_dark = template in ("plotly_dark", "dark")
+
+            if is_dark:
+                bg_color = "#1a1a2e"
+                text_color = "#e0e0e0"
+                line_color = "#00cc96"
+                grid_color = "#2a2a3e"
+            else:
+                bg_color = "#ffffff"
+                text_color = "#333333"
+                line_color = "#636efa"
+                grid_color = "#d0d0d0"
+
+            fig, ax = plt.subplots(figsize=(10, 5.5))
+            fig.patch.set_facecolor(bg_color)
+            ax.set_facecolor(bg_color)
+
+            ax.plot(df["timeframe"], df["prices"], color=line_color, linewidth=2)
+
+            ax.set_title(title, color=text_color, fontsize=16, fontweight="bold", pad=12)
+            ax.set_xlabel(bottom, color=text_color, fontsize=10)
+            ax.set_ylabel("price ($)", color=text_color, fontsize=10)
+
+            ax.tick_params(colors=text_color, labelsize=9)
+            ax.grid(True, color=grid_color, alpha=0.4, linestyle="--")
+
+            ax.yaxis.set_major_formatter(mticker.FuncFormatter(lambda x, _p: f"${x:,.0f}"))
+
+            # Let AutoDateLocator pick optimal tick positions, then format based on period
+            period_days = int(period) if period.isdigit() else 365
+            if period_days <= 1:
+                date_fmt = "%H:%M"
+            elif period_days <= 7:
+                date_fmt = "%a %d"
+            elif period_days <= 90:
+                date_fmt = "%b %d"
+            else:
+                date_fmt = "%b %Y"
+
+            locator = mdates.AutoDateLocator(minticks=4, maxticks=10)
+            ax.xaxis.set_major_locator(locator)
+            ax.xaxis.set_major_formatter(mdates.DateFormatter(date_fmt))
+            fig.autofmt_xdate(rotation=0, ha="center")
+
+            for spine in ax.spines.values():
+                spine.set_edgecolor(grid_color)
+
+            fig.tight_layout()
 
             buffer = io.BytesIO()
-            pio.write_image(fig, buffer, format="jpg")
+            fig.savefig(buffer, format="jpg", dpi=150, facecolor=bg_color)
+            plt.close(fig)
             buffer.seek(0)
             return buffer
         except Exception:
@@ -134,8 +179,7 @@ async def get_cg_price(coin: str, update: Update, context: ContextTypes.DEFAULT_
     span.set_attribute("user.id", str(update.effective_user.id))
 
     url_params = (
-        "?localization=false&tickers=false&market_data=true&"
-        "community_data=false&developer_data=false&sparkline=false"
+        "?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=false"
     )
 
     # Check rate limiting
@@ -161,11 +205,7 @@ async def get_cg_price(coin: str, update: Update, context: ContextTypes.DEFAULT_
         return
 
     # Extract basic info
-    market_cap_rank = (
-        f"{crypto_data['market_cap_rank']}°"
-        if crypto_data.get("market_cap_rank")
-        else ""
-    )
+    market_cap_rank = f"{crypto_data['market_cap_rank']}°" if crypto_data.get("market_cap_rank") else ""
     crypto_name = crypto_data["name"]
     usd_price = crypto_data["market_data"]["current_price"].get("usd")
     crypto_price = human_format(usd_price) if usd_price is not None else "N/A"
@@ -277,9 +317,7 @@ async def get_cg_price(coin: str, update: Update, context: ContextTypes.DEFAULT_
     )
 
     # Create separator line
-    separator = (
-        "-" * (len(column_sizes_changes) + 2 + reduce(lambda a, b: a + b, column_sizes_changes)) + "\n"
-    )
+    separator = "-" * (len(column_sizes_changes) + 2 + reduce(lambda a, b: a + b, column_sizes_changes)) + "\n"
 
     # Build final message
     message = (
@@ -411,8 +449,8 @@ async def get_cg_dominance(update: Update, context: ContextTypes.DEFAULT_TYPE) -
 
 async def chart_color_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     themes = [
-        ("🌕 white", "plotly_white"),
-        ("🌑 dark", "plotly_dark"),
+        ("🌕 light", "light"),
+        ("🌑 dark", "dark"),
     ]
     keyboard = []
     for label, template in themes:

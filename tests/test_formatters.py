@@ -1,6 +1,5 @@
 """Tests for formatting utilities."""
 
-
 from src.utils.formatters import (
     format_date,
     format_percentage,
@@ -113,10 +112,7 @@ class TestFormatTable:
 
     def test_format_table_simple(self):
         """Test simple table formatting."""
-        entries = [
-            ("BTC", "50000", "+5.2%"),
-            ("ETH", "3000", "-1.5%")
-        ]
+        entries = [("BTC", "50000", "+5.2%"), ("ETH", "3000", "-1.5%")]
         result = format_table(entries, ["left", "right", "right"])
         lines = result.split("\n")
         assert len(lines) == 2
@@ -144,10 +140,7 @@ class TestFormatTable:
 
     def test_format_table_alignment(self):
         """Test that alignment works correctly."""
-        entries = [
-            ("Short", "LongValue"),
-            ("VeryLongText", "Val")
-        ]
+        entries = [("Short", "LongValue"), ("VeryLongText", "Val")]
         result = format_table(entries, ["left", "right"])
         lines = result.split("\n")
         # First line should have spaces after "Short"
@@ -156,11 +149,7 @@ class TestFormatTable:
 
     def test_format_table_varied_widths(self):
         """Test table with varied column widths."""
-        entries = [
-            ("A", "B", "C"),
-            ("AA", "BB", "CC"),
-            ("AAA", "BBB", "CCC")
-        ]
+        entries = [("A", "B", "C"), ("AA", "BB", "CC"), ("AAA", "BBB", "CCC")]
         result = format_table(entries)
         lines = result.split("\n")
         # All lines should have the same length

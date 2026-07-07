@@ -71,7 +71,7 @@ class AtEntry:
         symbol: str,
         price: dict[str, float] | None,
         percentage: dict[str, float] | None,
-        date: dict[str, str] | None
+        date: dict[str, str] | None,
     ) -> None:
         """Initialize all-time entry.
 
@@ -120,10 +120,7 @@ class MarketCapEntry:
         Returns:
             MarketCapEntry instance
         """
-        return cls(
-            symbol=data[0].upper(),
-            percentage=f"{data[1]:.1f}%"
-        )
+        return cls(symbol=data[0].upper(), percentage=f"{data[1]:.1f}%")
 
 
 @dataclass
@@ -136,13 +133,7 @@ class GasEntry:
     time: str
 
     @classmethod
-    def from_data(
-        cls,
-        speed: str,
-        gas_price_gwei: float,
-        eth_price_usd: float,
-        time: str
-    ) -> "GasEntry":
+    def from_data(cls, speed: str, gas_price_gwei: float, eth_price_usd: float, time: str) -> "GasEntry":
         """Create a GasEntry from raw data.
 
         Args:
@@ -159,12 +150,7 @@ class GasEntry:
         gas_cost_eth = (gas_price_gwei * GAS_LIMIT_STANDARD_TRANSFER) / GWEI_TO_ETH
         gas_cost_usd = gas_cost_eth * eth_price_usd
 
-        return cls(
-            speed=speed,
-            gwei=f"{gas_price_gwei:.2f}",
-            usd=f"${gas_cost_usd:.2f}",
-            time=time
-        )
+        return cls(speed=speed, gwei=f"{gas_price_gwei:.2f}", usd=f"${gas_cost_usd:.2f}", time=time)
 
 
 @dataclass
@@ -181,11 +167,7 @@ class CoinInfo:
         Returns:
             Dictionary with id, symbol, and name
         """
-        return {
-            "id": self.id,
-            "symbol": self.symbol,
-            "name": self.name
-        }
+        return {"id": self.id, "symbol": self.symbol, "name": self.name}
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "CoinInfo":
@@ -197,11 +179,7 @@ class CoinInfo:
         Returns:
             CoinInfo instance
         """
-        return cls(
-            id=data["id"],
-            symbol=data["symbol"],
-            name=data["name"]
-        )
+        return cls(id=data["id"], symbol=data["symbol"], name=data["name"])
 
 
 @dataclass

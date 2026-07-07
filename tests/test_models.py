@@ -86,7 +86,7 @@ class TestAtEntry:
             symbol="ATH",
             price={"usd": 69000},
             percentage={"usd": -25.5},
-            date={"usd": "2021-11-10T14:24:11.849Z"}
+            date={"usd": "2021-11-10T14:24:11.849Z"},
         )
         assert entry.emoji == "📈"
         assert entry.symbol == "ATH"
@@ -101,7 +101,7 @@ class TestAtEntry:
             symbol="ATL",
             price={"usd": 0.05},
             percentage={"usd": 999999.9},
-            date={"usd": "2013-07-05T00:00:00.000Z"}
+            date={"usd": "2013-07-05T00:00:00.000Z"},
         )
         assert entry.emoji == "📉"
         assert entry.symbol == "ATL"
@@ -112,34 +112,20 @@ class TestAtEntry:
     def test_at_entry_with_missing_price(self):
         """Test AT entry with missing price data."""
         entry = AtEntry(
-            emoji="📈",
-            symbol="ATH",
-            price=None,
-            percentage={"usd": -10.0},
-            date={"usd": "2021-11-10T14:24:11.849Z"}
+            emoji="📈", symbol="ATH", price=None, percentage={"usd": -10.0}, date={"usd": "2021-11-10T14:24:11.849Z"}
         )
         assert entry.price == "N/A"
 
     def test_at_entry_with_missing_percentage(self):
         """Test AT entry with missing percentage data."""
         entry = AtEntry(
-            emoji="📈",
-            symbol="ATH",
-            price={"usd": 50000},
-            percentage=None,
-            date={"usd": "2021-11-10T14:24:11.849Z"}
+            emoji="📈", symbol="ATH", price={"usd": 50000}, percentage=None, date={"usd": "2021-11-10T14:24:11.849Z"}
         )
         assert entry.percentage == "N/A"
 
     def test_at_entry_with_missing_date(self):
         """Test AT entry with missing date data."""
-        entry = AtEntry(
-            emoji="📈",
-            symbol="ATH",
-            price={"usd": 50000},
-            percentage={"usd": -10.0},
-            date=None
-        )
+        entry = AtEntry(emoji="📈", symbol="ATH", price={"usd": 50000}, percentage={"usd": -10.0}, date=None)
         assert entry.date == "N/A"
 
     def test_at_entry_all_none(self):
@@ -189,11 +175,7 @@ class TestCoinInfo:
         """Test converting CoinInfo to dictionary."""
         coin = CoinInfo(id="ethereum", symbol="eth", name="Ethereum")
         data = coin.to_dict()
-        assert data == {
-            "id": "ethereum",
-            "symbol": "eth",
-            "name": "Ethereum"
-        }
+        assert data == {"id": "ethereum", "symbol": "eth", "name": "Ethereum"}
 
     def test_coin_info_from_dict(self):
         """Test creating CoinInfo from dictionary."""

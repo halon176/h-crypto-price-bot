@@ -18,13 +18,7 @@ async def send_tg(
     chat_id: int,
     text: str | None = None,
     photo: str | io.BytesIO | None = None,
-    reply_markup: (
-        InlineKeyboardMarkup
-        | ReplyKeyboardMarkup
-        | ReplyKeyboardRemove
-        | ForceReply
-        | None
-    ) = None,
+    reply_markup: (InlineKeyboardMarkup | ReplyKeyboardMarkup | ReplyKeyboardRemove | ForceReply | None) = None,
     disable_web_page_preview: bool = True,
     mk_parse: bool = True,
 ) -> None:

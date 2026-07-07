@@ -82,18 +82,10 @@ def mk2_formatter(text: str) -> str:
     Returns:
         Formatted text compatible with Telegram MarkdownV2
     """
-    return markdownify(
-        text,
-        max_line_length=None,
-        normalize_whitespace=False,
-        latex_escape=False
-    )
+    return markdownify(text, max_line_length=None, normalize_whitespace=False, latex_escape=False)
 
 
-def format_table(
-    entries: list[tuple[str, ...]],
-    alignments: list[str] | None = None
-) -> str:
+def format_table(entries: list[tuple[str, ...]], alignments: list[str] | None = None) -> str:
     """Format a list of entries into a aligned table.
 
     Args:

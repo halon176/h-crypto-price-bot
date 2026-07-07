@@ -32,9 +32,11 @@ MAX_REQUESTS_PER_HOUR: Final[int] = 10
 GAS_LIMIT_STANDARD_TRANSFER: Final[int] = 21000
 GWEI_TO_ETH: Final[int] = 1_000_000_000
 
+
 # Chart Configuration
 class ChartPeriod(StrEnum):
     """Available chart time periods."""
+
     ONE_DAY = "1"
     SEVEN_DAYS = "7"
     THIRTY_DAYS = "30"
@@ -44,6 +46,7 @@ class ChartPeriod(StrEnum):
 
 class ChartTheme(StrEnum):
     """Available chart themes."""
+
     LIGHT = "light"
     DARK = "dark"
 
@@ -56,9 +59,11 @@ CHART_PERIOD_LABELS: Final[dict[ChartPeriod, str]] = {
     ChartPeriod.ONE_YEAR: "1y",
 }
 
+
 # Callback Data Prefixes
 class CallbackPrefix(StrEnum):
     """Prefixes for callback query data."""
+
     CG = "cg"
     CMC = "cmc"
     CHART = "chart"
@@ -67,31 +72,20 @@ class CallbackPrefix(StrEnum):
 
 
 # Emojis
-POSITIONAL_EMOJIS: Final[list[str]] = [
-    "🥇", "🥈", "🥉", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣", "🔟"
-]
+POSITIONAL_EMOJIS: Final[list[str]] = ["🥇", "🥈", "🥉", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣", "🔟"]
 
 MOOD_EMOJIS: Final[list[str]] = ["😎", "😄", "🤨", "😰", "💀"]
 
 # Message Templates
 MESSAGE_RATE_LIMIT_EXCEEDED: Final[str] = (
-    "You have reached the maximum number of requests allowed per hour. "
-    "Please try again later."
+    "You have reached the maximum number of requests allowed per hour. Please try again later."
 )
 
-MESSAGE_COIN_NOT_FOUND: Final[str] = (
-    "The cryptocurrency '{}' was not found. "
-    "Please check the symbol and try again."
-)
+MESSAGE_COIN_NOT_FOUND: Final[str] = "The cryptocurrency '{}' was not found. Please check the symbol and try again."
 
-MESSAGE_INVALID_THEME: Final[str] = (
-    "Invalid theme selected. Please choose either 'light' or 'dark'."
-)
+MESSAGE_INVALID_THEME: Final[str] = "Invalid theme selected. Please choose either 'light' or 'dark'."
 
-MESSAGE_NO_ARGS_PROVIDED: Final[str] = (
-    "Please provide a cryptocurrency symbol. "
-    "Example: /price btc"
-)
+MESSAGE_NO_ARGS_PROVIDED: Final[str] = "Please provide a cryptocurrency symbol. Example: /price btc"
 
 # Formatting
 COLUMN_SEPARATOR: Final[str] = "    "

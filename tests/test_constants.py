@@ -1,6 +1,5 @@
 """Tests for constants module."""
 
-
 from src.constants import (
     CHART_PERIOD_LABELS,
     COINGECKO_API_BASE,

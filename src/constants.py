@@ -14,7 +14,7 @@ COINMARKETCAP_API_BASE: Final[str] = "https://pro-api.coinmarketcap.com/v1"
 COINMARKETCAP_API_MAP: Final[str] = f"{COINMARKETCAP_API_BASE}/cryptocurrency/map"
 COINMARKETCAP_API_QUOTES: Final[str] = f"{COINMARKETCAP_API_BASE}/cryptocurrency/quotes/latest"
 
-ETHERSCAN_API_BASE: Final[str] = "https://api.etherscan.io/api"
+ETHERSCAN_API_BASE: Final[str] = "https://api.etherscan.io/v2/api"
 
 HCPB_API_BASE: Final[str] = "https://hcpb-api.onrender.com"
 HCPB_API_TRACK: Final[str] = f"{HCPB_API_BASE}/track"

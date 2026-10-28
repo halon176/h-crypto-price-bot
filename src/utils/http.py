@@ -8,6 +8,7 @@ from opentelemetry import trace as otel_trace
 from opentelemetry.trace import StatusCode
 
 from src.config import settings as s
+from src.telemetry import redact_url_secrets
 
 api_headers = {"X-API-KEY": s.hcpb_api_key.get_secret_value()} if s.hcpb_api_key else None
 
@@ -49,14 +50,14 @@ async def fetch_url(
             if response.status_code == 200:
                 return response.json()
             else:
-                logging.error(f"Failed to fetch URL {url}, status code: {response.status_code}")
+                logging.error(f"Failed to fetch URL {redact_url_secrets(url)}, status code: {response.status_code}")
                 api_errors_total.add(1, metric_attrs)
                 span.set_status(StatusCode.ERROR, f"HTTP {response.status_code}")
                 return None
     except Exception as e:
         span.record_exception(e)
         span.set_status(StatusCode.ERROR, str(e))
-        logging.error(f"Error fetching URL {url}: {str(e)}")
+        logging.error(f"Error fetching URL {redact_url_secrets(url)}: {str(e)}")
         api_errors_total.add(1, metric_attrs)
         return None
     finally:

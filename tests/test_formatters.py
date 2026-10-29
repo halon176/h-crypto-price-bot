@@ -7,6 +7,7 @@ from src.utils.formatters import (
     format_table,
     human_format,
     max_column_size,
+    mk2_formatter,
 )
 
 
@@ -228,3 +229,25 @@ class TestFormatPercentage:
         """Test that rounding works correctly."""
         assert format_percentage(5.66, decimals=1) == "+5.7%"
         assert format_percentage(5.64, decimals=1) == "+5.6%"
+
+
+class TestMk2Formatter:
+    """Tests for mk2_formatter (Telegram MarkdownV2)."""
+
+    def test_escapes_reserved_characters_in_text(self):
+        """Test that MarkdownV2 reserved characters in plain text are escaped."""
+        assert mk2_formatter("Price 1.5! (BTC) #1 = top") == "Price 1\\.5\\! \\(BTC\\) \\#1 \\= top"
+
+    def test_keeps_code_span_verbatim(self):
+        """Test that only the text around a code span is escaped."""
+        assert mk2_formatter("`/p <crypto_symbol>` - price") == "`/p <crypto_symbol>` \\- price"
+
+    def test_keeps_code_block_verbatim(self):
+        """Test that tables sent as code blocks are not escaped."""
+        table = "```\n-----\n🥇  BTC   56.1%\n```"
+        assert mk2_formatter(table) == table
+
+    def test_keeps_link_url_verbatim(self):
+        """Test that link URLs are left as they are."""
+        link = "[GitHub](https://github.com/halon176/h-crypto-price-bot)"
+        assert mk2_formatter(link) == link

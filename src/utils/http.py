@@ -77,7 +77,7 @@ async def write_call(service_id: int, type_id: int, chat_id: str, coin: str | No
     try:
         async with httpx.AsyncClient() as client:
             response = await client.post(url, json=data, headers=api_headers)
-            if response.status_code != 401:
+            if response.status_code != 429:
                 span.set_attribute("rate_limited", False)
                 return True
             else:

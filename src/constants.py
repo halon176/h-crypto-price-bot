@@ -25,9 +25,6 @@ COINDESK_RSS_URL: Final[str] = "https://www.coindesk.com/arc/outboundfeeds/rss/"
 COIN_LIST_CACHE_HOURS: Final[int] = 1
 COIN_LIST_CACHE_SECONDS: Final[int] = COIN_LIST_CACHE_HOURS * 3600
 
-# Rate Limiting
-MAX_REQUESTS_PER_HOUR: Final[int] = 10
-
 # Ethereum Gas
 GAS_LIMIT_STANDARD_TRANSFER: Final[int] = 21000
 GWEI_TO_ETH: Final[int] = 1_000_000_000

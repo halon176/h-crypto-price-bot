@@ -144,7 +144,7 @@ def get_cg_id(crypto_symbol: str) -> list[str]:
         List of matching CoinGecko IDs
     """
     api_ids = []
-    for crypto in cg_coin_list.coin_list:
+    for crypto in cg_coin_list.coin_list or []:
         if crypto["symbol"] == crypto_symbol:
             api_ids.append(crypto["id"])
     return api_ids
@@ -159,7 +159,7 @@ async def get_cg_coin_info(coin_id: str) -> dict[str, str] | None:
     Returns:
         Dictionary with 'name' and 'symbol', or None if not found
     """
-    for crypto in cg_coin_list.coin_list:
+    for crypto in cg_coin_list.coin_list or []:
         if coin_id == crypto["id"]:
             return {"name": crypto["name"], "symbol": crypto["symbol"].upper()}
     return None
@@ -359,7 +359,7 @@ async def get_cg_chart(coin: str, update: Update, context: ContextTypes.DEFAULT_
     df["timeframe"] = pd.to_datetime(df["timeframe"], unit="s")
     span.set_attribute("chart.points", len(df))
     info = await get_cg_coin_info(coin)
-    title = f"{info['name']} ({info['symbol']})"
+    title = f"{info['name']} ({info['symbol']})" if info else coin
     bottom = f"{period} day{'s' if period != '1' else ''} chart"
     template = chart_template.get_template()
     buffer = _render_chart_image(df, title, bottom, template, coin, period)

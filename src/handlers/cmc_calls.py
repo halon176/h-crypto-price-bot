@@ -32,6 +32,8 @@ async def get_cmc_id(crypto_symbol: str) -> list[int]:
     :param crypto_symbol:
     :return:
     """
+    if not cmc_coin_list.coin_list:
+        return []
     crypto_symbol = crypto_symbol.upper()
     api_ids = []
     for crypto in cmc_coin_list.coin_list["data"]:
@@ -154,6 +156,10 @@ async def cmc_key_info(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     r = await fetch_url(url, headers, service="coinmarketcap")
     logging.info(f"Request CMC Key Info: {url}")
 
+    if not r:
+        await send_error("generic", update, context)
+        return
+
     data = r["data"]
     credit_limit_monthly = data["plan"].get("credit_limit_monthly", "N/A")
     credit_limit_monthly_reset = (data["plan"].get("credit_limit_monthly_reset", "N/A")).lower()
@@ -213,6 +219,11 @@ async def cmc_price_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) 
     span = otel_trace.get_current_span()
     span.set_attribute("chat.id", str(update.effective_chat.id))
     span.set_attribute("user.id", str(update.effective_user.id))
+
+    if not context.args:
+        await send_error("symbol", update, context)
+        return
+
     crypto_symbol = context.args[0].lower()
     span.set_attribute("crypto.symbol", crypto_symbol)
     coin = await cmc_coin_check(crypto_symbol, update, context)

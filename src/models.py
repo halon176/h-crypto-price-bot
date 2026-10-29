@@ -14,7 +14,7 @@ class PriceChangeEntry:
     """Formatted percentage string (e.g., '1.5%' or 'N/A')."""
 
     @classmethod
-    def from_raw(cls, label: str, value: float | None) -> "PriceChangeEntry":
+    def from_raw(cls, label: str, value: float | None) -> PriceChangeEntry:
         """Create a PriceChangeEntry from a raw percentage value.
 
         Args:
@@ -42,7 +42,7 @@ class GeneralDataEntry:
     """Human-formatted value (e.g., '1.2B') or 'N/A'."""
 
     @classmethod
-    def from_raw(cls, emoji: str, label: str, value: Any) -> "GeneralDataEntry":
+    def from_raw(cls, emoji: str, label: str, value: Any) -> GeneralDataEntry:
         """Create a GeneralDataEntry from a raw numeric value.
 
         Args:
@@ -111,7 +111,7 @@ class MarketCapEntry:
     percentage: str
 
     @classmethod
-    def from_tuple(cls, data: tuple[str, float]) -> "MarketCapEntry":
+    def from_tuple(cls, data: tuple[str, float]) -> MarketCapEntry:
         """Create a MarketCapEntry from a tuple of (symbol, percentage).
 
         Args:
@@ -133,7 +133,7 @@ class GasEntry:
     time: str
 
     @classmethod
-    def from_data(cls, speed: str, gas_price_gwei: float, eth_price_usd: float, time: str) -> "GasEntry":
+    def from_data(cls, speed: str, gas_price_gwei: float, eth_price_usd: float, time: str) -> GasEntry:
         """Create a GasEntry from raw data.
 
         Args:
@@ -170,7 +170,7 @@ class CoinInfo:
         return {"id": self.id, "symbol": self.symbol, "name": self.name}
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any]) -> "CoinInfo":
+    def from_dict(cls, data: dict[str, Any]) -> CoinInfo:
         """Create CoinInfo from dictionary.
 
         Args:
@@ -191,7 +191,7 @@ class CallbackData:
     value: str
 
     @classmethod
-    def parse(cls, callback_string: str) -> "CallbackData":
+    def parse(cls, callback_string: str) -> CallbackData:
         """Parse callback query data string.
 
         Expected format: "prefix.value" or "prefix_action.value"

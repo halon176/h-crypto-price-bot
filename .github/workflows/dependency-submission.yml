@@ -1,0 +1,25 @@
+name: Dependency submission
+
+# Keeps the dependency graph, and so the Dependabot alerts, in sync with uv.lock.
+# GitHub's own Dependabot graph job for uv stopped refreshing it (last run 2026-07-07),
+# and a snapshot submitted through the dependency submission API takes precedence over it.
+on:
+  push:
+    branches: [ master ]
+    paths: [ uv.lock ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  submit:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Submit uv.lock to the dependency graph
+        run: python3 .github/scripts/submit_uv_lock.py
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

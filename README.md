@@ -4,7 +4,7 @@
 [![tests](https://github.com/halon176/h-crypto-price-bot/workflows/Run%20Unit%20Test%20via%20Pytest/badge.svg)](https://github.com/halon176/h-crypto-price-bot/actions/workflows/run_tests.yml)
 [![coverage](https://img.shields.io/badge/coverage-97%25-brightgreen)](https://github.com/halon176/h-crypto-price-bot/tree/master/tests)
 [![license: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/halon176/h-crypto-price-bot/blob/master/LICENSE)
-[![Python 3.13](https://img.shields.io/badge/python-3.13-blue.svg)](https://www.python.org/downloads/release/python-3130/)
+[![Python 3.15](https://img.shields.io/badge/python-3.15-blue.svg)](https://www.python.org/downloads/release/python-3150/)
 
 A Python-based Telegram bot for fetching real-time cryptocurrency prices from CoinGecko. Provides price data, historical charts, market cap rankings, and Ethereum gas prices.
 
@@ -16,7 +16,7 @@ For advanced features like rate limits and usage tracking, check out the [hcpb-a
 
 ### Manual
 
-1. Make sure you have Python 3.13 installed:
+1. Make sure you have Python 3.15 installed:
 
    ```bash
    python --version
@@ -41,24 +41,33 @@ For advanced features like rate limits and usage tracking, check out the [hcpb-a
 
    ```bash
    export TELEGRAM_TOKEN=<your_telegram_bot_token>
-   export ETHSCAN_API_KEY=<your_etherscan_api_key>  # Required for gas prices
+   export ETHSCAN_API_KEY=<your_etherscan_api_key>  # Required for gas prices (Etherscan API V2)
    export CMC_API_KEY=<your_coinmarketcap_api_key>  # Optional
+   export HCPB_API_URL=<hcpb_api_url>  # Optional, enables usage tracking and rate limits
+   export HCPB_API_KEY=<hcpb_api_key>  # Required with HCPB_API_URL
    export LOGFIRE_TOKEN=<your_logfire_token>  # Optional, enables telemetry in Logfire
-   export API_URL=<api_url>  # Optional
+   export WEBHOOK_URL=<public_webhook_url>  # Optional, webhook mode instead of polling
+   export WEBHOOK_SECRET_TOKEN=<random_secret>  # Optional, checked on every webhook request
    ```
 
-   With `LOGFIRE_TOKEN` configured, the bot exports logs, traces and these metrics:
+   With `LOGFIRE_TOKEN` configured, the bot exports traces and these metrics:
    - `bot.handler.calls_total`
    - `bot.handler.errors_total`
    - `bot.handler.duration_seconds`
+   - `bot.api.calls_total`
+   - `bot.api.errors_total`
+   - `bot.api.duration_seconds`
+   - `bot.rate_limit.exceeded_total`
    - `bot.chart.generation.total`
    - `bot.chart.generation.errors_total`
    - `bot.chart.generation.duration_seconds`
 
+   Requests whose URL contains a secret (Telegram bot token, API keys) are not traced.
+
 6. Run the bot:
 
    ```bash
-   uv run python src/main.py
+   uv run python -m src.main
    ```
 
 ### Docker

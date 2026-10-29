@@ -1,11 +1,15 @@
 """Formatting utilities for the crypto price bot."""
 
+import re
 from datetime import datetime
+from string.templatelib import Interpolation, Template
 from typing import Protocol, TypeVar
 
 from telegramify_markdown import markdownify
 
 from src.constants import COLUMN_SEPARATOR
+
+MARKDOWN_PUNCTUATION = re.compile(r"([\\`*_{}\[\]()#+\-.!|~>=<])")
 
 
 class FormattableEntry(Protocol):
@@ -73,15 +77,22 @@ def human_format(num: float) -> str:
     return f"{formatted_num}{suffixes[magnitude]}"
 
 
-def mk2_formatter(text: str) -> str:
+def mk2_formatter(text: str | Template) -> str:
     """Format text for Telegram MarkdownV2.
 
     Args:
-        text: Text to format
+        text: Markdown text, or a t-string whose interpolated values are shown as plain text
 
     Returns:
         Formatted text compatible with Telegram MarkdownV2
     """
+    if isinstance(text, Template):
+        text = "".join(
+            MARKDOWN_PUNCTUATION.sub(r"\\\1", format(part.value, part.format_spec))
+            if isinstance(part, Interpolation)
+            else part
+            for part in text
+        )
     return markdownify(text, max_line_length=None, normalize_whitespace=False, latex_escape=False)
 
 

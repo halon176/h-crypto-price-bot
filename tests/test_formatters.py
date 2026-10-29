@@ -251,3 +251,16 @@ class TestMk2Formatter:
         """Test that link URLs are left as they are."""
         link = "[GitHub](https://github.com/halon176/h-crypto-price-bot)"
         assert mk2_formatter(link) == link
+
+    def test_template_values_are_plain_text(self):
+        """Test that values interpolated in a t-string are not read as Markdown."""
+        title = "ETH_2.0 [upgrade] *live*"
+        url = "https://example.com/eth_2.0_(live)?a=1"
+        assert mk2_formatter(t"🗞️ [{title}]({url})") == (
+            "🗞️ [ETH\\_2\\.0 \\[upgrade\\] \\*live\\*](https://example.com/eth_2.0_(live\\)?a=1)"
+        )
+
+    def test_template_keeps_its_own_markdown(self):
+        """Test that the literal parts of a t-string are still Markdown."""
+        coin = "BTC"
+        assert mk2_formatter(t"`{coin}` price") == "`BTC` price"

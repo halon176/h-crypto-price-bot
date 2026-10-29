@@ -2,6 +2,7 @@
 
 import io
 import logging
+from string.templatelib import Template
 from typing import Any
 
 from telegram import ForceReply, InlineKeyboardMarkup, ReplyKeyboardMarkup, ReplyKeyboardRemove
@@ -16,7 +17,7 @@ logger = logging.getLogger(__name__)
 async def send_tg(
     ctx: ContextTypes.DEFAULT_TYPE,
     chat_id: int,
-    text: str | None = None,
+    text: str | Template | None = None,
     photo: str | io.BytesIO | None = None,
     reply_markup: (InlineKeyboardMarkup | ReplyKeyboardMarkup | ReplyKeyboardRemove | ForceReply | None) = None,
     disable_web_page_preview: bool = True,

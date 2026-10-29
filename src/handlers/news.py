@@ -20,8 +20,8 @@ async def news(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     latest_entries = feed.entries[:7]
     span.set_attribute("news.count", len(latest_entries))
 
-    message = "    📰 News feed from CoinDesk 📰\n\n"
+    message = t"    📰 News feed from CoinDesk 📰\n\n"
     for entry in latest_entries:
-        message += f"🗞️ [{entry['title']}]({entry['link']})\n\n"
+        message += t"🗞️ [{entry['title']}]({entry['link']})\n\n"
 
     await send_tg(context, update.effective_chat.id, message)

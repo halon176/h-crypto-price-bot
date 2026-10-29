@@ -6,18 +6,16 @@ from functools import reduce
 from time import perf_counter
 
 import logfire
-import matplotlib
-import matplotlib.dates as mdates
-import matplotlib.pyplot as plt
-import matplotlib.ticker as mticker
-import pandas as pd
 from opentelemetry import metrics as otel_metrics
 from opentelemetry import propagate as otel_propagate
 from opentelemetry import trace as otel_trace
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import ContextTypes
-
-matplotlib.use("Agg")  # non-interactive backend for server rendering
+lazy import matplotlib
+lazy import matplotlib.dates as mdates
+lazy import matplotlib.pyplot as plt
+lazy import matplotlib.ticker as mticker
+lazy import pandas as pd
 
 from src.constants import (
     COINGECKO_API_COINS,
@@ -73,6 +71,7 @@ def _render_chart_image(df: pd.DataFrame, title: str, bottom: str, template: str
         span.set_attribute("chart.points", len(df))
 
         try:
+            matplotlib.use("Agg")
             is_dark = template in ("plotly_dark", "dark")
 
             if is_dark:

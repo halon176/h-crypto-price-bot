@@ -50,6 +50,10 @@ For advanced features like rate limits and usage tracking, check out the [hcpb-a
    export WEBHOOK_SECRET_TOKEN=<random_secret>  # Optional, checked on every webhook request
    ```
 
+   On [BotBarn](https://botbarn.dev) in webhook mode, the platform sets `BOTBARN_WEBHOOK_MANAGED`,
+   `BOTBARN_WEBHOOK_SECRET` and `PORT` and registers the webhook itself: the bot only serves updates on
+   `0.0.0.0:$PORT/`, and `WEBHOOK_URL` is ignored.
+
    With `LOGFIRE_TOKEN` configured, the bot exports traces and these metrics:
    - `bot.handler.calls_total`
    - `bot.handler.errors_total`

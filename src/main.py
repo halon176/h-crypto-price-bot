@@ -19,6 +19,7 @@ from src.handlers.ethersca_calls import gas_handler
 from src.handlers.info import bot_help, start
 from src.handlers.news import news
 from src.utils.shared import cg_coin_list, cmc_coin_list
+from src.webhook import serve_webhook
 
 from .config import settings as s
 
@@ -97,7 +98,10 @@ if __name__ == "__main__":
 
     bot = loop.run_until_complete(setup_bot())
 
-    if s.WEBHOOK_URL:
+    if s.BOTBARN_WEBHOOK_MANAGED and s.BOTBARN_WEBHOOK_SECRET:
+        logging.info("Starting webhook mode managed by BotBarn")
+        loop.run_until_complete(serve_webhook(bot, s.PORT, s.BOTBARN_WEBHOOK_SECRET.get_secret_value()))
+    elif s.WEBHOOK_URL:
         logging.info(f"Starting webhook mode on port {s.WEBHOOK_PORT} → {s.WEBHOOK_URL}")
         bot.run_webhook(
             listen="0.0.0.0",

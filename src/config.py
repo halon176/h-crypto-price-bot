@@ -13,6 +13,9 @@ class Settings(BaseSettings):
     WEBHOOK_URL: str | None = Field(None)
     WEBHOOK_SECRET_TOKEN: SecretStr | None = Field(None)
     WEBHOOK_PORT: int = Field(8443)
+    BOTBARN_WEBHOOK_MANAGED: bool = Field(False)
+    BOTBARN_WEBHOOK_SECRET: SecretStr | None = Field(None)
+    PORT: int = Field(8080)
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 

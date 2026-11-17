@@ -1,0 +1,54 @@
+name: Update dependencies
+
+# Dependabot does not support Python 3.15 yet, so uv.lock is upgraded here.
+on:
+  schedule:
+    - cron: "0 4 1 * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python 3.15
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.15"
+
+      - name: Install uv
+        run: python -m pip install uv
+
+      - name: Upgrade uv.lock
+        id: lock
+        run: |
+          uv lock --upgrade 2>&1 | grep -E "^(Updated|Added|Removed) " > updates.txt || true
+          git diff --quiet uv.lock || echo "changed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Test with the new lock
+        if: steps.lock.outputs.changed
+        env:
+          TELEGRAM_TOKEN: "123:test"
+        run: |
+          uv sync --group dev
+          uv run pytest -q
+
+      - name: Open pull request
+        if: steps.lock.outputs.changed
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          branch="deps/uv-lock-$(date +%Y-%m)"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch -c "$branch"
+          git commit -am "chore(deps): upgrade uv.lock"
+          git push -f origin "$branch"
+          { echo "Monthly \`uv lock --upgrade\`. Tests passed on the new lock."; echo; echo '```'; cat updates.txt; echo '```'; } > body.md
+          gh pr create --base master --head "$branch" --title "chore(deps): upgrade uv.lock" --body-file body.md || gh pr edit "$branch" --body-file body.md
